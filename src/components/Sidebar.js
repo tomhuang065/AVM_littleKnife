@@ -97,30 +97,29 @@ export default (props = {}) => {
               </Nav.Link>
             </div>
             <Nav className="flex-column pt-3 pt-md-0">
-              <NavItem title="Volt React" link={Routes.Presentation.path} image={ReactHero} />
+              <NavItem title="智慧小刀" link={Routes.Presentation.path} image={ReactHero} />
 
-              <NavItem title="Overview" link={Routes.DashboardOverview.path} icon={faChartPie} />
-              <NavItem external title="Messages" link="https://demo.themesberg.com/volt-pro-react/#/messages" target="_blank" badgeText="Pro" icon={faInbox} />
-              <NavItem title="Transactions" icon={faHandHoldingUsd} link={Routes.Transactions.path} />
-              <NavItem title="Settings" icon={faCog} link={Routes.Settings.path} />
-              <NavItem external title="Calendar" link="https://demo.themesberg.com/volt-pro-react/#/calendar" target="_blank" badgeText="Pro" icon={faCalendarAlt} />
-              <NavItem external title="Map" link="https://demo.themesberg.com/volt-pro-react/#/map" target="_blank" badgeText="Pro" icon={faMapPin} />
+              <NavItem title="首頁" link={Routes.DashboardOverview.path} icon={faChartPie} />
+              <CollapsableNavItem eventKey="examples/" title="設定" icon={faCog}>
+                <CollapsableNavItem eventKey="examples/" title="財會系統資料庫">
+                  <NavItem title="會計科目設定" link={Routes.Settings.path} />
+                  <NavItem title="價值標的設定" link={Routes.Settings.path} />
+                </CollapsableNavItem>
+                <CollapsableNavItem eventKey="examples/" title="進銷存資料庫">
+                  <NavItem title="BOM 設定" link={Routes.Settings.path} />
+                  <NavItem title="單位轉換表(pending)" link={Routes.Settings.path} />
+                  <NavItem title="原物料期初庫存設定" link={Routes.Settings.path} />
+                </CollapsableNavItem>
+                <NavItem title="供應商基本資料設定" link={Routes.Settings.path} />
+                <NavItem title="權限設定" link={Routes.Settings.path} />
+              </CollapsableNavItem>            
+              <NavItem title="Pos系統" icon={faHandHoldingUsd} link={Routes.Transactions.path} />
+              <NavItem title="財會系統" icon={faHandHoldingUsd} link={Routes.Transactions.path} />
 
-              <CollapsableNavItem eventKey="tables/" title="Tables" icon={faTable}>
-                <NavItem title="Bootstrap Table" link={Routes.BootstrapTables.path} />
+              <CollapsableNavItem eventKey="tables/" title="管理報表" icon={faTable}>
+                <NavItem title="財會系統：損益表" link={Routes.BootstrapTables.path} />
+                <NavItem title="進銷存管理報表" link={Routes.BootstrapTables.path} />
               </CollapsableNavItem>
-
-              <CollapsableNavItem eventKey="examples/" title="Page Examples" icon={faFileAlt}>
-                <NavItem title="Sign In" link={Routes.Signin.path} />
-                <NavItem title="Sign Up" link={Routes.Signup.path} />
-                <NavItem title="Forgot password" link={Routes.ForgotPassword.path} />
-                <NavItem title="Reset password" link={Routes.ResetPassword.path} />
-                <NavItem title="Lock" link={Routes.Lock.path} />
-                <NavItem title="404 Not Found" link={Routes.NotFound.path} />
-                <NavItem title="500 Server Error" link={Routes.ServerError.path} />
-              </CollapsableNavItem>
-
-              <NavItem external title="Plugins" link="https://demo.themesberg.com/volt-pro-react/#/plugins/datatable" target="_blank" badgeText="Pro" icon={faChartPie} />
 
               <Dropdown.Divider className="my-3 border-indigo" />
 
@@ -152,8 +151,8 @@ export default (props = {}) => {
                 <NavItem title="Toasts" link={Routes.Toasts.path} />
                 <NavItem title="Tooltips" link={Routes.Tooltips.path} />
               </CollapsableNavItem>
-              <NavItem external title="Themesberg" link="https://themesberg.com" target="_blank" image={ThemesbergLogo} />
-              <Button as={Link} to={Routes.Upgrade.path} variant="secondary" className="upgrade-to-pro"><FontAwesomeIcon icon={faRocket} className="me-1" /> Upgrade to Pro</Button>
+              
+            
             </Nav>
           </div>
         </SimpleBar>

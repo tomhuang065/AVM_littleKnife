@@ -2,14 +2,14 @@
 export const Routes = {
     // pages
     Presentation: { path: "/" },
-    DashboardOverview: { path: "/dashboard/overview" },
+    DashboardOverview: { path: "/dashboard/DashboardOverview" },
     Transactions: { path: "/transactions" },
     Settings: { path: "/settings" },
     Upgrade: { path: "/upgrade" },
     BootstrapTables: { path: "/tables/bootstrap-tables" },
     Billing: { path: "/examples/billing" },
     Invoice: { path: "/examples/invoice" },
-    Signin: { path: "/examples/sign-in" },
+    Signin: { path: "/examples/Signin" },
     Signup: { path: "/examples/sign-up" },
     ForgotPassword: { path: "/examples/forgot-password" },
     ResetPassword: { path: "/examples/reset-password" },
