@@ -16,6 +16,10 @@ export const Routes = {
     Lock: { path: "/examples/lock" },
     NotFound: { path: "/examples/404" },
     ServerError: { path: "/examples/500" },
+    Suppliers: { path: "/suppliers" },
+    Valuetargets: { path: "/valuetargets" },//價值標的
+    Accountingsettings: { path: "/accountingsettings" },//會計科目設定
+    Supplierssettings: { path: "/supplierssettings" },//供應商基本資料設定
 
     // docs
     DocsOverview: { path: "/documentation/overview" },

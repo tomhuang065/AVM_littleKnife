@@ -102,15 +102,15 @@ export default (props = {}) => {
               <NavItem title="首頁" link={Routes.DashboardOverview.path} icon={faChartPie} />
               <CollapsableNavItem eventKey="examples/" title="設定" icon={faCog}>
                 <CollapsableNavItem eventKey="examples/" title="財會系統資料庫">
-                  <NavItem title="會計科目設定" link={Routes.Settings.path} />
-                  <NavItem title="價值標的設定" link={Routes.Settings.path} />
+                  <NavItem title="會計科目設定" link={Routes.Accountingsettings.path} />
+                  <NavItem title="價值標的設定" link={Routes.Valuetargets.path} />
                 </CollapsableNavItem>
                 <CollapsableNavItem eventKey="examples/" title="進銷存資料庫">
                   <NavItem title="BOM 設定" link={Routes.Settings.path} />
                   <NavItem title="單位轉換表(pending)" link={Routes.Settings.path} />
                   <NavItem title="原物料期初庫存設定" link={Routes.Settings.path} />
                 </CollapsableNavItem>
-                <NavItem title="供應商基本資料設定" link={Routes.Settings.path} />
+                <NavItem title="供應商基本資料設定" link={Routes.Supplierssettings.path} />
                 <NavItem title="權限設定" link={Routes.Settings.path} />
               </CollapsableNavItem>            
               <NavItem title="Pos系統" icon={faHandHoldingUsd} link={Routes.Transactions.path} />
