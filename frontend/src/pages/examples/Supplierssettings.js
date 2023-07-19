@@ -4,7 +4,7 @@ import { faBoxOpen, faCartArrowDown, faChartPie, faChevronDown, faClipboard, faC
 import { Col, Row, Button, Dropdown, Form } from '@themesberg/react-bootstrap';
 import { ChoosePhotoWidget, ProfileCardWidget } from "../../components/Widgets";
 import { GeneralInfoForm } from "../../components/Forms";
-import { PageTrafficTable, RankingTable } from "../../components/Tables";
+import { PageTrafficTable, RankingTable , TransactionsTable} from "../../components/Tables";
 import api from "../../api/api";
 
 import Profile3 from "../../assets/img/team/profile-picture-3.jpg";
@@ -38,15 +38,6 @@ export default () => {
     // 可以使用表單資料或其他資料來源
   };
 
-  const handlemodify = () => {
-    // 在這裡處理修改的邏輯
-    // 可以使用表單資料或其他資料來源
-  };
-
-  const handledelete = () => {
-    // 在這裡處理刪除的邏輯
-    // 可以使用表單資料或其他資料來源
-  };
 
 
   return (
@@ -89,28 +80,15 @@ export default () => {
               Excel 下載
           </Button>
           
-      
-          {/* 修改按鈕 */}
-          <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handlemodify}>
-              <FontAwesomeIcon icon={faMagic} className="me-2" />
-              修改
-          </Button>
-
-
-          {/* 刪除按鈕 */}
-          <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handledelete}>
-
-              <FontAwesomeIcon icon={faTrash} className="me-2" />
-              刪除
-          </Button>
-
+    
         </div>
 
 
         </Col>
       </Row>
 
-      <PageTrafficTable />
+
+      <TransactionsTable />
 
 
 

@@ -215,17 +215,7 @@ export const TransactionsTable = () => {
         </td>
         <td>
           <span className="fw-normal">
-            {dueDate}
-          </span>
-        </td>
-        <td>
-          <span className="fw-normal">
-            ${parseFloat(price).toFixed(2)}
-          </span>
-        </td>
-        <td>
-          <span className={`fw-normal text-${statusVariant}`}>
-            {status}
+            {parseFloat(price).toFixed(0)}
           </span>
         </td>
         <td>
@@ -258,12 +248,10 @@ export const TransactionsTable = () => {
         <Table hover className="user-table align-items-center">
           <thead>
             <tr>
-              <th className="border-bottom">#</th>
-              <th className="border-bottom">Bill For</th>
+              <th className="border-bottom">編號</th>
+              <th className="border-bottom">供應商名稱</th>
               <th className="border-bottom">Issue Date</th>
-              <th className="border-bottom">Due Date</th>
-              <th className="border-bottom">Total</th>
-              <th className="border-bottom">Status</th>
+              <th className="border-bottom">供應商代碼</th>
               <th className="border-bottom">Action</th>
             </tr>
           </thead>
