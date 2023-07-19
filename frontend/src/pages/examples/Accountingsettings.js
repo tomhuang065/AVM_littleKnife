@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBoxOpen, faCartArrowDown, faChartPie, faChevronDown, faClipboard, faCommentDots, faDownload, faFileAlt, faPlus, faRocket, faStore } from '@fortawesome/free-solid-svg-icons';
+import { faBoxOpen, faCartArrowDown, faChartPie, faChevronDown, faClipboard, faCommentDots, faDownload, faFileAlt, faPlus, faRocket, faStore, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Button, Dropdown, Form } from '@themesberg/react-bootstrap';
 import { ChoosePhotoWidget, ProfileCardWidget } from "../../components/Widgets";
 import { GeneralInfoForm } from "../../components/Forms";
+import api from "../../api/api";
 
 import Profile3 from "../../assets/img/team/profile-picture-3.jpg";
 
@@ -14,6 +15,18 @@ export default () => {
     const file = event.target.files[0];
     setExcelFile(file);
   };
+
+  const handleExcelUploadSubmit = async () => {
+    const formData = new FormData();
+    formData.append("file", excelFile);
+    const res = await api.post("/api/excel", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    console.log(res);
+  };
+
 
   const handleSingleAdd = () => {
     // 在這裡處理單筆新增的邏輯
@@ -34,6 +47,13 @@ export default () => {
             <Form.Control type="file" accept=".xlsx,.xls" onChange={handleExcelUpload} />
           </Form.Group>
           </Col>
+
+          {/* Excel 上傳按鈕 */}
+          <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleExcelUploadSubmit}>
+            <FontAwesomeIcon icon={faUpload} className="me-2" />
+            上傳
+          </Button>
+
 
               {/* 分隔線 */}
           <hr />
