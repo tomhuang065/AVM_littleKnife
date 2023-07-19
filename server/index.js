@@ -343,20 +343,13 @@ function read_excel() {
   };
 
   let tmp = []
-  parseExcel("./供應商.xlsx").forEach(element => {
+  parseExcel("../供應商.xlsx").forEach(element => {
     element.data.forEach(item => {
       tmp.push(item);
     });
   });
 
-  let arr = []
-  tmp.forEach(element => {
-    let transformedData = {};
-    Object.entries(element).forEach(([key, value]) => {
-      transformedData[key.trim()] = typeof value === 'string' ? value.trim() : value;
-    });
-    arr.push(transformedData)
-  })
+  let arr = obj_to_dict(tmp)
   // console.log(arr)
   // console.log(arr[0]['third'])
   return (arr)
@@ -436,6 +429,7 @@ function upload_supplier() {
   })
 
 }
+upload_supplier()
 
 //呈現會科
 function sel_account_subjects() {
@@ -443,7 +437,8 @@ function sel_account_subjects() {
     if (error) {
       console.error('查詢錯誤：', error);
     } else {
-      console.log('查詢結果：', results);
+      let arr = obj_to_dict(results)
+      console.log('查詢結果：', arr);
     }
   });
 }
@@ -454,8 +449,47 @@ function sel_supplier() {
     if (error) {
       console.error('查詢錯誤：', error);
     } else {
-      console.log('查詢結果：', results);
+      let arr = obj_to_dict(results)
+      console.log('查詢結果：', arr);
     }
   });
 }
 
+//供應商新增(data由前端拋來)
+function add_supplier() {
+  connection.query('INSERT INTO supplier SET ?', data, (error, results, fields) => {
+    if (error) {
+      console.error('查詢錯誤：', error);
+    } else {
+      let arr = obj_to_dict(results)
+      console.log('查詢結果：', arr);
+    }
+  });
+}
+
+//供應商修改(data由前端拋來)
+function set_supplier() {
+  connection.query('UPDATE table_name SET column_name = ? WHERE condition_column = ?', [newData, parameter], (error, results, fields) => {
+    if (error) {
+      console.error('修改錯誤：', error);
+    } else {
+      console.log('修改成功！');
+    }
+  });
+}
+
+// sel_supplier()
+
+//obj轉dict{}
+function obj_to_dict(data) {
+  let arr = []
+  data.forEach(element => {
+    let transformedData = {};
+    Object.entries(element).forEach(([key, value]) => {
+      transformedData[key.trim()] = typeof value === 'string' ? value.trim() : value;
+    });
+    arr.push(transformedData)
+  })
+
+  return (arr)
+}
