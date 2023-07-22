@@ -1,14 +1,15 @@
 const ExcelJS = require("exceljs");
 const XLSX = require('xlsx');
 
-//連接資料庫
+
 const mysql = require('mysql2');
 
 const connection = mysql.createConnection({
   host: 'localhost', // 資料庫主機名稱
   user: 'root', // 資料庫使用者名稱
   password: '', // 資料庫密碼
-  database: 'avm_little_knife', // 資料庫名稱
+  // database: 'avm_little_knife', // 資料庫名稱
+  database:"AVM"
 });
 
 // 測試連線
@@ -20,6 +21,19 @@ connection.connect((error) => {
   }
 });
 
+// connection.connect(function(err) {
+//   if (err) throw err;
+//   console.log("Connected!");
+//   var sql = "CREATE TABLE supplier (supplier_num VARCHAR(255), supplier_name VARCHAR(255))";
+//   connection.query(sql, function (err, result) {
+//     if (err) throw err;
+//     console.log("Table created");
+//   })
+// });  
+
+// setTimeout(function(){
+//   console.log("Executed after 1 second");
+// }, 1000);
 
 //製作Excel表單(會計科目)
 function excel_subjects() {
@@ -395,7 +409,7 @@ function upload_account_subject() {
 
   })
 }
-
+upload_supplier();
 //匯入資料庫(供應商)
 function upload_supplier() {
   let arr = read_excel()
@@ -414,8 +428,9 @@ function upload_supplier() {
       }
     });
     return updatedItem;
-  })
+  });
   // console.log(updatedArr)
+
 
   updatedArr.forEach(element => {
     connection.query('INSERT INTO supplier SET ?', element, (error, results, fields) => {
@@ -429,7 +444,15 @@ function upload_supplier() {
   })
 
 }
-upload_supplier()
+
+// async function upload(){
+//   const num = await create_table();
+//   const obj = await upload_supplier();
+//   console.log(num, obj)
+
+// }
+// upload();
+
 
 //呈現會科
 function sel_account_subjects() {
