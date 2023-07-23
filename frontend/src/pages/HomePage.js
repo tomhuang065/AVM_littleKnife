@@ -7,6 +7,7 @@ import Presentation from "./examples/Signin";
 import Upgrade from "./Upgrade";
 import DashboardOverview from "./dashboard/DashboardOverview";
 import Transactions from "./Transactions";
+import Posystem from "./Posystem";
 import Settings from "./Settings";
 import BootstrapTables from "./tables/BootstrapTables";
 import Signin from "./examples/Signin";
@@ -116,6 +117,7 @@ export default () => (
     {/* pages */}
     <RouteWithSidebar exact path={Routes.DashboardOverview.path} component={DashboardOverview} />
     <RouteWithSidebar exact path={Routes.Upgrade.path} component={Upgrade} />
+    <RouteWithSidebar exact path={Routes.Posystem.path} component={Posystem} />
     <RouteWithSidebar exact path={Routes.Transactions.path} component={Transactions} />
     <RouteWithSidebar exact path={Routes.Settings.path} component={Settings} />
     <RouteWithSidebar exact path={Routes.BootstrapTables.path} component={BootstrapTables} />

@@ -1,13 +1,10 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBoxOpen, faCartArrowDown, faChartPie, faChevronDown, faClipboard, faCommentDots, faDownload, faFileAlt, faMagic, faPlus, faRocket, faStore, faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
-import { Col, Row, Button, Dropdown, Form } from '@themesberg/react-bootstrap';
-import { ChoosePhotoWidget, ProfileCardWidget } from "../../components/Widgets";
-import { GeneralInfoForm } from "../../components/Forms";
-import { PageTrafficTable, RankingTable , TransactionsTable} from "../../components/Tables";
+import { faDownload, faFileAlt,  faPlus,  faUpload } from '@fortawesome/free-solid-svg-icons';
+import { Col, Row, Button, Form } from '@themesberg/react-bootstrap';
+import { TransactionsTable} from "../../components/Tables";
 import api from "../../api/api";
 
-import Profile3 from "../../assets/img/team/profile-picture-3.jpg";
 
 export default () => {
   const [excelFile, setExcelFile] = useState(null);

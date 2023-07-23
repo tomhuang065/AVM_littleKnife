@@ -191,7 +191,7 @@ export const TransactionsTable = () => {
   const totalTransactions = transactions.length;
 
   const TableRow = (props) => {
-    const { invoiceNumber, subscription, price, issueDate, dueDate, status } = props;
+    const { invoiceNumber, subscription, price, issueDate,  status } = props;
     const statusVariant = status === "Paid" ? "success"
       : status === "Due" ? "warning"
         : status === "Canceled" ? "danger" : "primary";
