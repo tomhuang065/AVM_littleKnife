@@ -27,7 +27,8 @@ export default () => {
         val : value,
         
     }
-    signIn(payload);
+    // signIn(payload);
+    sendValue(payload);
     console.log(payload)
 
   }
@@ -64,7 +65,7 @@ export default () => {
           {/* the right top setting button to set hwo many datas to be shown in a page */}
           <Col xs={4} md={2} xl={1} className="ps-md-0 text-end">
             <Dropdown as={ButtonGroup}>
-              <Dropdown.Toggle split as={Button} variant="link" className="text-dark m-0 p-0">
+              <Dropdown.Toggle split as={Button} variant="link" onClick={() => console.log(val)} className="text-dark m-0 p-0">
                 <span className="icon icon-sm icon-gray">
                   <FontAwesomeIcon icon={faCog} />
                 </span>

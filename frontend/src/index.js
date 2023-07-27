@@ -25,11 +25,15 @@ import "react-datetime/css/react-datetime.css";
 
 import HomePage from "./pages/HomePage";
 import ScrollToTop from "./components/ScrollToTop";
+import { ChatProvider } from "./api/context"
+
 
 ReactDOM.render(
-  <HashRouter>
-    <ScrollToTop />
-    <HomePage />
-  </HashRouter>,
+  <ChatProvider>
+    <HashRouter>
+      <ScrollToTop />
+      <HomePage />
+    </HashRouter>
+  </ChatProvider>,
   document.getElementById("root")
 );
