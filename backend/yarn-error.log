@@ -1,0 +1,50 @@
+Arguments: 
+  /usr/bin/node /usr/bin/yarn install
+
+PATH: 
+  /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  14.21.3
+
+Platform: 
+  linux x64
+
+Trace: 
+  SyntaxError: /home/tomhuang/Desktop/AVM_antoine/backend/package.json: Unexpected token } in JSON at position 163
+      at JSON.parse (<anonymous>)
+      at /usr/lib/node_modules/yarn/lib/cli.js:1629:59
+      at Generator.next (<anonymous>)
+      at step (/usr/lib/node_modules/yarn/lib/cli.js:310:30)
+      at /usr/lib/node_modules/yarn/lib/cli.js:321:13
+
+npm manifest: 
+  {
+    "name": "server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "exceljs": "^4.3.0",
+      "mysql2": "^3.5.2",
+      "node": "^14.21.3",
+      "xlsx": "^0.18.5"
+    },
+    "devDependencies": {
+      "parcel": "^2.9.3"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

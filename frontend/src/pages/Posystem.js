@@ -1,11 +1,36 @@
 import React from "react";
+import { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faCog, faHome, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Form, Button, ButtonGroup, Breadcrumb, InputGroup, Dropdown } from '@themesberg/react-bootstrap';
 
 import { TransactionsTable } from "../components/Tables";
 
+import { useChat } from "../api/context";
+// import ChatContext from "../api/context";
+
+
+
 export default () => {
+  var [value, setValue] = useState("");
+  // const ctx = useContext(ChatContext);
+  const {val, setVal, sendValue, signIn} = useChat();
+  
+
+  const onSendValue = async () => {
+    console.log(value)
+    if(!value){
+        throw console.error("Some field missing");
+    }
+
+    const payload = {
+        val : value,
+        
+    }
+    signIn(payload);
+    console.log(payload)
+
+  }
   return (
     <>
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
@@ -33,9 +58,10 @@ export default () => {
               <InputGroup.Text>
                 <FontAwesomeIcon icon={faSearch} />
               </InputGroup.Text>
-              <Form.Control type="text" placeholder="Search" />
+              <Form.Control type="text" placeholder="Search" onClick={() => onSendValue()} onChange={e => setValue(e.target.value)}/>
             </InputGroup>
           </Col>
+          {/* the right top setting button to set hwo many datas to be shown in a page */}
           <Col xs={4} md={2} xl={1} className="ps-md-0 text-end">
             <Dropdown as={ButtonGroup}>
               <Dropdown.Toggle split as={Button} variant="link" className="text-dark m-0 p-0">
@@ -44,7 +70,7 @@ export default () => {
                 </span>
               </Dropdown.Toggle>
               <Dropdown.Menu className="dropdown-menu-xs dropdown-menu-right">
-                <Dropdown.Item className="fw-bold text-dark">Show</Dropdown.Item>
+                <Dropdown.Item className="fw-bold text-dark">Shjjjjow</Dropdown.Item>
                 <Dropdown.Item className="d-flex fw-bold">
                   10 <span className="icon icon-small ms-auto"><FontAwesomeIcon icon={faCheck} /></span>
                 </Dropdown.Item>
