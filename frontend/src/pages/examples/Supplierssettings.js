@@ -4,10 +4,16 @@ import { faDownload, faFileAlt,  faPlus,  faUpload } from '@fortawesome/free-sol
 import { Col, Row, Button, Form } from '@themesberg/react-bootstrap';
 import { TransactionsTable} from "../../components/Tables";
 import api from "../../api/api";
+import { useChat } from "../../api/context";
 
 
-export default () => {
+
+export default (props) => {
   const [excelFile, setExcelFile] = useState(null);
+  const {val, setVal, sendValue, signIn, suppliers} = useChat();
+
+  // const {supplier} = props;
+  // console.log("props", props)
 
   const handleExcelUpload = (event) => {
     const file = event.target.files[0];
@@ -85,7 +91,7 @@ export default () => {
       </Row>
 
 
-      <TransactionsTable />
+      <TransactionsTable supplier = {suppliers} />
 
 
 

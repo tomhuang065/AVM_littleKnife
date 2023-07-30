@@ -1,8 +1,12 @@
-const ExcelJS = require("exceljs");
-const XLSX = require('xlsx');
+import ExcelJS from "exceljs";
+import XLSX from 'xlsx';
+import mysql from 'mysql2';
 
-//連接資料庫
-const mysql = require('mysql2');
+// const ExcelJS = require("exceljs");
+// const XLSX = require('xlsx');
+
+// //連接資料庫
+// const mysql = require('mysql2');
 
 const connection = mysql.createConnection({
     host: 'localhost', // 資料庫主機名稱
@@ -412,7 +416,7 @@ function read_excel(name) {
     // console.log(arr[0]['third'])
     return (arr)
 };
-// read_excel()
+read_excel("供應商")
 
 //匯入資料庫
 //************************** 

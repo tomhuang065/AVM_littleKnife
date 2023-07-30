@@ -53,6 +53,11 @@ import Tables from "./components/Tables";
 import Tabs from "./components/Tabs";
 import Tooltips from "./components/Tooltips";
 import Toasts from "./components/Toasts";
+import { useChat } from "../api/context";
+
+  
+
+  
 
 const RouteWithLoader = ({ component: Component, ...rest }) => {
   const [loaded, setLoaded] = useState(false);
@@ -69,7 +74,22 @@ const RouteWithLoader = ({ component: Component, ...rest }) => {
 
 const RouteWithSidebar = ({ component: Component, ...rest }) => {
   const [loaded, setLoaded] = useState(false);
+  
+  const {val, setVal, sendValue, signIn, suppliers} = useChat();
+  const onSendValue = async () => {
+    // console.log(value)
+    // if(!value){
+    //     throw console.error("Some field missing");
+    // }
+    console.log("onsendvalue")
+    const payload = {
+        val : "",  
+    }
+    // signIn(payload);
+    sendValue(payload);
+    // console.log(payload)
 
+  }
   useEffect(() => {
     const timer = setTimeout(() => setLoaded(true), 1000);
     return () => clearTimeout(timer);
@@ -103,7 +123,10 @@ const RouteWithSidebar = ({ component: Component, ...rest }) => {
   );
 };
 
+
 export default () => (
+
+  
   <Switch>
     <RouteWithLoader exact path={Routes.Presentation.path} component={Presentation} />
     <RouteWithLoader exact path={Routes.Signin.path} component={Signin} />

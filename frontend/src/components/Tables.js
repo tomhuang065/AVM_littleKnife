@@ -187,35 +187,36 @@ export const RankingTable = () => {
   );
 };
 
-export const TransactionsTable = () => {
+export const TransactionsTable = (props) => {
   const totalTransactions = transactions.length;
-
+  const {supplier} = props;
+  console.log(supplier)
   const TableRow = (props) => {
-    const { invoiceNumber, subscription, price, issueDate,  status } = props;
-    const statusVariant = status === "Paid" ? "success"
-      : status === "Due" ? "warning"
-        : status === "Canceled" ? "danger" : "primary";
+    const { supplier_num, supplier_name, id, update_user,  update_time } = props;
+    // const statusVariant = status === "Paid" ? "success"
+    //   : status === "Due" ? "warning"
+    //     : status === "Canceled" ? "danger" : "primary";
 
     return (
       <tr>
         <td>
           <Card.Link as={Link} to={Routes.Invoice.path} className="fw-normal">
-            {invoiceNumber}
+            {supplier_num}
           </Card.Link>
         </td>
         <td>
           <span className="fw-normal">
-            {subscription}
+            {supplier_name}
           </span>
         </td>
         <td>
           <span className="fw-normal">
-            {issueDate}
+            {id}
           </span>
         </td>
         <td>
           <span className="fw-normal">
-            {parseFloat(price).toFixed(0)}
+            {parseFloat(update_user).toFixed(0)}
           </span>
         </td>
         <td>
@@ -256,7 +257,7 @@ export const TransactionsTable = () => {
             </tr>
           </thead>
           <tbody>
-            {transactions.map(t => <TableRow key={`transaction-${t.invoiceNumber}`} {...t} />)}
+            {supplier.map(t => <TableRow key={`transaction-${t.invoiceNumber}`} {...t} />)}
           </tbody>
         </Table>
         <Card.Footer className="px-3 border-0 d-lg-flex align-items-center justify-content-between">

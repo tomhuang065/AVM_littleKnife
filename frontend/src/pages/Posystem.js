@@ -14,7 +14,7 @@ import { useChat } from "../api/context";
 export default () => {
   var [value, setValue] = useState("");
   // const ctx = useContext(ChatContext);
-  const {val, setVal, sendValue, signIn} = useChat();
+  const {val, setVal, sendValue, signIn, suppliers} = useChat();
   
 
   const onSendValue = async () => {
@@ -24,8 +24,7 @@ export default () => {
     }
 
     const payload = {
-        val : value,
-        
+        val : value,  
     }
     // signIn(payload);
     sendValue(payload);
@@ -51,6 +50,9 @@ export default () => {
           </ButtonGroup>
         </div>
       </div>
+      <div>
+        test
+      </div>
 
       <div className="table-settings mb-4">
         <Row className="justify-content-between align-items-center">
@@ -65,7 +67,7 @@ export default () => {
           {/* the right top setting button to set hwo many datas to be shown in a page */}
           <Col xs={4} md={2} xl={1} className="ps-md-0 text-end">
             <Dropdown as={ButtonGroup}>
-              <Dropdown.Toggle split as={Button} variant="link" onClick={() => console.log(val)} className="text-dark m-0 p-0">
+              <Dropdown.Toggle split as={Button} variant="link" onClick={() => console.log(suppliers+' '+val)} className="text-dark m-0 p-0">
                 <span className="icon icon-sm icon-gray">
                   <FontAwesomeIcon icon={faCog} />
                 </span>
@@ -83,7 +85,7 @@ export default () => {
         </Row>
       </div>
 
-      <TransactionsTable />
+      <TransactionsTable supplier={suppliers}/>
     </>
   );
 };

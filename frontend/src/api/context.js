@@ -1,5 +1,6 @@
 import { useState,useContext,createContext } from "react";
 import React from "react";
+// import logging 
 import {value} from "../pages/Posystem"
 // import { useUserDispatch} from "./UserContext";
 
@@ -7,7 +8,7 @@ import {value} from "../pages/Posystem"
 // var salt = bcrypt.genSaltSync(10);
 const WS_URL=process.env.NODE_ENV==="production"?
     window.location.origin.replace(/^http/,"ws"):
-    "ws://localhost:4000";
+    "ws://localhost:5000";
 // const WS_URL="ws://localhost:4000"; 
 let client=new WebSocket(WS_URL);
 
@@ -15,7 +16,11 @@ let client=new WebSocket(WS_URL);
 
 const sendData=async (data)=>{
     // console.log("sendData")
-    // console.log(client)
+    // console.log(client)    if(client.readyState === 1){
+    // client.onclose = function(e){
+    //     logger.error("websocket disconnected")
+    //     logger.info(e.code+" "+e.reason+" " +e.wasClean)
+    // }
     if(client.readyState === 1){
         client.send(
             JSON.stringify(data)
@@ -27,15 +32,18 @@ const ChatContext = createContext({
     setVal:()=>{},
     sendValue:()=>{},
     signIn:()=>{},
+    suppliers:[],
+
 });
 
 
 const ChatProvider = (props) => {
-    const [val, setVal] = useState("")
+    const [val, setVal] = useState("");
+    const [suppliers, setSuppliers] = useState([]);
     
     const sendValue =(payload) => {
-        // console.log(payload)
-        console.log(client.readyState)
+        console.log("context")
+        // console.log(client.readyState)
         sendData(['sendVal',payload]);
     }
     const signIn=(payload) => {
@@ -56,11 +64,12 @@ const ChatProvider = (props) => {
         //     }, 20000);
         // }
         switch (task) {
-            case "ssendBackkkkkk": {
-                if(payload.status===true){
-                    // localStorage.setItem('id_token', 1)
-                    setVal(100);
-                }
+            case "getSupplier": {
+                console.log("get supp")
+                console.log(payload.sup)
+                setVal(payload.Val);
+                setSuppliers(payload.sup)
+                
                 break; 
             }
             
@@ -78,6 +87,7 @@ const ChatProvider = (props) => {
                 sendValue,
                 setVal,
                 signIn,
+                suppliers,
             }}
             {...props}
         />
