@@ -21,6 +21,7 @@ import Suppliers from "./examples/suppliers";
 import Valuetargets from "./examples/Valuetargets";
 import Accountingsettings from "./examples/Accountingsettings";
 import Supplierssettings from "./examples/Supplierssettings";
+import BeginningInventorysettings from "./examples/BeginningInventorysettings";
 
 // documentation pages
 import DocsOverview from "./documentation/DocsOverview";
@@ -53,11 +54,6 @@ import Tables from "./components/Tables";
 import Tabs from "./components/Tabs";
 import Tooltips from "./components/Tooltips";
 import Toasts from "./components/Toasts";
-import { useChat } from "../api/context";
-
-  
-
-  
 
 const RouteWithLoader = ({ component: Component, ...rest }) => {
   const [loaded, setLoaded] = useState(false);
@@ -74,22 +70,7 @@ const RouteWithLoader = ({ component: Component, ...rest }) => {
 
 const RouteWithSidebar = ({ component: Component, ...rest }) => {
   const [loaded, setLoaded] = useState(false);
-  
-  const {val, setVal, sendValue, signIn, suppliers} = useChat();
-  const onSendValue = async () => {
-    // console.log(value)
-    // if(!value){
-    //     throw console.error("Some field missing");
-    // }
-    console.log("onsendvalue")
-    const payload = {
-        val : "",  
-    }
-    // signIn(payload);
-    sendValue(payload);
-    // console.log(payload)
 
-  }
   useEffect(() => {
     const timer = setTimeout(() => setLoaded(true), 1000);
     return () => clearTimeout(timer);
@@ -123,10 +104,7 @@ const RouteWithSidebar = ({ component: Component, ...rest }) => {
   );
 };
 
-
 export default () => (
-
-  
   <Switch>
     <RouteWithLoader exact path={Routes.Presentation.path} component={Presentation} />
     <RouteWithLoader exact path={Routes.Signin.path} component={Signin} />
@@ -148,6 +126,7 @@ export default () => (
     <RouteWithSidebar exact path={Routes.Valuetargets.path} component={Valuetargets} />
     <RouteWithSidebar exact path={Routes.Accountingsettings.path} component={Accountingsettings} />
     <RouteWithSidebar exact path={Routes.Supplierssettings.path} component={Supplierssettings} />
+    <RouteWithSidebar exact path={Routes.BeginningInventorysettings.path} component={BeginningInventorysettings} />
 
     {/* components */}
     <RouteWithSidebar exact path={Routes.Accordions.path} component={Accordion} />

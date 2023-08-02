@@ -33,7 +33,6 @@ const ChatContext = createContext({
     sendValue:()=>{},
     signIn:()=>{},
     suppliers:[],
-
 });
 
 
@@ -42,6 +41,7 @@ const ChatProvider = (props) => {
     const [suppliers, setSuppliers] = useState([]);
     
     const sendValue =(payload) => {
+        
         console.log("context")
         // console.log(client.readyState)
         sendData(['sendVal',payload]);
@@ -50,6 +50,7 @@ const ChatProvider = (props) => {
         // console.log(payload)
         sendData(['signIn',payload]);
     };
+    // Define the function to send data to the server
   
 
     
@@ -87,6 +88,7 @@ const ChatProvider = (props) => {
                 sendValue,
                 setVal,
                 signIn,
+                //implement more functions here
                 suppliers,
             }}
             {...props}

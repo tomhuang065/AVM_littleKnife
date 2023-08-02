@@ -21,6 +21,7 @@ export const Routes = {
     Valuetargets: { path: "/valuetargets" },//價值標的
     Accountingsettings: { path: "/accountingsettings" },//會計科目設定
     Supplierssettings: { path: "/supplierssettings" },//供應商基本資料設定
+    BeginningInventorysettings: { path: "/beginninginventorysettings" },//期初存貨設定
 
     // docs
     DocsOverview: { path: "/documentation/overview" },

@@ -1,19 +1,17 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faFileAlt,  faPlus,  faUpload } from '@fortawesome/free-solid-svg-icons';
-import { Col, Row, Button, Form } from '@themesberg/react-bootstrap';
+import { Col, Row, Button, Form , Tab ,Nav } from '@themesberg/react-bootstrap';
 import { TransactionsTable} from "../../components/Tables";
 import api from "../../api/api";
-import { useChat } from "../../api/context";
+import SupplierFormModal from './SupplierFormModal';
 
 
 
-export default (props) => {
+
+export default () => {
   const [excelFile, setExcelFile] = useState(null);
-  const {val, setVal, sendValue, signIn, suppliers} = useChat();
-
-  // const {supplier} = props;
-  // console.log("props", props)
+  const [showSupplierModal, setShowSupplierModal] = useState(false);
 
   const handleExcelUpload = (event) => {
     const file = event.target.files[0];
@@ -36,68 +34,89 @@ export default (props) => {
     // 可以使用表單資料或其他資料來源
   };
 
+
   const handleSingleAdd = () => {
-    // 在這裡處理單筆新增的邏輯
-    // 可以使用表單資料或其他資料來源
+    setShowSupplierModal(true);
+  };
+
+  const handleCloseSupplierModal = () => {
+    setShowSupplierModal(false);
+  };
+
+  const handleSaveSupplier = (supplierData) => {
+    // Handle the logic to save the supplier data
+    console.log("Supplier Data:", supplierData);
+    setShowSupplierModal(false);
   };
 
 
 
   return (
     <>
+      <Tab.Container defaultActiveKey="upload">
+        <Row>
+          <Col xs={12} xl={10}>
+            {/* Nav for Tabs */}
+            <Nav variant="tabs">
+              <Nav.Item>
+                <Nav.Link eventKey="upload">上傳</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="download">下載範例</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="browse">瀏覽</Nav.Link>
+              </Nav.Item>
+            </Nav>
 
-      <Row>
-        <Col xs={12} xl={10}>
-          {/*<GeneralInfoForm />*/}
+            {/* Tab Content */}
+            <Tab.Content>
+              <Tab.Pane eventKey="upload">
+                <Col xs={12} xl={5}>
+                  <Form.Group>
+                    <Form.Label>上傳excel</Form.Label>
+                    <Form.Control type="file" accept=".xlsx,.xls" onChange={handleExcelUpload} />
+                  </Form.Group>
+                </Col>
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleExcelUploadSubmit}>
+                  <FontAwesomeIcon icon={faUpload} className="me-2" />
+                  上傳
+                </Button>
+              </Tab.Pane>
+              <Tab.Pane eventKey="download">
+                {/* Download content here */}
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleExceldownload}>
+                  <FontAwesomeIcon icon={faDownload} className="me-2" />
+                  下載範例
+                </Button>
+              </Tab.Pane>
+              <Tab.Pane eventKey="browse">
+              {/* Browse content here */}
+              {/* You can display a table or a list of files here */}
+              <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+                {/* 單筆新增按鈕 */}
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
+                  <FontAwesomeIcon icon={faPlus} className="me-2" />
+                  單筆新增
+                </Button>
+              </div>
+              <TransactionsTable />
+            </Tab.Pane>
+            </Tab.Content>
 
-          {/* Excel 上傳 */}
-          <Col xs={12} xl={5}>
-          <Form.Group>
-            <Form.Label>上傳excel</Form.Label>
-            <Form.Control type="file" accept=".xlsx,.xls" onChange={handleExcelUpload} />
-          </Form.Group>
           </Col>
 
-          {/* Excel 上傳按鈕 */}
-          <Col xs={12} xl={5}>
-          <Button variant="primary" onClick={handleExcelUploadSubmit}>
-            <FontAwesomeIcon icon={faUpload} className="me-2" />
-            上傳
-          </Button>
-          </Col>
+        </Row>
+      </Tab.Container>
 
-              {/* 分隔線 */}
-          <hr />
-          
-          <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-          {/* 單筆新增按鈕 */}
-          <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
-              <FontAwesomeIcon icon={faPlus} className="me-2" />
-              單筆新增
-          </Button>
-
-          {/* Excel 下載按鈕 */}
-          <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleExceldownload}>
-
-              <FontAwesomeIcon icon={faDownload} className="me-2" />
-              Excel 下載
-          </Button>
-          
-    
-        </div>
-
-
-        </Col>
-      </Row>
-
-
-      <TransactionsTable supplier = {suppliers} />
-
-
-
-
-
-
+      {/* Supplier Form Modal */}
+      <SupplierFormModal
+        show={showSupplierModal}
+        onClose={handleCloseSupplierModal}
+        onSave={handleSaveSupplier}
+      />
     </>
   );
 };
+
+ 
