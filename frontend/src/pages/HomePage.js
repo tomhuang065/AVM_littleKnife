@@ -17,7 +17,6 @@ import ResetPassword from "./examples/ResetPassword";
 import Lock from "./examples/Lock";
 import NotFoundPage from "./examples/NotFound";
 import ServerError from "./examples/ServerError";
-import Suppliers from "./examples/suppliers";
 import Valuetargets from "./examples/Valuetargets";
 import Accountingsettings from "./examples/Accountingsettings";
 import Supplierssettings from "./examples/Supplierssettings";
@@ -97,7 +96,6 @@ export default () => (
     <RouteWithSidebar exact path={Routes.Transactions.path} component={Transactions} />
     <RouteWithSidebar exact path={Routes.Settings.path} component={Settings} />
     <RouteWithSidebar exact path={Routes.BootstrapTables.path} component={BootstrapTables} />
-    <RouteWithSidebar exact path={Routes.Suppliers.path} component={Suppliers} />
     <RouteWithSidebar exact path={Routes.Valuetargets.path} component={Valuetargets} />
     <RouteWithSidebar exact path={Routes.Accountingsettings.path} component={Accountingsettings} />
     <RouteWithSidebar exact path={Routes.Supplierssettings.path} component={Supplierssettings} />
