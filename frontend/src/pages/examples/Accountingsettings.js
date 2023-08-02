@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBoxOpen, faCartArrowDown, faChartPie, faChevronDown, faClipboard, faCommentDots, faDownload, faFileAlt, faPlus, faRocket, faStore, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Button, Dropdown, Form, Tab, Nav } from '@themesberg/react-bootstrap';
-import { ChoosePhotoWidget, ProfileCardWidget } from "../../components/Widgets";
-import { GeneralInfoForm } from "../../components/Forms";
+
 import api from "../../api/api";
 
 //import excel_subjects from "../../api/index"

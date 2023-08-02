@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBoxOpen, faCartArrowDown, faChartPie, faChevronDown, faClipboard, faCommentDots, faDownload, faFileAlt, faMagic, faPlus, faRocket, faStore, faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Button, Dropdown, Form, Tab ,Nav } from '@themesberg/react-bootstrap';
-import { ChoosePhotoWidget, ProfileCardWidget } from "../../components/Widgets";
-import { GeneralInfoForm } from "../../components/Forms";
 import { ValuetargetsTable, RankingTable , TransactionsTable} from "../../components/Tables";
 import api from "../../api/api";
 import SupplierFormModal from './SupplierFormModal';
