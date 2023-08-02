@@ -6,10 +6,7 @@ export const Routes = {
     Transactions: { path: "/transactions" },
     Posystem: { path: "/possystem" },
     Settings: { path: "/settings" },
-    Upgrade: { path: "/upgrade" },
     BootstrapTables: { path: "/tables/bootstrap-tables" },
-    Billing: { path: "/examples/billing" },
-    Invoice: { path: "/examples/invoice" },
     Signin: { path: "/examples/Signin" },
     Signup: { path: "/examples/sign-up" },
     ForgotPassword: { path: "/examples/forgot-password" },
@@ -22,15 +19,6 @@ export const Routes = {
     Accountingsettings: { path: "/accountingsettings" },//會計科目設定
     Supplierssettings: { path: "/supplierssettings" },//供應商基本資料設定
     BeginningInventorysettings: { path: "/beginninginventorysettings" },//期初存貨設定
-
-    // docs
-    DocsOverview: { path: "/documentation/overview" },
-    DocsDownload: { path: "/documentation/download" },
-    DocsQuickStart: { path: "/documentation/quick-start" },
-    DocsLicense: { path: "/documentation/license" },
-    DocsFolderStructure: { path: "/documentation/folder-structure" },
-    DocsBuild: { path: "/documentation/build-tools" },
-    DocsChangelog: { path: "/documentation/changelog" },
 
     // components
     Accordions: { path: "/components/accordions" },
