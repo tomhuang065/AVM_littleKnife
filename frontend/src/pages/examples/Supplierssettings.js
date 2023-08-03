@@ -5,12 +5,13 @@ import { Col, Row, Button, Form , Tab ,Nav } from '@themesberg/react-bootstrap';
 import { TransactionsTable} from "../../components/Tables";
 import api from "../../api/api";
 import SupplierFormModal from './SupplierFormModal';
-
+import { useChat } from "../../api/context";
 
 
 
 export default () => {
   const [excelFile, setExcelFile] = useState(null);
+  const {val, setVal, sendValue, signIn, suppliers} = useChat();
   const [showSupplierModal, setShowSupplierModal] = useState(false);
 
   const handleExcelUpload = (event) => {
@@ -100,7 +101,8 @@ export default () => {
                   單筆新增
                 </Button>
               </div>
-              <TransactionsTable />
+              {/* <TransactionsTable /> */}
+              <TransactionsTable supplier = {suppliers} />
             </Tab.Pane>
             </Tab.Content>
 

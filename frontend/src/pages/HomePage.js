@@ -27,6 +27,7 @@ import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Preloader from "../components/Preloader";
+import { useChat } from "../api/context";
 
 
 const RouteWithLoader = ({ component: Component, ...rest }) => {
@@ -45,6 +46,21 @@ const RouteWithLoader = ({ component: Component, ...rest }) => {
 const RouteWithSidebar = ({ component: Component, ...rest }) => {
   const [loaded, setLoaded] = useState(false);
 
+  const {val, setVal, sendValue, signIn, suppliers} = useChat();
+  const onSendValue = async () => {
+    // console.log(value)
+    // if(!value){
+    //     throw console.error("Some field missing");
+    // }
+    console.log("onsendvalue")
+    const payload = {
+        val : "",  
+    }
+    // signIn(payload);
+    sendValue(payload);
+    // console.log(payload)
+
+  }
   useEffect(() => {
     const timer = setTimeout(() => setLoaded(true), 1000);
     return () => clearTimeout(timer);

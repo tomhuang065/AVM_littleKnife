@@ -4,12 +4,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faCog, faHome, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Form, Button, ButtonGroup, Breadcrumb, InputGroup, Dropdown } from '@themesberg/react-bootstrap';
 
-import { TransactionsTable } from "../components/Tables";
+import { TransactionsTable, TransactionsTable2 } from "../components/Tables";
 
 import { useChat } from "../api/context";
 // import ChatContext from "../api/context";
-
-
 
 export default () => {
   var [value, setValue] = useState("");
@@ -85,7 +83,9 @@ export default () => {
         </Row>
       </div>
 
-      <TransactionsTable supplier={suppliers}/>
+      <TransactionsTable suppliers={suppliers}/>
+
+      <TransactionsTable2 suppliers={suppliers}/> 
     </>
   );
 };
