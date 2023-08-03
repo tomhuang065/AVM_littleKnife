@@ -85,7 +85,7 @@ export default () => {
 
       <TransactionsTable suppliers={suppliers}/>
 
-      <TransactionsTable2 suppliers={suppliers}/> 
+      {/* <TransactionsTable2 suppliers={suppliers}/>  */}
     </>
   );
 };

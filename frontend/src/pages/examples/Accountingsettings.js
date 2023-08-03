@@ -44,7 +44,7 @@ export default () => {
     console.log(res);
   };
 
-  const handleDownload = () => {
+  const handleExceldownload = () => {
     // 在這裡處理下載的邏輯
     // 可以使用表單資料或其他資料來源
   };
@@ -53,6 +53,11 @@ export default () => {
 
   return (
     <>
+      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-3">
+        <h2 className="fw-bold">
+          會計科目設定
+        </h2>
+      </div>
       <Tab.Container defaultActiveKey="upload">
         <Row>
           <Col xs={12} xl={10}>
@@ -62,9 +67,6 @@ export default () => {
                 <Nav.Link eventKey="upload">上傳</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="download">下載範例</Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
                 <Nav.Link eventKey="browse">瀏覽</Nav.Link>
               </Nav.Item>
             </Nav>
@@ -72,23 +74,26 @@ export default () => {
             {/* Tab Content */}
             <Tab.Content>
               <Tab.Pane eventKey="upload">
+                <div className="d-flex justify-content-center align-items-center mb-3">
+                  <Col xs={12} xl={5}>
+                    <Form.Group>
+                      <Form.Label>上傳excel</Form.Label>
+                      <Form.Control type="file" accept=".xlsx,.xls" onChange={handleExcelUpload} />
+                    </Form.Group>
+                  </Col>
+                </div>
+                <div className="d-flex justify-content-center align-items-center mb-3">
                 <Col xs={12} xl={5}>
-                  <Form.Group>
-                    <Form.Label>上傳excel</Form.Label>
-                    <Form.Control type="file" accept=".xlsx,.xls" onChange={handleExcelUpload} />
-                  </Form.Group>
-                </Col>
-                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleExcelUploadSubmit}>
-                  <FontAwesomeIcon icon={faUpload} className="me-2" />
-                  上傳
-                </Button>
-              </Tab.Pane>
-              <Tab.Pane eventKey="download">
-                {/* Download content here */}
-                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleDownload}>
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleExceldownload}>
                   <FontAwesomeIcon icon={faDownload} className="me-2" />
                   下載範例
                 </Button>
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleExcelUploadSubmit}>
+                    <FontAwesomeIcon icon={faUpload} className="me-2" />
+                    上傳
+                </Button>
+                </Col>
+                </div>
               </Tab.Pane>
               <Tab.Pane eventKey="browse">
                 {/* Browse content here */}

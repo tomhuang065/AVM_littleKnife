@@ -54,6 +54,11 @@ export default () => {
 
   return (
     <>
+      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-3">
+        <h2 className="fw-bold">
+          價值標的設定
+        </h2>
+      </div>
       <Tab.Container defaultActiveKey="upload">
         <Row>
           <Col xs={12} xl={10}>
@@ -63,35 +68,42 @@ export default () => {
                 <Nav.Link eventKey="upload">上傳</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="download">下載範例</Nav.Link>
+                <Nav.Link eventKey="ingred">原料</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="browse">瀏覽</Nav.Link>
+                <Nav.Link eventKey="customer">顧客</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="product">產品</Nav.Link>
               </Nav.Item>
             </Nav>
 
             {/* Tab Content */}
             <Tab.Content>
               <Tab.Pane eventKey="upload">
+                <div className="d-flex justify-content-center align-items-center mb-3">
+                  <Col xs={12} xl={5}>
+                    <Form.Group>
+                      <Form.Label>上傳excel</Form.Label>
+                      <Form.Control type="file" accept=".xlsx,.xls" onChange={handleExcelUpload} />
+                    </Form.Group>
+                  </Col>
+
+                </div>
+                <div className="d-flex justify-content-center align-items-center mb-3">
                 <Col xs={12} xl={5}>
-                  <Form.Group>
-                    <Form.Label>上傳excel</Form.Label>
-                    <Form.Control type="file" accept=".xlsx,.xls" onChange={handleExcelUpload} />
-                  </Form.Group>
-                </Col>
-                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleExcelUploadSubmit}>
-                  <FontAwesomeIcon icon={faUpload} className="me-2" />
-                  上傳
-                </Button>
-              </Tab.Pane>
-              <Tab.Pane eventKey="download">
-                {/* Download content here */}
                 <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleExceldownload}>
                   <FontAwesomeIcon icon={faDownload} className="me-2" />
                   下載範例
                 </Button>
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleExcelUploadSubmit}>
+                    <FontAwesomeIcon icon={faUpload} className="me-2" />
+                    上傳
+                </Button>
+                </Col>
+                </div>
               </Tab.Pane>
-              <Tab.Pane eventKey="browse">
+              <Tab.Pane eventKey="product">
               {/* Browse content here */}
               {/* You can display a table or a list of files here */}
               <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
@@ -102,7 +114,32 @@ export default () => {
                 </Button>
               </div>
               <ValuetargetsTable />
-            </Tab.Pane>
+              </Tab.Pane>
+              <Tab.Pane eventKey="ingred">
+              {/* Browse content here */}
+              {/* You can display a table or a list of files here */}
+              <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+                {/* 單筆新增按鈕 */}
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
+                  <FontAwesomeIcon icon={faPlus} className="me-2" />
+                  單筆新增
+                </Button>
+              </div>
+              <ValuetargetsTable />
+              </Tab.Pane>
+              <Tab.Pane eventKey="customer">
+              {/* Browse content here */}
+              {/* You can display a table or a list of files here */}
+              <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+                {/* 單筆新增按鈕 */}
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
+                  <FontAwesomeIcon icon={faPlus} className="me-2" />
+                  單筆新增
+                </Button>
+              </div>
+              <ValuetargetsTable />
+              </Tab.Pane>
+
             </Tab.Content>
 
           </Col>
