@@ -794,52 +794,68 @@ function sel_inventory() {
 }
 
 // 計算BOM成本&呈現
+// 計算BOM成本&呈現
 async function calculateProductCost() {
     try {
         const bomFirstData = await getBomFirstData();
         const bomSecondData = await getBomSecondData();
         const mInventorySetupData = await getInventorySetupData();
 
-        // console.log("first:",bomFirstData);
-        // console.log("second:",bomSecondData);
-        // console.log("third:",mInventorySetupData);
-
         // 第一階產品成本
         const productCosts = {};
         // 第二階產品成本
         const productCosts_sec = {};
+        // 第三階產品成本
+        const productCosts_third = {};
 
         bomFirstData.forEach((row) => {
             const { product_id, product_name, product_sec_id, use_quantity } = row;
             const productKey = `${product_id}-${product_name}`;
-            // console.log(row);
-            // console.log(productKey)
             if (!productCosts[productKey]) {
-                productCosts[productKey] = 0;
+                productCosts[productKey] = {
+                    product_name: product_name,
+                    product_cost: 0,
+                };
             }
 
             const bomSecondRows = bomSecondData.filter((bomSecondRow) => bomSecondRow.product_sec_id === product_sec_id);
-            // console.log(bomSecondRows);
             bomSecondRows.forEach((bomSecondRow) => {
                 const { product_sec_id, product_sec_name, material_id, use_quantity: bomSecondUseQuantity } = bomSecondRow;
                 const productKey_sec = `${productKey}:${product_sec_id}-${product_sec_name}`;
                 if (!productCosts_sec[productKey_sec]) {
-                    productCosts_sec[productKey_sec] = 0;
+                    productCosts_sec[productKey_sec] = {
+                        product_sec_name: product_sec_name,
+                        useage: 0,
+                        unit_price: 0,
+                        total_price: 0,
+                    };
                 }
 
                 const mInventorySetupRow = mInventorySetupData.find((mInventoryRow) => mInventoryRow.m_id === material_id);
-                // console.log(mInventorySetupRow)
                 if (mInventorySetupRow) {
-                    const { start_unit_price } = mInventorySetupRow
-                    productCosts_sec[productKey_sec] += start_unit_price * bomSecondUseQuantity
-                    productCosts[productKey] += start_unit_price * bomSecondUseQuantity * use_quantity;
+                    const { m_name, start_unit_price } = mInventorySetupRow;
+                    productCosts_sec[productKey_sec].useage += bomSecondUseQuantity;
+                    productCosts_sec[productKey_sec].unit_price = start_unit_price;
+                    productCosts_sec[productKey_sec].total_price += bomSecondUseQuantity * start_unit_price;
+                    productCosts[productKey].product_cost += bomSecondUseQuantity * start_unit_price * use_quantity;
+
+                    const productKey_third = `${productKey_sec}-${material_id}`;
+                    if (!productCosts_third[productKey_third]) {
+                        productCosts_third[productKey_third] = {
+                            material_name: m_name,
+                            useage: bomSecondUseQuantity,
+                            unit_price: start_unit_price,
+                            total_price: bomSecondUseQuantity * start_unit_price,
+                        };
+                    }
                 }
             });
         });
 
-        //最終呈現結果
-        console.log(productCosts)
-        console.log(productCosts_sec)
+        // 最終呈現結果
+        console.log(productCosts);
+        console.log(productCosts_sec);
+        console.log(productCosts_third);
 
     } catch (error) {
         console.error(error);
