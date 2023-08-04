@@ -1,18 +1,14 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBoxOpen, faCartArrowDown, faChartPie, faChevronDown, faClipboard, faCommentDots, faDownload, faFileAlt, faMagic, faPlus, faRocket, faStore, faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faFileAlt, faMagic, faPlus, faRocket, faStore, faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Button, Dropdown, Form, Tab ,Nav } from '@themesberg/react-bootstrap';
-import { ValuetargetsTable, RankingTable , TransactionsTable} from "../../components/Tables";
+import { RawMaterialInventoryTable } from "../../components/Tables";
 import api from "../../api/api";
-import SupplierFormModal from './SupplierFormModal';
-
-
-import Profile3 from "../../assets/img/team/profile-picture-3.jpg";
-
+import RawMaterialFormModal from "./InventoryForm";
 
 export default () => {
   const [excelFile, setExcelFile] = useState(null);
-  const [showSupplierModal, setShowSupplierModal] = useState(false);
+  const [showInventoryModal, setShowInventoryModal] = useState(false);
 
   const handleExcelUpload = (event) => {
     const file = event.target.files[0];
@@ -36,19 +32,48 @@ export default () => {
   };
 
 
-  const handleSingleAdd = () => {
-    setShowSupplierModal(true);
+  const [showModal, setShowModal] = useState(false);
+
+  // Function to open the modal
+  const handleOpenModal = () => {
+    setShowModal(true);
   };
 
-  const handleCloseSupplierModal = () => {
-    setShowSupplierModal(false);
+  // Function to close the modal
+  const handleCloseModal = () => {
+    setShowModal(false);
   };
 
-  const handleSaveSupplier = (supplierData) => {
-    // Handle the logic to save the supplier data
-    console.log("Supplier Data:", supplierData);
-    setShowSupplierModal(false);
+  // Function to handle saving the form data from the modal
+  const handleSaveModalData = (rawMaterialData) => {
+    // Perform saving logic here, e.g., call API or update state
+    console.log("Raw material data:", rawMaterialData);
+
+    // Close the modal after saving
+    handleCloseModal();
   };
+
+  const rawMaterials = [
+    {
+      productCode: "P001",
+      productName: "Product A",
+      date: "2023-07-27",
+      openingQuantity: 100,
+      openingUnit: "kg",
+      openingUnitPrice: 10.5,
+      openingCost: 1050,
+    },
+    {
+      productCode: "P003",
+      productName: "Product A",
+      date: "2023-07-27",
+      openingQuantity: 100,
+      openingUnit: "kg",
+      openingUnitPrice: 10.5,
+      openingCost: 1050,
+    },
+    // Add more raw material data as needed
+  ];
 
 
 
@@ -56,7 +81,7 @@ export default () => {
     <>
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-3">
         <h2 className="fw-bold">
-          價值標的設定
+          原物料期初庫存設定
         </h2>
       </div>
       <Tab.Container defaultActiveKey="upload">
@@ -68,19 +93,14 @@ export default () => {
                 <Nav.Link eventKey="upload">上傳</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="ingred">原料</Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="customer">顧客</Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="product">產品</Nav.Link>
+                <Nav.Link eventKey="browse">瀏覽</Nav.Link>
               </Nav.Item>
             </Nav>
 
             {/* Tab Content */}
             <Tab.Content>
               <Tab.Pane eventKey="upload">
+
                 <div className="d-flex justify-content-center align-items-center mb-3">
                   <Col xs={12} xl={5}>
                     <Form.Group>
@@ -103,43 +123,18 @@ export default () => {
                 </Col>
                 </div>
               </Tab.Pane>
-              <Tab.Pane eventKey="product">
+              <Tab.Pane eventKey="browse">
               {/* Browse content here */}
               {/* You can display a table or a list of files here */}
               <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
                 {/* 單筆新增按鈕 */}
-                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleOpenModal}>
                   <FontAwesomeIcon icon={faPlus} className="me-2" />
                   單筆新增
                 </Button>
               </div>
-              <ValuetargetsTable />
-              </Tab.Pane>
-              <Tab.Pane eventKey="ingred">
-              {/* Browse content here */}
-              {/* You can display a table or a list of files here */}
-              <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-                {/* 單筆新增按鈕 */}
-                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
-                  <FontAwesomeIcon icon={faPlus} className="me-2" />
-                  單筆新增
-                </Button>
-              </div>
-              <ValuetargetsTable />
-              </Tab.Pane>
-              <Tab.Pane eventKey="customer">
-              {/* Browse content here */}
-              {/* You can display a table or a list of files here */}
-              <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-                {/* 單筆新增按鈕 */}
-                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
-                  <FontAwesomeIcon icon={faPlus} className="me-2" />
-                  單筆新增
-                </Button>
-              </div>
-              <ValuetargetsTable />
-              </Tab.Pane>
-
+              <RawMaterialInventoryTable rawMaterials={rawMaterials} />
+            </Tab.Pane>
             </Tab.Content>
 
           </Col>
@@ -148,10 +143,10 @@ export default () => {
       </Tab.Container>
 
       {/* Supplier Form Modal */}
-      <SupplierFormModal
-        show={showSupplierModal}
-        onClose={handleCloseSupplierModal}
-        onSave={handleSaveSupplier}
+      <RawMaterialFormModal
+        show={showModal}
+        onClose={handleCloseModal}
+        onSave={handleSaveModalData}
       />
     </>
   );

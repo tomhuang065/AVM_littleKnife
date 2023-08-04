@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import SimpleBar from 'simplebar-react';
 import { useLocation } from "react-router-dom";
@@ -7,8 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBook, faBoxOpen, faChartPie, faCog, faHandHoldingUsd, faSignOutAlt, faTable, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { Nav, Badge, Image, Button, Dropdown, Accordion, Navbar } from '@themesberg/react-bootstrap';
 import { Link } from 'react-router-dom';
-import { useChat } from "../api/context";
 
+import { useChat } from "../api/context";
 import { Routes } from "../routes";
 import ReactHero from "../assets/img/technologies/react-hero-logo.svg";
 
@@ -16,7 +15,7 @@ export default (props = {}) => {
   const location = useLocation();
   const { pathname } = location;
   const {val, setVal, sendValue, signIn, suppliers} = useChat();
-  
+
 
   const onSendValue = async () => {
     // console.log(value)
@@ -35,8 +34,6 @@ export default (props = {}) => {
   useEffect(() => {
     onSendValue()
   }, [location]);
-
-
   const CollapsableNavItem = (props) => {
     const { eventKey, title, icon, children = null } = props;
     const defaultKey = pathname.indexOf(eventKey) !== -1 ? eventKey : "";
@@ -81,18 +78,17 @@ export default (props = {}) => {
       </Nav.Item>
     );
   };
-  
 
   return (
     <>
-      <CSSTransition timeout={300}  classNames="sidebar-transition" >
+      <CSSTransition timeout={300}  classNames="sidebar-transition">
         <SimpleBar className={`collapse show sidebar d-md-block bg-primary text-white`}>
           {/* px : distance to the left, pt : distance to the top */}
           <div className="sidebar-inner px-4 pt-3"> 
             <Nav className="flex-column pt-3 pt-md-0">
               <NavItem title="智慧小刀" link={Routes.Presentation.path} image={ReactHero} />
               <NavItem title="首頁" link={Routes.DashboardOverview.path} icon={faChartPie} />
-              <CollapsableNavItem eventKey="examples/" title="設定" icon={faCog} >
+              <CollapsableNavItem eventKey="examples/" title="設定" icon={faCog}>
                 <CollapsableNavItem eventKey="examples/" title="財會系統資料庫">
                   <NavItem title="會計科目設定" link={Routes.Accountingsettings.path} />
                   <NavItem title="價值標的設定" link={Routes.Valuetargets.path} />
@@ -100,9 +96,9 @@ export default (props = {}) => {
                 <CollapsableNavItem eventKey="examples/" title="進銷存資料庫">
                   <NavItem title="BOM 設定" link={Routes.Settings.path} />
                   <NavItem title="單位轉換表(pending)" link={Routes.Settings.path} />
-                  <NavItem title="原物料期初庫存設定" link={Routes.Settings.path} />
+                  <NavItem title="原物料期初庫存設定" link={Routes.BeginningInventorysettings.path} />
                 </CollapsableNavItem>
-                <NavItem title="供應商基本資料設定" link={Routes.Supplierssettings.path} sup={suppliers} />
+                <NavItem title="供應商基本資料設定" link={Routes.Supplierssettings.path}  sup={suppliers} />
                 <NavItem title="權限設定" link={Routes.Settings.path} />
               </CollapsableNavItem>            
               <NavItem title="Pos系統" icon={faHandHoldingUsd} link={Routes.Posystem.path} />
@@ -115,34 +111,7 @@ export default (props = {}) => {
 
               <Dropdown.Divider className="my-3 border-indigo" />
 
-              <CollapsableNavItem eventKey="documentation/" title="Getting Started" icon={faBook}>
-                <NavItem title="Overview" link={Routes.DocsOverview.path} />
-                <NavItem title="Download" link={Routes.DocsDownload.path} />
-                <NavItem title="Quick Start" link={Routes.DocsQuickStart.path} />
-                <NavItem title="License" link={Routes.DocsLicense.path} />
-                <NavItem title="Folder Structure" link={Routes.DocsFolderStructure.path} />
-                <NavItem title="Build Tools" link={Routes.DocsBuild.path} />
-                <NavItem title="Changelog" link={Routes.DocsChangelog.path} />
-              </CollapsableNavItem>
-              <CollapsableNavItem eventKey="components/" title="Components" icon={faBoxOpen}>
-                <NavItem title="Accordion" link={Routes.Accordions.path} />
-                <NavItem title="Alerts" link={Routes.Alerts.path} />
-                <NavItem title="Badges" link={Routes.Badges.path} />
-                <NavItem external title="Widgets" link="https://demo.themesberg.com/volt-pro-react/#/components/widgets" target="_blank" badgeText="Pro" />
-                <NavItem title="Breadcrumbs" link={Routes.Breadcrumbs.path} />
-                <NavItem title="Buttons" link={Routes.Buttons.path} />
-                <NavItem title="Forms" link={Routes.Forms.path} />
-                <NavItem title="Modals" link={Routes.Modals.path} />
-                <NavItem title="Navbars" link={Routes.Navbars.path} />
-                <NavItem title="Navs" link={Routes.Navs.path} />
-                <NavItem title="Pagination" link={Routes.Pagination.path} />
-                <NavItem title="Popovers" link={Routes.Popovers.path} />
-                <NavItem title="Progress" link={Routes.Progress.path} />
-                <NavItem title="Tables" link={Routes.Tables.path} />
-                <NavItem title="Tabs" link={Routes.Tabs.path} />
-                <NavItem title="Toasts" link={Routes.Toasts.path} />
-                <NavItem title="Tooltips" link={Routes.Tooltips.path} />
-              </CollapsableNavItem>
+
               
             </Nav>
           </div>
