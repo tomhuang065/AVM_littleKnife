@@ -384,6 +384,41 @@ function excel_inventory() {
     // });
 
 }
+
+function excel_bom() {
+    const bom = new ExcelJS.Workbook();
+    const sheet = bom.addWorksheet('BOM表設定');
+    sheet.addTable({
+        ref: 'A1',
+        columns: [
+            { name: '一階產品代碼' },
+            { name: '一階產品名稱' },
+            { name: '二階產品代碼' },
+            { name: '二階產品名稱' },
+            { name: '二階產品使用量(每一單位一階產品)' },
+            { name: '三階產品代碼' },
+            { name: '三階產品名稱' },
+            { name: '三階產品使用量(每一單位二階產品)' },
+        ],
+        rows: [
+            ["P001", "小刀產品1", "P001 - 1", "小刀產品1- 1", "5", "M001", "2"],
+            ["P001", "小刀產品1", "P001 - 1", "小刀產品1- 1", "5", "M002", "3"],
+            ["P001", "小刀產品1", "P001 - 2", "小刀產品1- 2", "6", "M001", "2"],
+            ["P001", "小刀產品1", "P001 - 2", "小刀產品1- 2", "6", "M002", "3"],
+            ["P001", "小刀產品1", "P001 - 2", "小刀產品1- 2", "6", "M003", "1"],
+        ]
+    })
+    //等前端處理
+    // supplier.xlsx.writeBuffer().then((content) => {
+    //     const link = document.createElement("a");
+    //     const blobData = new Blob([content], {
+    //     type: "application/vnd.ms-excel;charset=utf-8;"
+    //     });
+    //     link.download = 'BOM表設定.xlsx';
+    //     link.href = URL.createObjectURL(blobData);
+    // });
+}
+
 //*************************** 
 
 //讀取excel資料(需要前端傳filename)
@@ -609,6 +644,89 @@ function upload_inventory(name) {
     });
 
 }
+
+//BOM表設定
+function upload_bom(name) {
+    let arr = read_excel(name)
+
+    //將column name改成英文
+    const updatedArr = arr.map((item) => {
+        const updatedItem = {};
+
+        Object.keys(item).forEach((key) => {
+            if (key === '一階產品代碼') {
+                updatedItem['product_id'] = item[key];
+            } else if (key === '一階產品名稱') {
+                updatedItem['product_name'] = item[key];
+            } else if (key === '二階產品代碼') {
+                updatedItem['product_sec_id'] = item[key];
+            } else if (key === '二階產品名稱') {
+                updatedItem['product_sec_name'] = item[key];
+            } else if (key === '二階產品使用量(每一單位一階產品)') {
+                updatedItem['sec_use_quantity'] = item[key];
+            } else if (key === '三階產品代碼') {
+                updatedItem['product_thr_id'] = item[key];
+            } else if (key === '三階產品使用量(每一單位二階產品)') {
+                updatedItem['thr_use_quantity'] = item[key];
+            } else {
+                updatedItem[key] = item[key];
+            }
+        });
+        return updatedItem;
+    })
+
+    // console.log(updatedArr)
+
+    const myDate = new Date();
+    const sqlDate = myDate.toISOString().substring(0, 10);
+    const user = "測試人員"
+
+    const insert_first = updatedArr.map(element => [
+        element.product_id,
+        element.product_name,
+        element.product_sec_id,
+        element.sec_use_quantity,
+        sqlDate,
+        user
+    ]);
+
+    console.log(insert_first)
+    const unique_first = Array.from(new Set(insert_first.map(JSON.stringify)), JSON.parse);
+
+    console.log(unique_first);
+
+    const insert_second = updatedArr.map(element => [
+        element.product_id,
+        element.product_sec_id,
+        element.product_sec_name,
+        element.product_thr_id,
+        element.thr_use_quantity,
+        sqlDate,
+        user
+    ]);
+
+    const first_query = 'INSERT INTO bom_first (`product_id`, `product_name`, `product_sec_id`, `use_quantity`, `update_user`, `update_time`) VALUES ?';
+    const second_query = 'INSERT INTO bom_second ( `product_id`, `product_sec_id`, `product_sec_name`, `material_id`, `use_quantity`, `update_user`, `update_time`) VALUES ?';
+
+
+    connection.query(first_query, [unique_first], (error, results, fields) => {
+        if (error) {
+            console.error('寫入資料庫錯誤：', error);
+            return;//這邊看你們要return什麼給前端
+        }
+        console.log('已成功將資料寫入資料庫');
+    });
+
+    connection.query(second_query, [insert_second], (error, results, fields) => {
+        if (error) {
+            console.error('寫入資料庫錯誤：', error);
+            return;//這邊看你們要return什麼給前端
+        }
+        console.log('已成功將資料寫入資料庫');
+    });
+
+}
+
 //***********************
 
 //呈現會科
@@ -673,6 +791,59 @@ function sel_inventory() {
             }
         });
     })
+}
+
+// 計算BOM成本&呈現
+async function calculateProductCost() {
+    try {
+        const bomFirstData = await getBomFirstData();
+        const bomSecondData = await getBomSecondData();
+        const mInventorySetupData = await getInventorySetupData();
+
+        // console.log("first:",bomFirstData);
+        // console.log("second:",bomSecondData);
+        // console.log("third:",mInventorySetupData);
+
+        // 第一階產品成本
+        const productCosts = {};
+        // 第二階產品成本
+        const productCosts_sec = {};
+
+        bomFirstData.forEach((row) => {
+            const { product_id, product_name, product_sec_id, use_quantity } = row;
+            const productKey = `${product_id}-${product_name}`;
+            // console.log(row);
+            // console.log(productKey)
+            if (!productCosts[productKey]) {
+                productCosts[productKey] = 0;
+            }
+
+            const bomSecondRows = bomSecondData.filter((bomSecondRow) => bomSecondRow.product_sec_id === product_sec_id);
+            // console.log(bomSecondRows);
+            bomSecondRows.forEach((bomSecondRow) => {
+                const { product_sec_id, product_sec_name, material_id, use_quantity: bomSecondUseQuantity } = bomSecondRow;
+                const productKey_sec = `${productKey}:${product_sec_id}-${product_sec_name}`;
+                if (!productCosts_sec[productKey_sec]) {
+                    productCosts_sec[productKey_sec] = 0;
+                }
+
+                const mInventorySetupRow = mInventorySetupData.find((mInventoryRow) => mInventoryRow.m_id === material_id);
+                // console.log(mInventorySetupRow)
+                if (mInventorySetupRow) {
+                    const { start_unit_price } = mInventorySetupRow
+                    productCosts_sec[productKey_sec] += start_unit_price * bomSecondUseQuantity
+                    productCosts[productKey] += start_unit_price * bomSecondUseQuantity * use_quantity;
+                }
+            });
+        });
+
+        //最終呈現結果
+        console.log(productCosts)
+        console.log(productCosts_sec)
+
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 //供應商新增(data由前端拋來)
@@ -800,6 +971,48 @@ function obj_to_dict(data) {
     })
 
     return (arr)
+}
+
+//取bom_first_id
+function getBomFirstData() {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM bom_first', (error, results, fields) => {
+            if (error) {
+                console.error('查詢 bom_first 錯誤：', error);
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+}
+
+//取bom_second_id
+function getBomSecondData() {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM bom_second', (error, results, fields) => {
+            if (error) {
+                console.error('查詢 bom_second 錯誤：', error);
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+}
+
+//取m_invetory_setup
+function getInventorySetupData() {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM m_inventory_setup', (error, results, fields) => {
+            if (error) {
+                console.error('查詢 m_inventory_setup 錯誤：', error);
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
+    });
 }
 
 export default {
