@@ -1,9 +1,11 @@
 
 import React from "react";
+import {useState} from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp, faArrowDown, faArrowUp, faEdit, faEllipsisH, faExternalLinkAlt, faEye, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
-import { Col, Row, Nav, Card, Image, Button, Table, Dropdown, ProgressBar, Pagination, ButtonGroup } from '@themesberg/react-bootstrap';
+import { Col, Row, Nav, Card, Button, Table, Dropdown, ProgressBar, Pagination, ButtonGroup } from '@themesberg/react-bootstrap';
 import { Link } from 'react-router-dom';
+import Modal from 'react-bootstrap/Modal';
 
 import { Routes } from "../routes";
 import transactions from "../data/transactions";
@@ -25,11 +27,51 @@ const ValueChange = ({ value, suffix }) => {
 };
 
 export const AccountTable = (props) => {
+  const [removeModal, setRemoveModal] = useState(false);
   const totalTransactions = transactions.length;
   console.log(props);
   
+  const handleRowEdit = () => {
+    console.log("edit row")
+  }
+
+  const handleRowDelete = () => {
+    console.log("delete row")
+    setRemoveModal(true);
+    console.log(removeModal)
+  }
   const Acc = props.accounts
-  console.log(Acc)
+  // console.log(Acc)
+
+  const RemoveModal = ({ onHide, show, state }) =>{
+
+    return(
+    <Modal
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+        {...{ onHide, show }}
+
+    >
+      <Modal.Header closeButton>
+        <Modal.Title id="contained-modal-title-vcenter">
+          {state === "deleting" ? "確定要刪除此會計科目？" : "你正在新增文章"}
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        {/* <h4>Centered Modal</h4> */}
+        {
+
+        }
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="outline-secondary" onClick={onHide}>Close</Button>
+        <Button variant="outline-primary" onClick={() => console.log('送出')} > Save changes</Button>
+      </Modal.Footer>
+    </Modal>
+    )
+  };
+      
   const TableRow = (props) => {
     // const { invoiceNumber, subscription, price, issueDate,  status } = props;
     const { third, third_subjects_cn, third_subjects_eng, fourth, fourth_subjects_cn, fourth_subjects_eng, } = props;
@@ -70,29 +112,35 @@ export const AccountTable = (props) => {
           </span>
         </td>
         <td>
-          <Dropdown as={ButtonGroup}>
+          <Dropdown className = "btn-group dropleft"id = "dropdown-button-drop-start" as={ButtonGroup}>
             <Dropdown.Toggle as={Button} split variant="link" className="text-dark m-0 p-0">
               <span className="icon icon-sm">
                 <FontAwesomeIcon icon={faEllipsisH} className="icon-dark" />
               </span>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item>
+              <Dropdown.Item onClick={handleRowEdit}>
                 <FontAwesomeIcon icon={faEdit} className="me-2" /> Edit
               </Dropdown.Item>
-              <Dropdown.Item className="text-danger">
+              <Dropdown.Item className="text-danger" onClick={handleRowDelete} >
                 <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> Remove
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </td>
+        {removeModal?
+          <RemoveModal /** 編輯視窗 */
+            show={removeModal}
+            onHide={() => setRemoveModal(false)}
+            state="deleting"
+        />:<div></div>}
       </tr>
     );
   };
 
   return (
   <div>
-    {typeof(Acc)=== 'undefined' ?<div></div>:<Card border="light" className="table-wrapper table-responsive shadow-sm">
+    {typeof(Acc)=== 'undefined' ?<div></div>:<Card border="light" className="overflow-auto table-wrapper table-responsive shadow-sm" style ={{width:"115%"}}>
       <Card.Body className="pt-0">
         <Table hover className="user-table align-items-center">
           <thead>
@@ -107,10 +155,11 @@ export const AccountTable = (props) => {
             </tr>
           </thead>
           <tbody>
-            {Acc.map(t => <TableRow key={`transaction-${t.invoiceNumber}`} {...t} />)}
+            {Acc.map(t => <TableRow className = "overflow-auto" key={`transaction-${t.invoiceNumber}`} {...t} />)}
 
           </tbody>
         </Table>
+        
         <Card.Footer className="px-3 border-0 d-lg-flex align-items-center justify-content-between">
           <Nav>
             <Pagination className="mb-2 mb-lg-0">

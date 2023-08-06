@@ -189,16 +189,6 @@ export { ChatProvider, useChat };
 // });
 
 
-// //呈現會科
-// app.get('/api/sel_account_subjects', async (req, res) => {
-//     try {
-//         const result = await sel_account_subjects();
-//         res.json(result);
-//     } catch (error) {
-//         console.error('發生錯誤：', error);
-//         res.status(500).send('伺服器發生錯誤');
-//     }
-// });
 
 // //呈現供應商
 // app.get('/api/sel_supplier', async (req, res) => {

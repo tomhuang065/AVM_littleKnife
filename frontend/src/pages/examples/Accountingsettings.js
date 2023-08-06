@@ -14,20 +14,10 @@ var xlsx = require("xlsx")
 
 
 export default () => {
-  const {handleAccountDownload, msg,  accLink} = useChat();
   const [excelFile, setExcelFile] = useState(null);
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [result, setResult] = useState([]);
 
-
-  useEffect(() => {
-      // handleClick(accLink);
-      console.log(msg);
-      // console.log(accColumns);
-      // accLink.click();
-
-  }, [msg]);
-  
 
   const onHandleAccountDownload = async () => {
     const workbook = new ExcelJs.Workbook(); // 創建試算表檔案
@@ -130,9 +120,9 @@ export default () => {
           會計科目設定
         </h2>
       </div>
-      <Tab.Container defaultActiveKey="upload">
+      <Tab.Container className = "overflow-auto" style = {{backGroundColor:"red"}}defaultActiveKey="upload">
         <Row>
-          <Col xs={12} xl={10}>
+          <Col xs={20} xl={10}>
             {/* Nav for Tabs */}
             <Nav variant="tabs">
               <Nav.Item>
