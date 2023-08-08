@@ -23,6 +23,18 @@ router.get('/sel_account_subjects', async (req, res) => {
     }
 });
 
+router.get('/sel_inventory', async (req, res) => {
+    try {
+        const result = await sel_inventory();
+        res.json(result);
+    } catch (error) {
+        console.error('發生錯誤：', error);
+        res.status(500).send('伺服器發生錯誤');
+
+    }
+});
+
+
 export default router
 
 function sel_account_subjects() {
@@ -38,6 +50,21 @@ function sel_account_subjects() {
             }
         });
     });
+}
+
+function sel_inventory() {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM p_inventory_setup', (error, results, fields) => {
+            if (error) {
+                console.error('查詢錯誤：', error);
+                reject(error);
+            } else {
+                let arr = obj_to_dict(results)
+                console.log('查詢結果：', arr);
+                resolve(arr);
+            }
+        });
+    })
 }
 
 function obj_to_dict(data) {

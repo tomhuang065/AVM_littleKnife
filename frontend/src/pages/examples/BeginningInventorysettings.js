@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faFileAlt, faMagic, faPlus, faRocket, faStore, faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Button, Dropdown, Form, Tab ,Nav } from '@themesberg/react-bootstrap';
@@ -6,11 +6,14 @@ import { RawMaterialInventoryTable } from "../../components/Tables";
 // import api from "../../api/api";
 import RawMaterialFormModal from "./InventoryForm";
 import ExcelJs from "exceljs";
+import axios from "axios";
 
 
 export default () => {
   const [excelFile, setExcelFile] = useState(null);
   const [showInventoryModal, setShowInventoryModal] = useState(false);
+  const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
+  const [result, setResult] = useState([]);
 
   const handleExcelUpload = (event) => {
     const file = event.target.files[0];
@@ -107,6 +110,12 @@ export default () => {
     // Add more raw material data as needed
   ];
 
+  const handleViewInventory = async () => {
+
+    setResult(await instance.get('/sel_inventory'));
+    console.log(result);
+  }
+
 
 
   return (
@@ -125,7 +134,7 @@ export default () => {
                 <Nav.Link eventKey="upload">上傳</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="browse">瀏覽</Nav.Link>
+                <Nav.Link eventKey="browse" onClick={handleViewInventory}>瀏覽</Nav.Link>
               </Nav.Item>
             </Nav>
 
@@ -165,7 +174,7 @@ export default () => {
                   單筆新增
                 </Button>
               </div>
-              <RawMaterialInventoryTable rawMaterials={rawMaterials} />
+              <RawMaterialInventoryTable rawMaterials={result.data} />
             </Tab.Pane>
             </Tab.Content>
 
