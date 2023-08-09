@@ -25,9 +25,6 @@ const sendData = (data, ws) => {
 }
 
 const sendValue = async (payload, ws) => {
-    // console.log(payload)
-    console.log("111111111111")
-    // sendData(['test',payload]);
     connection.query('SELECT * FROM supplier', (err, results) => {
         if (err) throw err;
         console.log(results)
@@ -38,7 +35,7 @@ const sendValue = async (payload, ws) => {
 
 
 //會計科目excel
-function excel_subjects() {
+const excel_subjects = (paylaod, ws)  => {
     const account_subjects = new ExcelJS.Workbook();
     const sheet = account_subjects.addWorksheet('會計科目');
     sheet.addTable({
@@ -282,6 +279,16 @@ function excel_subjects() {
             ,
             ['753', '投資損失 ', 'investment loss', '7531', '金融資產評價損失 ', 'loss on valuation of financial asset']
             ,
+            ['748', '其他營業外收益 ', 'other non-operating revenue', '7485', '存貨盤盈 ', 'gain on physical inventory']
+            ,
+            ['748', '其他營業外收益 ', 'other non-operating revenue', '7487', '壞帳轉回利益 ', 'gain on reversal of bad debts']
+            ,
+            ['748', '其他營業外收益 ', 'other non-operating revenue', '7488', '其他營業外收益－其他 ', 'other non-operating revenue– other items']
+            ,
+            ['751', '利息費用 ', 'interest expense', '7511', '利息費用 ', 'interest expense']
+            ,
+            ['753', '投資損失 ', 'investment loss', '7531', '金融資產評價損失 ', 'loss on valuation of financial asset']
+            ,
             ['753', '投資損失 ', 'investment loss', '7532', '金融負債評價損失 ', 'loss on valuation of financial liability']
             ,
             ['753', '投資損失 ', 'investment loss', '7533', '採權益法認列之投資損失 ', 'investment loss recognized under equity method']
@@ -308,10 +315,23 @@ function excel_subjects() {
             ,
             ['821', '稅後純益（或純損） ', 'income after tax', '8211', '稅後純益（或純損） ', 'income after tax']
         ]
+
+        
+    });
+    account_subjects.xlsx.writeBuffer().then((content) => {
+        const link = document.createElement("a");
+          const blobData = new Blob([content], {
+            type: "application/vnd.ms-excel;charset=utf-8;"
+          });
+          link.download = '會計科目.xlsx';
+          link.href = URL.createObjectURL(blobData);
     });
 
+    
+    // sendData(['getAccountDownload', { Acc: account_subjects.xlsx.writeBuffer(), link: link }], ws);
+    sendData(['getAccountDownload', { link: account_subjects }], ws);
     //等前端處理
-    return account_subjects.xlsx.writeBuffer();
+    // return account_subjects.xlsx.writeBuffer();
 }
 
 //供應商excel
@@ -1115,6 +1135,10 @@ export default {
             switch (task) {
                 case 'sendVal': {
                     sendValue(payload, ws);
+                    break;
+                }
+                case 'accountDownload': {
+                    excel_subjects(payload, ws);
                     break;
                 }
             }

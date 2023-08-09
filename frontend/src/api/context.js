@@ -1,5 +1,7 @@
 import { useState,useContext,createContext } from "react";
 import React from "react";
+import axios from 'axios';
+
 // import logging 
 import {value} from "../pages/Posystem"
 // import { useUserDispatch} from "./UserContext";
@@ -29,16 +31,30 @@ const sendData=async (data)=>{
 };
 const ChatContext = createContext({
     val:'', 
+    // buf
+    // accRows:[],
+    accColumns:[],
+    accLink:'',
     setVal:()=>{},
     sendValue:()=>{},
+    accountDownload:()=>{},
+    handleAccountDownload:()=>{},
     signIn:()=>{},
     suppliers:[],
 });
 
+const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
 
 const ChatProvider = (props) => {
     const [val, setVal] = useState("");
     const [suppliers, setSuppliers] = useState([]);
+    // const [accDownload, setAccDownload] = useState([]);
+    const [accLink, setAccLink] = useState("");
+    const [ accRows, setAccRows] = useState([]);
+    const [ accColumns, setAccColumns] = useState([]);
+    // const [ buf, setBuf] = useState("");
+
+
     
     const sendValue =(payload) => {
         
@@ -46,10 +62,19 @@ const ChatProvider = (props) => {
         // console.log(client.readyState)
         sendData(['sendVal',payload]);
     }
+    const accountDownload =() => {
+        console.log("accountDownload")
+        const payload = "";
+        sendData(['accountDownload',payload]);
+    }
     const signIn=(payload) => {
         // console.log(payload)
         sendData(['signIn',payload]);
     };
+    const handleAccountDownload = async(payload) =>{
+        const{data:{buffer}} = await instance.post('/accountdownload')
+        
+    }
     // Define the function to send data to the server
   
 
@@ -73,6 +98,13 @@ const ChatProvider = (props) => {
                 
                 break; 
             }
+            case "getAccountDownload": {
+                console.log(payload)
+                // setAccRows(payload.rows)
+                // setAccColumns(payload.columns)
+                setAccLink(payload.link)
+                break; 
+            }
             
             
             
@@ -88,6 +120,11 @@ const ChatProvider = (props) => {
                 sendValue,
                 setVal,
                 signIn,
+                accountDownload,
+                handleAccountDownload,
+                accRows,
+                accColumns,
+                accLink,
                 //implement more functions here
                 suppliers,
             }}

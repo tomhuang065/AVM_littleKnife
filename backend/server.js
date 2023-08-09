@@ -1,353 +1,31 @@
-
-import mysql from 'mysql2';
-import React from "react";
-import axios from 'axios';
-import express from 'express'
 import ExcelJS from "exceljs";
-import { useState,useContext,createContext } from "react";
-
-// const app = express();
-
-// const port = 5000;
-
-// // 使用 body-parser 中間件來解析 POST 請求的資料
-// app.use(express.json());
-
-// // 監聽 5000 port--------------------------------------------------------------------
-// app.listen(port, () => {
-//     console.log('API 伺服器已啟動在 http://localhost:${port}');
-// });
+import XLSX from 'xlsx';
+import express from 'express'
+import cors from 'cors'
+import mysql from 'mysql2';
+import MySQL from "./src/connection.js";
+import avmRoute from './src/route/avm.js'
 
 
-//前端接範例
+const app = express();
+app.use(cors());
 
+app.use(express.json());
 
-// // 假設你要傳遞的供應商資料是一個物件
-// const supplierData = {
-//   name: '供應商名稱',
-//   address: '供應商地址',
-//   // 其他屬性...
-// };
+const port = process.env.PORT||5000
+app.listen(port, ()=>{
+    console.log(`API Server is up on port ${port}.`)
+})
+MySQL.connect();
 
-// // 使用 Axios 發送 POST 請求
-// axios.post('http://localhost:5000/api/add_supplier', supplierData)
-//   .then(response => {
-//     // 處理 API 回傳的資料
-//     console.log(response.data); // 假設 API 回傳資料為 { message: '新增供應商成功' }
-//   })
-//   .catch(error => {
-//     console.error('發生錯誤：', error);
-//   });
-
-
-const ChatContext = createContext({
-    val:'', 
-    msg:'',
-    accRows:[],
-    accColumns:[],
-    accLink:'',
-    setVal:()=>{},
-    sendValue:()=>{},
-    handleAccountDownload:()=>{},
-    signIn:()=>{},
-    suppliers:[],
-});
-const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
-
-
-const ChatProvider = (props) => {
-    const [suppliers, setSuppliers] = useState([]);
-    // const [accDownload, setAccDownload] = useState([]);
-    const [accLink, setAccLink] = useState("");
-    const [ accRows, setAccRows] = useState([]);
-    const [ accColumns, setAccColumns] = useState([]);
-    const [ msg, setMsg] = useState("");
-    
-    const handleAccountDownload = async(payload) =>{
-        const{data:{buffer}} = await instance.post('/accountdownload')
-        console.log(buffer);
-        // setMsg(msg);
-    }
-
-    return (
-        <ChatContext.Provider
-            value={{
-                msg,
-                
-                handleAccountDownload,
-                accRows,
-                accColumns,
-                accLink,
-                //implement more functions here
-                suppliers,
-            }}
-            {...props}
-        />
-    );
-};
-const useChat = () => useContext(ChatContext);
-export { ChatProvider, useChat };
-// export default ChatContext
+app.use('/api/avm', avmRoute)
 
 
 
+//製作Excel表單
 
-//api------------------------------------------------------------------------
-
-// 供應商 Excel
-// app.get('/api/excel_supplier', (req, res) => {
-//     excel_supplier()
-//         .then(buffer => {
-//             // 將 Buffer 回傳給前端
-//             res.setHeader('Content-Type', 'application/vnd.ms-excel');
-//             res.setHeader('Content-Disposition', 'attachment; filename=供應商.xlsx');
-//             res.send(buffer);
-//         })
-//         .catch(error => {
-//             console.error('發生錯誤：', error);
-//             res.status(500).send('伺服器發生錯誤');
-//         });
-// });
-
-
-// //會計科目 excel
-// app.get('/api/excel_subjects', (req, res) => {
-//     excel_subjects()
-//         .then(buffer => {
-//             // 將 Buffer 回傳給前端
-//             res.setHeader('Content-Type', 'application/vnd.ms-excel');
-//             res.setHeader('Content-Disposition', 'attachment; filename=會計科目.xlsx');
-//             res.send(buffer);
-//         })
-//         .catch(error => {
-//             console.error('發生錯誤：', error);
-//             res.status(500).send('伺服器發生錯誤');
-//         });
-// });
-
-// //價值標的 excel
-// app.get('/api/excel_target', (req, res) => {
-//     excel_target()
-//         .then(buffer => {
-//             // 將 Buffer 回傳給前端
-//             res.setHeader('Content-Type', 'application/vnd.ms-excel');
-//             res.setHeader('Content-Disposition', 'attachment; filename=價值標的.xlsx');
-//             res.send(buffer);
-//         })
-//         .catch(error => {
-//             console.error('發生錯誤：', error);
-//             res.status(500).send('伺服器發生錯誤');
-//         });
-// });
-
-
-// //期初庫存excel
-// app.get('/api/excel_inventory', (req, res) => {
-//     excel_inventory()
-//         .then(buffer => {
-//             // 將 Buffer 回傳給前端
-//             res.setHeader('Content-Type', 'application/vnd.ms-excel');
-//             res.setHeader('Content-Disposition', 'attachment; filename=期初庫存.xlsx');
-//             res.send(buffer);
-//         })
-//         .catch(error => {
-//             console.error('發生錯誤：', error);
-//             res.status(500).send('伺服器發生錯誤');
-//         });
-// });
-
-
-// //匯入會計科目
-// app.post('/api/upload_account_subject', (req, res) => {
-//     const name = req.body; // 從請求的資料中獲取檔案名 name
-//     upload_account_subject(name); // 呼叫 upload_account_subject 函式，將 name 作為參數傳遞
-//     res.send('匯入成功'); // 回傳回應給前端
-// });
-
-
-// //匯入期初庫存
-// app.post('/api/upload_inventory', (req, res) => {
-//     const name = req.body; // 從請求的資料中獲取檔案名 name
-//     upload_inventory(name); // 呼叫 upload_account_subject 函式，將 name 作為參數傳遞
-//     res.send('匯入成功'); // 回傳回應給前端
-// });
-
-
-// //匯入供應商
-// app.post('/api/upload_supplier', (req, res) => {
-//     const name = req.body; // 從請求的資料中獲取檔案名 name
-//     upload_supplier(name); // 呼叫 upload_account_subject 函式，將 name 作為參數傳遞
-//     res.send('匯入成功'); // 回傳回應給前端
-// });
-
-
-// //匯入價值標的
-// app.post('/api/upload_target', (req, res) => {
-//     const name = req.body; // 從請求的資料中獲取檔案名 name
-//     upload_target(name); // 呼叫 upload_account_subject 函式，將 name 作為參數傳遞
-//     res.send('匯入成功'); // 回傳回應給前端
-// });
-
-
-// //呈現會科
-// app.get('/api/sel_account_subjects', async (req, res) => {
-//     try {
-//         const result = await sel_account_subjects();
-//         res.json(result);
-//     } catch (error) {
-//         console.error('發生錯誤：', error);
-//         res.status(500).send('伺服器發生錯誤');
-//     }
-// });
-
-// //呈現供應商
-// app.get('/api/sel_supplier', async (req, res) => {
-//     try {
-//         const result = await sel_supplier();
-//         res.json(result);
-//     } catch (error) {
-//         console.error('發生錯誤：', error);
-//         res.status(500).send('伺服器發生錯誤');
-//     }
-// });
-
-
-// //呈現價值標的
-// app.get('/api/sel_target', async (req, res) => {
-//     try {
-//         const result = await sel_target();
-//         res.json(result);
-//     } catch (error) {
-//         console.error('發生錯誤：', error);
-//         res.status(500).send('伺服器發生錯誤');
-//     }
-// });
-
-
-// //呈現期初庫存
-// app.get('/api/sel_inventory', async (req, res) => {
-//     try {
-//         const result = await sel_inventory();
-//         res.json(result);
-//     } catch (error) {
-//         console.error('發生錯誤：', error);
-//         res.status(500).send('伺服器發生錯誤');
-//     }
-// });
-
-// //供應商新增
-// app.post('/api/add_supplier', (req, res) => {
-//     const data = req.body; // 從請求的資料中獲取參數 data
-//     add_supplier(data); // 呼叫 add_supplier 函式，將 data 作為參數傳遞
-//     res.send('新增成功'); // 回傳回應給前端
-// });
-
-
-// //價值標的新增
-// app.post('/api/add_target', (req, res) => {
-//     const data = req.body; // 從請求的資料中獲取參數 data
-//     add_target(data); // 呼叫 add_target 函式，將 data 作為參數傳遞
-//     res.send('新增成功'); // 回傳回應給前端
-// });
-
-
-// // 期初庫存新增
-// app.post('/api/add_inventory', (req, res) => {
-//     const data = req.body; // 從請求的資料中獲取參數 data
-//     add_inventory(data); // 呼叫 add_inventory 函式，將 data 作為參數傳遞
-//     res.send('新增成功'); // 回傳回應給前端
-// });
-
-
-// // 供應商修改
-// app.put('/api/update_supplier', (req, res) => {
-//     const condition = req.body.condition; // 從請求主體中獲取條件對象
-//     const updatedata = req.body.updatedata; // 從請求主體中獲取更新數據對象
-
-//     const updateQuery = 'UPDATE supplier SET ? WHERE ?';
-//     connection.query(updateQuery, [updatedata, condition], (error, results, fields) => {
-//         if (error) {
-//             console.error('修改資料庫錯誤：', error);
-//             res.status(500).send('修改資料庫錯誤');
-//         } else {
-//             console.log('已成功修改資料');
-//             res.send('已成功修改資料');
-//         }
-//     });
-// });
-
-// // 價值標的修改
-// app.put('/api/update_target', (req, res) => {
-//     const condition = req.body.condition; // 從請求主體中獲取條件對象
-//     const updatedata = req.body.updatedata; // 從請求主體中獲取更新數據對象
-
-//     const updateQuery = 'UPDATE value_target SET ? WHERE ?';
-//     connection.query(updateQuery, [updatedata, condition], (error, results, fields) => {
-//         if (error) {
-//             console.error('修改資料庫錯誤：', error);
-//             res.status(500).send('修改資料庫錯誤');
-//         } else {
-//             console.log('已成功修改資料');
-//             res.send('已成功修改資料');
-//         }
-//     });
-// });
-
-
-
-// // 期初庫存修改
-// app.put('/api/update_inventory', (req, res) => {
-//     const condition = req.body.condition; // 從請求主體中獲取條件對象
-//     const updatedata = req.body.updatedata; // 從請求主體中獲取更新數據對象
-
-//     const updateQuery = 'UPDATE m_inventory_setup SET ? WHERE ?';
-//     const data = updatedata.map(item => ({
-//         ...item,
-//         start_cost: item.start_quantity * item.start_unit_price
-//     }));
-
-
-//     connection.query(updateQuery, [updatedata, condition], (error, results, fields) => {
-//         if (error) {
-//             console.error('修改資料庫錯誤：', error);
-//             res.status(500).send('修改資料庫錯誤');
-//         } else {
-//             console.log('已成功修改資料');
-//             res.send('已成功修改資料');
-//         }
-//     });
-// });
-
-// // 供應商刪除
-// app.delete('/api/del_supplier', (req, res) => {
-//     const condition = req.body; // 假設客戶端以 JSON 格式傳送刪除條件
-//     del_supplier(condition);
-//     res.send('已成功刪除供應商資料');
-// });
-
-// // 價值標的刪除
-// app.put('/api/del_target', (req, res) => {
-//     const condition = req.body; // 假設客戶端以 JSON 格式傳送更新條件
-//     const updatedata = {
-//         status: 0
-//     };
-//     del_target(condition, updatedata);
-//     res.send('已成功更新目標值狀態');
-// });
-
-// // 期初庫存刪除
-// app.delete('/api/del_inventory', (req, res) => {
-//     const condition = req.body; // 假設客戶端以 JSON 格式傳送刪除條件
-//     del_inventory(condition);
-//     res.send('已成功刪除庫存資料');
-// });
-
-// //function-------------------------------------------------------------------
-
-// //製作Excel表單
-
-// //***************************
-// //會計科目excel
+//***************************
+//會計科目excel
 // function excel_subjects() {
 //     const account_subjects = new ExcelJS.Workbook();
 //     const sheet = account_subjects.addWorksheet('會計科目');
@@ -620,6 +298,64 @@ export { ChatProvider, useChat };
 //         ]
 //     });
 
+//     //等前端處理
+//     // account_subject.xlsx.writeBuffer().then((content) => {
+//     //     const link = document.createElement("a");
+//     //     const blobData = new Blob([content], {
+//     //     type: "application/vnd.ms-excel;charset=utf-8;"
+//     //     });
+//     //     link.download = '會計科目.xlsx';
+//     //     link.href = URL.createObjectURL(blobData);
+//     // });
+// }
+
+// //供應商excel
+// function excel_supplier() {
+//     const supplier = new ExcelJS.Workbook();
+//     const sheet = supplier.addWorksheet('供應商');
+//     sheet.addTable({
+//         ref: 'A1',
+//         columns: [{ name: '供應商代碼' }, { name: '供應商名稱' }],
+//         rows: [
+//             ['0001', '小刀測試1'],
+//             ['0002', '小刀測試2']
+//         ]
+//     })
+//     //等前端處理
+//     // supplier.xlsx.writeBuffer().then((content) => {
+//     //     const link = document.createElement("a");
+//     //     const blobData = new Blob([content], {
+//     //     type: "application/vnd.ms-excel;charset=utf-8;"
+//     //     });
+//     //     link.download = '供應商.xlsx';
+//     //     link.href = URL.createObjectURL(blobData);
+//     // });
+// }
+
+// //價值標的excel
+// function excel_target() {
+//     const value_target = new ExcelJS.Workbook();
+//     const sheet = value_target.addWorksheet('價值標的');
+//     sheet.addTable({
+//         ref: 'A1',
+//         columns: [{ name: '標的種類(只可填"顧客"、"原料"或"產品")' }, { name: '標的代碼' }, { name: '標的名稱' }],
+//         rows: [
+//             ["顧客", 'C001', '小刀測試1'],
+//             ["原料", 'M001', '小刀測試2'],
+//             ["產品", 'P001', '小刀測試3']
+//         ]
+//     })
+//     //等前端處理
+//     // value_target.xlsx.writeBuffer().then((content) => {
+//     //     const link = document.createElement("a");
+//     //     const blobData = new Blob([content], {
+//     //     type: "application/vnd.ms-excel;charset=utf-8;"
+//     //     });
+//     //     link.download = '價值標的.xlsx';
+//     //     link.href = URL.createObjectURL(blobData);
+//     // });
+// }
+
 // //期初庫存excel
 // function excel_inventory() {
 //     const inventory = new ExcelJS.Workbook();
@@ -651,21 +387,18 @@ export { ChatProvider, useChat };
 
 // }
 // //*************************** 
-// }
-// //*************************** 
-
 
 // //讀取excel資料(需要前端傳filename)
 // function read_excel(name) {
 //     const parseExcel = (filename) => {
 //         console.log(`Reading file: ${filename}`);
 
-//         //const excelData = XLSX.readFile(filename, { encoding: "big-5" });
+//         const excelData = XLSX.readFile(filename, { encoding: "big-5" });
 
-//         //return Object.keys(excelData.Sheets).map(name => ({
-//         //    name,
-//             //data: XLSX.utils.sheet_to_json(excelData.Sheets[name]),
-//         //}));
+//         return Object.keys(excelData.Sheets).map(name => ({
+//             name,
+//             data: XLSX.utils.sheet_to_json(excelData.Sheets[name]),
+//         }));
 //     };
 
 //     let tmp = []
@@ -675,22 +408,21 @@ export { ChatProvider, useChat };
 //         });
 //     });
 
-
 //     let arr = obj_to_dict(tmp)
 //     // console.log(arr)
 //     // console.log(arr[0]['third'])
 //     return (arr)
 // };
+// read_excel("供應商")
 
-
-// //匯入資料庫
-// //************************** 
 // //匯入資料庫
 // //************************** 
 
 // //會計科目
 // function upload_account_subject(name) {
 //     let arr = read_excel(name)
+
+//     //將column name改成英文
 //     const updatedArr = arr.map((item) => {
 //         const updatedItem = {};
 
@@ -713,10 +445,10 @@ export { ChatProvider, useChat };
 //         });
 //         return updatedItem;
 //     })
-        
- 
+
 //     const stat = 1;
 //     const user = "test"
+
 //     const insertValues = updatedArr.map(element => [
 //         element.third,
 //         element.third_subjects_cn,
@@ -736,12 +468,14 @@ export { ChatProvider, useChat };
 //         }
 //         console.log('已成功將資料寫入資料庫');
 //     });
+
 // }
 
 // //供應商
 // function upload_supplier(name) {
 //     console.log(name)
 //     let arr = read_excel(name)
+
 //     //將column name改成英文
 //     const updatedArr = arr.map((item) => {
 //         const updatedItem = {};
@@ -757,12 +491,12 @@ export { ChatProvider, useChat };
 //         });
 //         return updatedItem;
 //     })
-   
 //     // console.log(updatedArr)
 
 //     const update_user = 'test';
 //     const now = new Date();
 //     const sqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
+
 //     const insertValues = updatedArr.map(element => [element.supplier_num, element.supplier_name, update_user, sqlDatetime]);
 
 //     const query = 'INSERT INTO supplier (supplier_num, supplier_name, update_user, update_time) VALUES ?';
@@ -773,13 +507,13 @@ export { ChatProvider, useChat };
 //         }
 //         console.log('已成功將資料寫入資料庫');
 //     });
-  
-// }
 
+// }
 
 // //價值標的
 // function upload_target(name) {
 //     let arr = read_excel(name)
+
 //     //將column name改成英文
 //     const updatedArr = arr.map((item) => {
 //         const updatedItem = {};
@@ -798,7 +532,6 @@ export { ChatProvider, useChat };
 //         });
 //         return updatedItem;
 //     })
-    
 //     // console.log(updatedArr)
 
 //     const stat = 1;
@@ -806,14 +539,12 @@ export { ChatProvider, useChat };
 //     const now = new Date();
 //     const sqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
 
-  
 //     const insertValues = updatedArr.map(element => [
 //         element.category,
 //         element.target_num,
 //         element.target_name,
 //         stat,
 //         sqlDatetime]);
-
 
 //     const query = 'INSERT INTO value_target (category, target_num, target_name, target_status, update_time) VALUES ?';
 //     connection.query(query, [insertValues], (error, results, fields) => {
@@ -823,11 +554,13 @@ export { ChatProvider, useChat };
 //         }
 //         console.log('已成功將資料寫入資料庫');
 //     });
+
 // }
 
 // //期初庫存
 // function upload_inventory(name) {
 //     let arr = read_excel(name)
+
 //     //將column name改成英文
 //     const updatedArr = arr.map((item) => {
 //         const updatedItem = {};
@@ -849,10 +582,8 @@ export { ChatProvider, useChat };
 //         });
 //         return updatedItem;
 //     })
-   
 //     // console.log(updatedArr)
 
- 
 //     const updatedArrWithCost = updatedArr.map(item => ({
 //         ...item,
 //         start_cost: item.start_quantity * item.start_unit_price
@@ -861,7 +592,6 @@ export { ChatProvider, useChat };
 //     const myDate = new Date();
 //     const sqlDate = myDate.toISOString().substring(0, 10);
 
-   
 //     const insertValues = updatedArrWithCost.map(element => [
 //         element.m_id,
 //         element.m_name,
@@ -872,7 +602,6 @@ export { ChatProvider, useChat };
 //         sqlDate,
 //     ]);
 
-   
 //     const query = 'INSERT INTO m_inventory_setup (m_id, m_name, start_quantity, start_unit, start_unit_price, start_cost, date) VALUES ?';
 //     connection.query(query, [insertValues], (error, results, fields) => {
 //         if (error) {
@@ -885,73 +614,57 @@ export { ChatProvider, useChat };
 // }
 // //***********************
 
-
 // //呈現會科
 // function sel_account_subjects() {
-//     return new Promise((resolve, reject) => {
-//         connection.query('SELECT * FROM account_subjects', (error, results, fields) => {
-//             if (error) {
-//                 console.error('查詢錯誤：', error);
-//                 reject(error);
-//             } else {
-//                 let arr = obj_to_dict(results);
-//                 console.log('查詢結果：', arr);
-//                 resolve(arr);
-//             }
-//         });
+//     connection.query('SELECT * FROM account_subjects', (error, results, fields) => {
+//         if (error) {
+//             console.error('查詢錯誤：', error);
+//         } else {
+//             let arr = obj_to_dict(results)
+//             console.log('查詢結果：', arr);
+//             return (arr)
+//         }
 //     });
 // }
-
 
 // //呈現供應商
 // function sel_supplier() {
-//     return new Promise((resolve, reject) => {
-//         connection.query('SELECT * FROM supplier', (error, results, fields) => {
-//             if (error) {
-//                 console.error('查詢錯誤：', error);
-//                 reject(error);
-//             } else {
-//                 let arr = obj_to_dict(results)
-//                 console.log('查詢結果：', arr);
-//                 resolve(arr);
-//             }
-//         });
+//     connection.query('SELECT * FROM supplier', (error, results, fields) => {
+//         if (error) {
+//             console.error('查詢錯誤：', error);
+//         } else {
+//             let arr = obj_to_dict(results)
+//             console.log('查詢結果：', arr);
+//             return (arr)
+//         }
 //     });
 // }
 
-
 // //呈現價值標的
 // function sel_target() {
-//     return new Promise((resolve, reject) => {
-//         connection.query('SELECT * FROM value_target', (error, results, fields) => {
-//             if (error) {
-//                 console.error('查詢錯誤：', error);
-//                 reject(error);
-//             } else {
-//                 let arr = obj_to_dict(results)
-//                 console.log('查詢結果：', arr);
-//                 resolve(arr);
-//             }
-//         });
-//     })
+//     connection.query('SELECT * FROM value_target', (error, results, fields) => {
+//         if (error) {
+//             console.error('查詢錯誤：', error);
+//         } else {
+//             let arr = obj_to_dict(results)
+//             console.log('查詢結果：', arr);
+//             return (arr)
+//         }
+//     });
 // }
 
 // //呈現期初庫存
 // function sel_inventory() {
-//     return new Promise((resolve, reject) => {
-//         connection.query('SELECT * FROM m_inventory_setup', (error, results, fields) => {
-//             if (error) {
-//                 console.error('查詢錯誤：', error);
-//                 reject(error);
-//             } else {
-//                 let arr = obj_to_dict(results)
-//                 console.log('查詢結果：', arr);
-//                 resolve(arr);
-//             }
-//         });
-//     })
+//     connection.query('SELECT * FROM m_inventory_setup', (error, results, fields) => {
+//         if (error) {
+//             console.error('查詢錯誤：', error);
+//         } else {
+//             let arr = obj_to_dict(results)
+//             console.log('查詢結果：', arr);
+//             return (arr)
+//         }
+//     });
 // }
-
 
 // //供應商新增(data由前端拋來)
 // function add_supplier(data) {
@@ -966,7 +679,7 @@ export { ChatProvider, useChat };
 // }
 
 // //供應商修改(條件、data由前端拋來)
-// function update_supplier(condition, updatedata) {
+// function set_supplier(condition, updatedata) {
 //     const updateQuery = 'UPDATE supplier SET ? WHERE ?';
 //     connection.query(updateQuery, [updatedata, condition], (error, results, fields) => {
 //         if (error) {
@@ -1002,7 +715,6 @@ export { ChatProvider, useChat };
 //     });
 // }
 
-
 // //價值標的修改(條件、data由前端傳回來)
 // function update_target(condition, updatedata) {
 //     const updateQuery = 'UPDATE value_target SET ? WHERE ?';
@@ -1016,8 +728,11 @@ export { ChatProvider, useChat };
 // }
 
 // //價值標的刪除()
-// function del_target(condition, updatedata) {
+// function del_target(condition) {
 //     const updateQuery = 'UPDATE value_target SET ? WHERE ?';
+//     const updatedata = {
+//         status: 0
+//     }
 //     connection.query(updateQuery, [updatedata, condition], (error, results, fields) => {
 //         if (error) {
 //             console.error('修改資料庫錯誤：', error);
@@ -1026,7 +741,6 @@ export { ChatProvider, useChat };
 //         }
 //     });
 // }
-
 
 // //期初庫存新增(data由前端傳回來)
 // function add_inventory(data) {
@@ -1057,7 +771,7 @@ export { ChatProvider, useChat };
 // }
 
 // //期初庫存刪除(條件由前端傳回來)
-// function del_inventory(condition) {
+// function del_inventory(condition){
 //     const deleteQuery = 'DELETE FROM m_inventory_setup WHERE ?';
 //     connection.query(deleteQuery, condition, (error, results, fields) => {
 //         if (error) {
@@ -1067,7 +781,6 @@ export { ChatProvider, useChat };
 //         }
 //     });
 // }
-
 
 // //obj轉dict{}
 // function obj_to_dict(data) {
@@ -1082,6 +795,6 @@ export { ChatProvider, useChat };
 
 //     return (arr)
 // }
-  
 
-
+// // const name = "期初庫存"
+// // upload_inventory(name)

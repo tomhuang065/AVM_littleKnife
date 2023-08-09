@@ -3,14 +3,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faFileAlt,  faPlus,  faUpload } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Button, Form , Tab ,Nav } from '@themesberg/react-bootstrap';
 import { TransactionsTable2} from "../../components/Tables";
-import api from "../../api/api";
+// import api from "../../api/api";
+import ExcelJs from "exceljs";
 import SupplierFormModal from './SupplierFormModal';
 import { useChat } from "../../api/context";
 
 
 export default () => {
   const [excelFile, setExcelFile] = useState(null);
-  const {val, setVal, sendValue, signIn, suppliers} = useChat();
+  const {val, setVal, sendValue, signIn, suppliers, msg} = useChat();
   const [showSupplierModal, setShowSupplierModal] = useState(false);
 
   const handleExcelUpload = (event) => {
@@ -20,19 +21,42 @@ export default () => {
 
   const handleExcelUploadSubmit = async () => {
     const formData = new FormData();
-    formData.append("file", excelFile);
-    const res = await api.post("/api/excel", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-    console.log(res);
+    // formData.append("file", excelFile);
+    // const res = await api.post("/api/excel", formData, {
+    //   headers: {
+    //     "Content-Type": "multipart/form-data",
+    //   },
+    // });
+    // console.log(res);
   };
 
-  const handleExceldownload = () => {
-    // 在這裡處理下載的邏輯
-    // 可以使用表單資料或其他資料來源
-  };
+  const handleExceldownload = async () => {
+    const workbook = new ExcelJs.Workbook(); // 創建試算表檔案
+    const sheet = workbook.addWorksheet('供應商'); //在檔案中新增工作表 參數放自訂名稱
+
+		sheet.addTable({ // 在工作表裡面指定位置、格式並用columsn與rows屬性填寫內容
+	    name: 'table名稱',  // 表格內看不到的，讓你之後想要針對這個table去做額外設定的時候，可以指定到這個table
+	    ref: 'A1', // 從A1開始
+	    columns: [{ name: '供應商代碼' }, { name: '供應商名稱' }],
+        rows: [
+            ['0001', '小刀測試1'],
+            ['0002', '小刀測試2']
+        ]
+		});
+
+    // 表格裡面的資料都填寫完成之後，訂出下載的callback function
+		// 異步的等待他處理完之後，創建url與連結，觸發下載
+	  workbook.xlsx.writeBuffer().then((content) => {
+		const link = document.createElement("a");
+	    const blobData = new Blob([content], {
+	      type: "application/vnd.ms-excel;charset=utf-8;"
+	    });
+	    link.download = '供應商.xlsx';
+	    link.href = URL.createObjectURL(blobData);
+	    link.click();
+	  });
+      
+  }
 
 
   const handleSingleAdd = () => {
