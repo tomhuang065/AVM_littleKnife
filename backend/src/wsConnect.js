@@ -1031,6 +1031,80 @@ function getInventorySetupData() {
     });
 }
 
+//BOM第一階新增(對應到bom_first table)
+function add_bom_first(data) {
+    connection.query('INSERT INTO bom_first SET ?', data, (error, results, fields) => {
+        if (error) {
+            console.error('新增錯誤', error);
+        } else {
+            // let arr = obj_to_dict(results)
+            console.log('新增成功');
+        }
+    });
+}
+
+//BOM第二階新增(對應到bom_second table)
+function add_bom_second(data) {
+    connection.query('INSERT INTO bom_second SET ?', data, (error, results, fields) => {
+        if (error) {
+            console.error('新增錯誤', error);
+        } else {
+            // let arr = obj_to_dict(results)
+            console.log('新增成功');
+        }
+    });
+
+}
+
+//BOM第一階修改(對應到bom_first table)
+function update_bom_first(condition, updatedata) {
+    const updateQuery = 'UPDATE bom_first SET ? WHERE ?';
+    connection.query(updateQuery, [updatedata, condition], (error, results, fields) => {
+        if (error) {
+            console.error('修改資料庫錯誤：', error);
+        } else {
+            console.log('已成功修改資料');
+        }
+    });
+}
+
+//BOM第二階修改(對應到bom_second table)
+function update_bom_second(condition, updatedata){
+    const updateQuery = 'UPDATE bom_second SET ? WHERE ?';
+    connection.query(updateQuery, [updatedata, condition], (error, results, fields) => {
+        if (error) {
+            console.error('修改資料庫錯誤：', error);
+        } else {
+            console.log('已成功修改資料');
+        }
+    });
+}
+
+//BOM第一階刪除(對應到bom_first table)
+function del_bom_first(condition){
+    const deleteQuery = 'DELETE FROM bom_first WHERE ?';
+    connection.query(deleteQuery, condition, (error, results, fields) => {
+        if (error) {
+            console.error('刪除資料庫錯誤：', error);
+        } else {
+            console.log('已成功刪除資料');
+        }
+    });
+}
+
+//BOM第二階刪除(對應到bom_second table)
+function del_bom_second(condition){
+    const deleteQuery = 'DELETE FROM bom_second WHERE ?';
+    connection.query(deleteQuery, condition, (error, results, fields) => {
+        if (error) {
+            console.error('刪除資料庫錯誤：', error);
+        } else {
+            console.log('已成功刪除資料');
+        }
+    });
+}
+
+
 export default {
     onMessage: (ws, wss) => (
         ws.onmessage = async function (byteString) {
