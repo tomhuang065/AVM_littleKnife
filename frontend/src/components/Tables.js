@@ -1,9 +1,10 @@
 
 import React from "react";
+import axios from 'axios';
 import {useState} from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp, faArrowDown, faArrowUp, faEdit, faEllipsisH, faExternalLinkAlt, faEye, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
-import { Col, Row, Nav, Card, Button, Table, Dropdown, ProgressBar, Pagination, ButtonGroup } from '@themesberg/react-bootstrap';
+import { Form, Nav, Card, Button, Table, Dropdown, ProgressBar,  InputGroup, Pagination, ButtonGroup } from '@themesberg/react-bootstrap';
 import { Link } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 
@@ -27,17 +28,161 @@ const ValueChange = ({ value, suffix }) => {
 };
 
 export const AccountTable = (props) => {
+  const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [removeModal, setRemoveModal] = useState(false);
   const totalTransactions = transactions.length;
-  console.log(props);
   
-  const handleRowEdit = () => {
+  const handleRowEdit = (third, third_subjects_cn, third_subjects_eng, fourth, fourth_subjects_cn, fourth_subjects_eng) => {
     console.log("edit row")
+    setState("editing")
+    setRemoveModal(true);
+    setThird(third)
+    setThirdCn(third_subjects_cn)
+    setThirdEng(third_subjects_eng)
+    setFourth(fourth)
+    setFourthCn(fourth_subjects_cn)
+    setFourthEng(fourth_subjects_eng)
+    setRemoveModal(true);
+    setOrig(fourth)
+  }
+  const handleClick = (response) =>{
+    alert(response);
+    window.location.reload(false)
+    
+  }
+  const handleDeleteAccount = async()=>{
+    console.log(fourth)
+    const jsonData = {
+      content: `${fourth}`
+    };
+    const response = await instance.post('/del_account_subjects', {
+      ID:JSON.stringify(jsonData)
+    }
+  )
+    console.log(response.data)
+    setRemoveModal(false)
+    handleClick(response.data);
+
   }
 
-  const handleRowDelete = () => {
+  const handleEditAccount = async()=>{
+  //   console.log(fourth)
+    const jsonData = {
+      orig: `${orig}`,
+      third: `${third}`,
+      thirdCn: `${thirdCn}`,
+      thirdEng: `${thirdEng}`,
+      fourth: `${fourth}`,
+      fourthCn: `${fourthCn}`,
+      fourthEng: `${fourthEng}`,
+      // orig: `${orig}`,
+      // third: `third = "${third}"`,
+      // thirdCn: `third_subjects_cn = "${thirdCn}"`,
+      // thirdEng: `third_subjects_eng = "${thirdEng}"`,
+      // fourth: `fourth = "${fourth}"`,
+      // fourthCn: `fourth_subjects_cn = "${fourthCn}"`,
+      // fourthEng: `fourth_subjects_eng = "${fourthEng}"`,
+    };
+    const response = await instance.post('/mod_account_subjects', {
+      ID:JSON.stringify(jsonData)
+    }
+  )
+    console.log(response.data)
+    console.log(orig, " ", third ," ", thirdCn, " ", thirdEng, " ", fourth, " ", fourthCn, " ", fourthEng)
+    setRemoveModal(false)
+    setEditing(false);
+    setIndex("選擇修改項目")
+    handleClick(response.data);
+
+
+  }
+
+  const editAccountSubject = (content) =>{
+    setEditing(true)
+    switch(content) {
+      case "三階代碼" :{
+        setIndex(content)
+        break;
+      }
+      case "三階科目中文名稱" :{
+        setIndex(content)
+        break;
+      }
+      case "三階科目英文名稱" :{
+        setIndex(content)
+        break;
+      }
+      case "四階代碼" :{
+        setIndex(content)
+        break;
+      }
+      case "四階科目中文名稱" :{
+        setIndex(content)
+        break;
+      }
+      case "四階科目英文名稱" :{
+        setIndex(content)
+        break;
+      }
+      default:{
+        break;
+      }
+    }
+  }
+
+  const modifyAccountSubject = (event) =>{
+    // setEditing(false);
+    console.log(event.target.value)
+    if(event !== ""){
+      switch(index) {
+        case "三階代碼" :{
+          setThird(event.target.value)
+          // setPlaceHolder("")
+          break;
+        }
+        case "三階科目中文名稱" :{
+          setThirdCn(event.target.value)
+          // setPlaceHolder("")
+          break;
+        }
+        case "三階科目英文名稱" :{
+          setThirdEng(event.target.value)
+          // setPlaceHolder("")
+          break;
+        }
+        case "四階代碼" :{
+          setFourth(event.target.value)
+          // setPlaceHolder("")
+          break;
+        }
+        case "四階科目中文名稱" :{
+          setFourthCn(event.target.value)
+          // setPlaceHolder("")
+          break;
+        }
+        case "四階科目英文名稱" :{
+          setFourthEng(event.target.value)
+          break;
+        }
+        default:{
+          break;
+        }
+    }
+    
+    }
+
+  }
+
+  const handleRowDelete = (third, third_subjects_cn, third_subjects_eng, fourth, fourth_subjects_cn, fourth_subjects_eng) => {
     console.log("delete row")
+    setState("deleting")
     setRemoveModal(true);
+    setThird(third)
+    setThirdCn(third_subjects_cn)
+    setThirdEng(third_subjects_eng)
+    setFourth(fourth)
+    setFourthCn(fourth_subjects_cn)
+    setFourthEng(fourth_subjects_eng)
     console.log(removeModal)
   }
   const Acc = props.accounts
@@ -55,18 +200,62 @@ export const AccountTable = (props) => {
     >
       <Modal.Header closeButton>
         <Modal.Title id="contained-modal-title-vcenter">
-          {state === "deleting" ? "確定要刪除此會計科目？" : "你正在新增文章"}
+          {state === "deleting" ? "確定要刪除此會計科目？" : "你正在編輯會計科目"}
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body>
-        {/* <h4>Centered Modal</h4> */}
-        {
-
-        }
-      </Modal.Body>
+      {state === "deleting"?
+        <Modal.Body>
+          三階代碼 : {third} / 三階科目中文名稱 : {thirdCn} / 三階科目英文名稱 : {thirdEng} /<br></br> 四階代碼 : {fourth} / 四階科目中文名稱 : {fourthCn} / 四階科目英文名稱 :{fourthEng}
+        </Modal.Body>
+        :
+        <Modal.Body>
+          <Dropdown className = "btn-group dropleft"id = "dropdown-button-drop-start" as={ButtonGroup}>
+            <Dropdown.Toggle as={Button} split variant="link"  className="text-dark m-0 p-0" style ={{color :"red"}}>
+              {/* <span className="icon icon-sm">
+                <FontAwesomeIcon icon={faEllipsisH} className="icon-dark" />
+                  "選擇修改項目"
+              </span> */}
+              <Button variant="outline-primary" >{index}</Button>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={() => {editAccountSubject("三階代碼")}}>
+                <FontAwesomeIcon icon={faEdit} className="me-2" /> 三階代碼
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => {editAccountSubject("三階科目中文名稱")}}>
+                <FontAwesomeIcon icon={faEdit} className="me-2" /> 三階科目中文名稱
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => {editAccountSubject("三階科目英文名稱")}}>
+                <FontAwesomeIcon icon={faEdit} className="me-2" /> 三階科目英文名稱
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => {editAccountSubject("四階代碼")}}>
+                <FontAwesomeIcon icon={faEdit} className="me-2" /> 四階代碼
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => {editAccountSubject("四階科目中文名稱")}}>
+                <FontAwesomeIcon icon={faEdit} className="me-2" /> 四階科目中文名稱
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => {editAccountSubject("四階科目英文名稱")}}>
+                <FontAwesomeIcon icon={faEdit} className="me-2" /> 四階科目英文名稱
+              </Dropdown.Item>
+              {/* <Dropdown.Item className="text-danger" onClick={console.log("button2")} >
+                <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> Option1 onClick={() => console.log("searching")} 
+              </Dropdown.Item> */}
+            </Dropdown.Menu>
+          </Dropdown>
+          {editing? 
+          <Form >
+            <InputGroup >
+              <InputGroup.Text>
+                <FontAwesomeIcon  />
+              </InputGroup.Text>
+              <Form.Control type="text" onClick ={e => modifyAccountSubject(e)} onChange={e => console.log(e.target.value)} />
+              {/* <FontAwesomeIcon icon={faEdit} className="me-2" />  */}
+            </InputGroup>
+          </Form>:null}
+        </Modal.Body>
+      }
       <Modal.Footer>
-        <Button variant="outline-secondary" onClick={onHide}>Close</Button>
-        <Button variant="outline-primary" onClick={() => console.log('送出')} > Save changes</Button>
+        {state === "deleting"?<Button variant="outline-secondary" onClick={handleDeleteAccount}>確認</Button> :<Button variant="outline-secondary" onClick={handleEditAccount}>修改</Button>  }
+        <Button variant="outline-primary" onClick={() => {setRemoveModal(false)}}>取消</Button>
       </Modal.Footer>
     </Modal>
     )
@@ -119,21 +308,16 @@ export const AccountTable = (props) => {
               </span>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item onClick={handleRowEdit}>
+              <Dropdown.Item onClick={() => {handleRowEdit(third, third_subjects_cn, third_subjects_eng, fourth, fourth_subjects_cn, fourth_subjects_eng)}}>
                 <FontAwesomeIcon icon={faEdit} className="me-2" /> Edit
               </Dropdown.Item>
-              <Dropdown.Item className="text-danger" onClick={handleRowDelete} >
+              <Dropdown.Item className="text-danger" onClick={() => {handleRowDelete(third, third_subjects_cn, third_subjects_eng, fourth, fourth_subjects_cn, fourth_subjects_eng)}} >
                 <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> Remove
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
-        </td>
-        {removeModal?
-          <RemoveModal /** 編輯視窗 */
-            show={removeModal}
-            onHide={() => setRemoveModal(false)}
-            state="deleting"
-        />:<div></div>}
+        </td> 
+        
       </tr>
     );
   };
@@ -159,7 +343,6 @@ export const AccountTable = (props) => {
 
           </tbody>
         </Table>
-        
         <Card.Footer className="px-3 border-0 d-lg-flex align-items-center justify-content-between">
           <Nav>
             <Pagination className="mb-2 mb-lg-0">
@@ -181,6 +364,12 @@ export const AccountTable = (props) => {
           </small>
         </Card.Footer>
       </Card.Body>
+      {removeModal?
+          <RemoveModal /** 編輯視窗 */
+            show={removeModal}
+            onHide={() => setRemoveModal(false)}
+            state={state}
+        />:<div></div>}
     </Card>} 
   </div>
     

@@ -51,7 +51,6 @@ export default () => {
   }
 
   const handleViewAccount = async()=>{
-
     setResult(await instance.get('/sel_account_subjects'))
     console.log(result.data)
   }
@@ -125,16 +124,21 @@ export default () => {
           <Col xs={20} xl={10}>
             {/* Nav for Tabs */}
             <Nav variant="tabs">
+              
               <Nav.Item>
                 <Nav.Link eventKey="upload">上傳</Nav.Link>
               </Nav.Item>
               <Nav.Item>
                 <Nav.Link eventKey="browse" onClick={handleViewAccount}>瀏覽</Nav.Link>
               </Nav.Item>
+              
             </Nav>
 
             {/* Tab Content */}
             <Tab.Content >
+              <Tab.Pane eventKey="browse" >
+                  <AccountTable accounts={result.data}/>
+              </Tab.Pane>
               <Tab.Pane eventKey="upload">
                 <div className="d-flex justify-content-center align-items-center mb-3">
                   <Col xs={12} xl={5}>
@@ -157,9 +161,7 @@ export default () => {
                 </Col>
                 </div>
               </Tab.Pane>
-              <Tab.Pane eventKey="browse" >
-                  <AccountTable accounts={result.data}/>
-              </Tab.Pane>
+              
             </Tab.Content >
           </Col>
         </Row>
