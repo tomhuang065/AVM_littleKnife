@@ -31,6 +31,18 @@ export const AccountTable = (props) => {
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [removeModal, setRemoveModal] = useState(false);
   const totalTransactions = transactions.length;
+  const [third, setThird] = useState("");
+  const [thirdCn, setThirdCn] = useState("");
+  const [thirdEng, setThirdEng] = useState("");
+  const [fourth, setFourth] = useState("");
+  const [fourthCn, setFourthCn] = useState("");
+  const [fourthEng, setFourthEng] = useState("");
+
+  const [state, setState] = useState("")
+  const [editing, setEditing] = useState(false)
+  const [index, setIndex] = useState("選擇修改項目")
+  const [placeHolder, setPlaceHolder] = useState("")
+  const [orig, setOrig] = useState("")
   
   const handleRowEdit = (third, third_subjects_cn, third_subjects_eng, fourth, fourth_subjects_cn, fourth_subjects_eng) => {
     console.log("edit row")
