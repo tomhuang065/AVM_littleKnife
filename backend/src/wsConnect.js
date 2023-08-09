@@ -439,6 +439,38 @@ function excel_bom() {
     // });
 }
 
+//m_purchase(大量新增要上傳excel)
+function material_excel() {
+    const m_purchase = new ExcelJS.Workbook();
+    const sheet = m_purchase.addWorksheet('材料採購');
+    sheet.addTable({
+        ref: 'A1',
+        columns: [
+            { name: '日期(請符合範例格式yyyy-mm-dd)' },
+            { name: '材料代碼' },
+            { name: '材料名稱' },
+            { name: '採購數量' },
+            { name: '採購單位' },
+            { name: '採購成本' }
+        ],
+        rows: [
+            ['2023-0809', 'M001', '小刀材料1', '100', '包', '10000'],
+            ['2023-0809', 'M002', '小刀材料2', '50', '瓶', '8000'],
+            ['2023-0809', 'M003', '小刀材料3', '75', '罐', '9000'],
+            ['2023-0809', 'M004', '小刀材料4', '90', '箱', '3600'],
+            ['2023-0809', 'M005', '小刀材料5', '100', '箱', '12000']
+        ]
+    })
+    //等前端處理
+    // m_purchase.xlsx.writeBuffer().then((content) => {
+    //     const link = document.createElement("a");
+    //     const blobData = new Blob([content], {
+    //     type: "application/vnd.ms-excel;charset=utf-8;"
+    //     });
+    //     link.download = '材料採購.xlsx';
+    //     link.href = URL.createObjectURL(blobData);
+    // });
+}
 //*************************** 
 
 //讀取excel資料(需要前端傳filename)
@@ -747,6 +779,54 @@ function upload_bom(name) {
 
 }
 
+//材料採購匯入
+function upload_material(name) {
+    let arr = read_excel(name)
+
+    //將column name改成英文
+    const updatedArr = arr.map((item) => {
+        const updatedItem = {};
+
+        Object.keys(item).forEach((key) => {
+            if (key === '日期(請符合範例格式yyyy-mm-dd)') {
+                updatedItem['date'] = item[key];
+            } else if (key === '材料代碼') {
+                updatedItem['purchase_id'] = item[key];
+            } else if (key === '材料名稱') {
+                updatedItem['purchase_name'] = item[key];
+            } else if (key === '採購數量') {
+                updatedItem['purchase_quantity'] = item[key];
+            } else if (key === '採購單位') {
+                updatedItem['purchase_unit'] = item[key];
+            } else if (key === '採購成本') {
+                updatedItem['purchase_price'] = item[key];
+            } else {
+                updatedItem[key] = item[key];
+            }
+        });
+        return updatedItem;
+    })
+    // console.log(updatedArr)
+
+    const insertValues = updatedArr.map(element => [
+        element.date,
+        element.purchase_id,
+        element.purchase_name,
+        element.purchase_quantity,
+        element.purchase_unit,
+        element.purchase_price,
+    ]);
+
+    const query = 'INSERT INTO m_purchase (date, purchase_id, purchase_name, purchase_quantity, purchase_unit, purchase_price) VALUES ?';
+    connection.query(query, [insertValues], (error, results, fields) => {
+        if (error) {
+            console.error('寫入資料庫錯誤：', error);
+            return;//這邊看你們要return什麼給前端
+        }
+        console.log('已成功將資料寫入資料庫');
+    });
+
+}
 //***********************
 
 //呈現會科
