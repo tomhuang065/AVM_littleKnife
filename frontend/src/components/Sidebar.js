@@ -94,7 +94,7 @@ export default (props = {}) => {
                   <NavItem title="價值標的設定" link={Routes.Valuetargets.path} />
                 </CollapsableNavItem>
                 <CollapsableNavItem eventKey="examples/" title="進銷存資料庫">
-                  <NavItem title="BOM 設定" link={Routes.Settings.path} />
+                  <NavItem title="BOM 設定" link={Routes.Bomsettings.path} />
                   <NavItem title="單位轉換表(pending)" link={Routes.Settings.path} />
                   <NavItem title="原物料期初庫存設定" link={Routes.BeginningInventorysettings.path} />
                 </CollapsableNavItem>

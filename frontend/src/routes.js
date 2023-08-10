@@ -19,5 +19,6 @@ export const Routes = {
     Accountingsettings: { path: "/accountingsettings" },//會計科目設定
     Supplierssettings: { path: "/supplierssettings" },//供應商基本資料設定
     BeginningInventorysettings: { path: "/beginninginventorysettings" },//期初存貨設定
+    Bomsettings: { path: "/bomsettings" },//BOM設定
 
 };

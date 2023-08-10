@@ -17,6 +17,7 @@ export default () => {
   const [excelFile, setExcelFile] = useState(null);
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [result, setResult] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
 
 
   const onHandleAccountDownload = async () => {
@@ -90,20 +91,28 @@ export default () => {
   }
 
   const handleExcelUpload = (event) => {
-    const file = event.target.files[0];
-    setExcelFile(file);
+    setSelectedFile(event.target.files[0]);
+
   };
 
   const handleExcelUploadSubmit = async () => {
-    const formData = new FormData();
-    formData.append("file", excelFile);
-    // const res = await api.post("/api/excel", formData, {
-    //   headers: {
-    //     "Content-Type": "multipart/form-data",
-    //   },
-    // });
-    // console.log(res);
-  };
+    if (selectedFile) {
+      const fileReader = new FileReader();
+      fileReader.readAsBinaryString(selectedFile);
+      fileReader.onload = async (event) => {
+        try {
+          const { result } = event.target;
+          const workbook = xlsx.read(result, { type: "binary" });
+          const rows = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+          console.log(rows);
+          await instance.post('/upload',rows)
+          alert('上傳成功')
+        } catch (e) {
+          console.log("error", e);
+        }
+      };
+    }
+  }
 
   const handleExceldownload = () => {
     // 在這裡處理下載的邏輯
