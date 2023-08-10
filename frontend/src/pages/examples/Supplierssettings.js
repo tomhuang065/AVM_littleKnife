@@ -1,18 +1,22 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faFileAlt,  faPlus,  faUpload } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Button, Form , Tab ,Nav } from '@themesberg/react-bootstrap';
-import { TransactionsTable2} from "../../components/Tables";
+import { SupplierTable } from "../../components/SupplierTable";
 // import api from "../../api/api";
 import ExcelJs from "exceljs";
 import SupplierFormModal from './SupplierFormModal';
 import { useChat } from "../../api/context";
 
 
+
 export default () => {
   const [excelFile, setExcelFile] = useState(null);
   const {val, setVal, sendValue, signIn, suppliers, msg} = useChat();
   const [showSupplierModal, setShowSupplierModal] = useState(false);
+  const [result, setResult] = useState("")
+  const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
 
   const handleExcelUpload = (event) => {
     const file = event.target.files[0];
@@ -72,6 +76,11 @@ export default () => {
     console.log("Supplier Data:", supplierData);
     setShowSupplierModal(false);
   };
+  const handleViewSupplier= async () => {
+
+    setResult(await instance.get('/sel_supplier'));
+    console.log(result);
+  }
 
 
 
@@ -90,7 +99,7 @@ export default () => {
               <Nav.Item>
                 <Nav.Link eventKey="upload">上傳</Nav.Link>
               </Nav.Item>
-              <Nav.Item>
+              <Nav.Item onClick={handleViewSupplier}>
                 <Nav.Link eventKey="browse">瀏覽</Nav.Link>
               </Nav.Item>
             </Nav>
@@ -133,7 +142,7 @@ export default () => {
                 </Button>
               </div>
               {/* <TransactionsTable /> */}
-              <TransactionsTable2 supplier = {suppliers} />
+              <SupplierTable supplier = {result.data} />
               {suppliers}
             </Tab.Pane>
             </Tab.Content>
