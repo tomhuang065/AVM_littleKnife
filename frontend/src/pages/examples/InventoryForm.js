@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Modal, Button, Form } from '@themesberg/react-bootstrap';
+import axios from "axios";
 
 const RawMaterialFormModal = ({ show, onClose, onSave }) => {
+  const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [rawMaterialData, setRawMaterialData] = useState({
     productCode: "",
     productName: "",
@@ -21,9 +23,16 @@ const RawMaterialFormModal = ({ show, onClose, onSave }) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     onSave(rawMaterialData);
+    console.log(rawMaterialData)
+    const response = await instance.post('/add_inventory', {
+      ID:JSON.stringify(rawMaterialData)
+    }
+  )
+  alert("已新增原料資料")
+  window.location.reload(false)
   };
 
   return (
