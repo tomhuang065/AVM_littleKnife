@@ -21,6 +21,7 @@ import Valuetargets from "./examples/Valuetargets";
 import Accountingsettings from "./examples/Accountingsettings";
 import Supplierssettings from "./examples/Supplierssettings";
 import BeginningInventorysettings from "./examples/BeginningInventorysettings";
+import Bomsettings from "./examples/Bomsettings";
 
 // components
 import Sidebar from "../components/Sidebar";
@@ -116,7 +117,7 @@ export default () => (
     <RouteWithSidebar exact path={Routes.Accountingsettings.path} component={Accountingsettings} />
     <RouteWithSidebar exact path={Routes.Supplierssettings.path} component={Supplierssettings} />
     <RouteWithSidebar exact path={Routes.BeginningInventorysettings.path} component={BeginningInventorysettings} />
-
+    <RouteWithSidebar exact path={Routes.Bomsettings.path} component={Bomsettings} />
 
 
     {/* documentation */}

@@ -5,7 +5,7 @@ import { Col, Row, Button, Dropdown, Form, Tab ,Nav } from '@themesberg/react-bo
 import { ValuetargetsTable, RankingTable , TransactionsTable} from "../../components/Tables";
 // import api from "../../api/api";
 import ExcelJs from "exceljs";
-import SupplierFormModal from './SupplierFormModal';
+import ValueFormModal from './ValueFormModal';
 
 
 import Profile3 from "../../assets/img/team/profile-picture-3.jpg";
@@ -172,7 +172,7 @@ export default () => {
       </Tab.Container>
 
       {/* Supplier Form Modal */}
-      <SupplierFormModal
+      <ValueFormModal
         show={showSupplierModal}
         onClose={handleCloseSupplierModal}
         onSave={handleSaveSupplier}

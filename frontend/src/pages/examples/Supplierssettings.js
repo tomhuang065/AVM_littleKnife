@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faFileAlt,  faPlus,  faUpload } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Button, Form , Tab ,Nav } from '@themesberg/react-bootstrap';
-import { TransactionsTable2} from "../../components/Tables";
+import { BomTable, TransactionsTable2} from "../../components/Tables";
 // import api from "../../api/api";
 import ExcelJs from "exceljs";
 import SupplierFormModal from './SupplierFormModal';
@@ -133,7 +133,7 @@ export default () => {
                 </Button>
               </div>
               {/* <TransactionsTable /> */}
-              <TransactionsTable2 supplier = {suppliers} />
+              <BomTable supplier = {suppliers} />
               {suppliers}
             </Tab.Pane>
             </Tab.Content>

@@ -2,7 +2,22 @@ import express from 'express';
 import ExcelJS from "exceljs";
 import mysql from 'mysql2';
 import bodyParser from "body-parser";
+import multer from 'multer';
 // import { genNumber, getNumber } from '../core/getNumber'
+
+// 配置文件上传
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, 'uploads/'); // 存储上传的文件的目录
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.originalname); // 使用原始文件名作为存储文件名
+    }
+  });
+  
+const upload = multer({ storage });
+
+
 
 const router = express.Router();
 // router.use(bodyParser.json());
@@ -14,6 +29,36 @@ const connection = mysql.createConnection({
     database: 'avm_little_knife', // 資料庫名稱
     // database:"AVM"
   });
+
+router.post('/upload', (req, res) => {
+    const data = req.body;
+
+    if (!data || !Array.isArray(data)) {
+        return res.status(400).json({ error: 'Invalid data format' });
+    }
+
+    const insertValues = data.map(element => [
+        element.third,
+        element.third_subjects_cn,
+        element.third_subjects_eng,
+        element.fourth,
+        element.fourth_subjects_cn,
+        element.fourth_subjects_eng,
+        element.status
+    ]);
+
+    const query = 'INSERT INTO account_subjects (third, third_subjects_cn, third_subjects_eng, fourth, fourth_subjects_cn, fourth_subjects_eng, status) VALUES ?';
+    connection.query(query, [insertValues], (error, results, fields) => {
+        if (error) {
+            console.error('寫入資料庫錯誤：', error);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        console.log('已成功將資料寫入資料庫');
+        return res.status(200).json({ message: 'Data inserted successfully' });
+    });
+});
+
+
 
 router.get('/sel_account_subjects', async (req, res) => {
     try {const result = await sel_account_subjects();
@@ -42,6 +87,17 @@ router.post('/add_inventory', async (req, res) => {
 router.get('/sel_inventory', async (req, res) => {
     try {
         const result = await sel_inventory();
+        res.json(result);
+    } catch (error) {
+        console.error('發生錯誤：', error);
+        res.status(500).send('伺服器發生錯誤');
+
+    }
+});
+
+router.get('/get_bom', async (req, res) => {
+    try {
+        const result = await get_getBomFirstData();
         res.json(result);
     } catch (error) {
         console.error('發生錯誤：', error);
@@ -275,5 +331,68 @@ function obj_to_dict(data) {
     return (arr)
 }
 
+function getBomFirstData() {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM bom_first', (error, results, fields) => {
+            if (error) {
+                console.error('查詢 bom_first 錯誤：', error);
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+}
 
 
+function upload_account_subject(name) {
+    let arr = read_excel(name)
+
+    //將column name改成英文
+    const updatedArr = arr.map((item) => {
+        const updatedItem = {};
+
+        Object.keys(item).forEach((key) => {
+            if (key === '三階代碼') {
+                updatedItem['third'] = item[key];
+            } else if (key === '三階中文名') {
+                updatedItem['third_subjects_cn'] = item[key];
+            } else if (key === '三階英文名') {
+                updatedItem['third_subjects_eng'] = item[key];
+            } else if (key === '四階代碼') {
+                updatedItem['fourth'] = item[key];
+            } else if (key === '四階中文名') {
+                updatedItem['fourth_subjects_cn'] = item[key];
+            } else if (key === '四階英文名') {
+                updatedItem['fourth_subjects_eng'] = item[key];
+            } else {
+                updatedItem[key] = item[key];
+            }
+        });
+        return updatedItem;
+    })
+
+    const stat = 1;
+    const user = "test"
+
+    const insertValues = updatedArr.map(element => [
+        element.third,
+        element.third_subjects_cn,
+        element.third_subjects_eng,
+        element.fourth,
+        element.fourth_subjects_cn,
+        element.fourth_subjects_eng,
+        stat,
+        user
+    ]);
+
+    const query = 'INSERT INTO account_subjects (third, third_subjects_cn, third_subjects_eng, fourth, fourth_subjects_cn, fourth_subjects_eng, status, update_user) VALUES ?';
+    connection.query(query, [insertValues], (error, results, fields) => {
+        if (error) {
+            console.error('寫入資料庫錯誤：', error);
+            return;//這邊看你們要return什麼給前端
+        }
+        console.log('已成功將資料寫入資料庫');
+    });
+
+}
