@@ -1,7 +1,11 @@
 import React, { useState } from "react";
-import { Modal, Button, Form } from '@themesberg/react-bootstrap';
+import { Modal, Button, Form } from '@themesberg/react-bootstrap'
+import axios from "axios";
+
 
 const SupplierFormModal = ({ show, onClose, onSave }) => {
+  const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
+
   const [supplierData, setSupplierData] = useState({
     name: "",
     supplierCode: "", // Updated field name to "供應商代碼"
@@ -16,9 +20,16 @@ const SupplierFormModal = ({ show, onClose, onSave }) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     onSave(supplierData);
+    console.log(supplierData)
+    const response = await instance.post('/add_supplier', {
+      ID:JSON.stringify(supplierData)
+    }
+  )
+  alert("已新增供應商")
+  window.location.reload(false)
   };
 
   return (

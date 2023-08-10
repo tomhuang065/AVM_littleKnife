@@ -78,10 +78,35 @@ router.post('/mod_account_subjects', async (req, res) => {
     res.send('已成功更新會計科目資料');
 });
 
-router.post('/add_inventory', async (req, res) => {
+
+
+
+
+router.get('/sel_supplier', async (req, res) => {
+    try {
+        const result = await sel_supplier();
+        res.json(result);
+    } catch (error) {
+        console.error('發生錯誤：', error);
+        res.status(500).send('伺服器發生錯誤');
+
+    }
+});
+router.post('/del_supplier', async (req, res) => {
+    await del_supplier(JSON.parse(req.body.ID).content)
+    res.send('已成功刪除供應商');
+})
+
+router.post('/update_supplier', async(req, res) => {
     console.log(JSON.parse(req.body.ID))
-    await add_inventory(JSON.parse(req.body.ID))
-    res.send('已成功新增庫存資料');
+    await update_supplier(JSON.parse(req.body.ID))
+    res.send('已成功修改期初庫存資料');
+
+});
+router.post('/add_supplier', async (req, res) => {
+    console.log(JSON.parse(req.body.ID).supplierCode)
+    await add_supplier(JSON.parse(req.body.ID))
+    res.send('已成功新增供應商');
 });
 
 router.get('/sel_inventory', async (req, res) => {
@@ -138,6 +163,20 @@ function del_account_subjects(condition) {
         }
     });
 }
+
+function del_supplier(condition) {
+    console.log(condition)
+    const deleteQuery = "DELETE FROM `supplier` WHERE `supplier`.`supplier_num` = ?";
+    
+    connection.query(deleteQuery,condition,(error, results, fields) => {
+        if (error) {
+            console.error('刪除資料庫錯誤：', error);
+        } else {
+            console.log('已成功刪除資料');
+        }
+    });
+}
+
 function sel_account_subjects() {
     return new Promise((resolve, reject) => {
         connection.query('SELECT * FROM account_subjects', (error, results, fields) => {
@@ -150,6 +189,34 @@ function sel_account_subjects() {
                 resolve(arr);
             }
         });
+    });
+}
+function sel_supplier() {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM supplier', (error, results, fields) => {
+            if (error) {
+                console.error('查詢錯誤：', error);
+                reject(error);
+            } else {
+                let arr = obj_to_dict(results)
+                console.log('查詢結果：', arr);
+                resolve(arr);
+            }
+        });
+    });
+}
+function add_supplier(data) {
+
+    const id = '0';
+    // console.log(data.productCode);
+    connection.query('INSERT INTO supplier (`id`, `supplier_name`, `supplier_num`, `update_user`, `update_time`) VALUES (?, ?, ?, ?, ?)', [id, data.name, data.supplierCode, data.updateUsr, data.updateTime], (error, results, fields) => {
+        if (error) {
+            console.error('查詢錯誤：', error);
+        } else {
+            console.log("added")
+            // let arr = obj_to_dict(results)
+            // console.log('查詢結果：', arr);
+        }
     });
 }
 
@@ -226,6 +293,42 @@ function update_account_subjects(updatedata) {
     });
     updateQuery = 'UPDATE `account_subjects` SET fourth_subjects_eng = ? WHERE `account_subjects`.`fourth` = ?';
     connection.query(updateQuery, [updatedata.fourthEng, condition], (error, results, fields) => {
+        if (error) {
+            console.error('修改資料庫錯誤：', error);
+        } else {
+            console.log('已成功修改資料');
+        }
+    });
+}
+
+function update_supplier(updatedata) {
+    const condition = updatedata.orig
+    let updateQuery = 'UPDATE `supplier` SET supplier_num = ? WHERE `supplier`.`supplier_num` = ?';
+    connection.query(updateQuery, [updatedata.supNum, condition], (error, results, fields) => {
+        if (error) {
+            console.error('修改資料庫錯誤：', error);
+        } else {
+            console.log('已成功修改資料');
+        }
+    });
+    updateQuery = 'UPDATE `supplier` SET supplier_name = ? WHERE `supplier`.`supplier_num` = ?';
+    connection.query(updateQuery, [updatedata.supName, condition], (error, results, fields) => {
+        if (error) {
+            console.error('修改資料庫錯誤：', error);
+        } else {
+            console.log('已成功修改資料');
+        }
+    });
+    updateQuery = 'UPDATE `supplier` SET update_user = ? WHERE `supplier`.`supplier_num` = ?';
+    connection.query(updateQuery, [updatedata.updateUsr, condition], (error, results, fields) => {
+        if (error) {
+            console.error('修改資料庫錯誤：', error);
+        } else {
+            console.log('已成功修改資料');
+        }
+    });
+    updateQuery = 'UPDATE `supplier` SET update_time = ? WHERE `supplier`.`supplier_num` = ?';
+    connection.query(updateQuery, [updatedata.updateTime, condition], (error, results, fields) => {
         if (error) {
             console.error('修改資料庫錯誤：', error);
         } else {
