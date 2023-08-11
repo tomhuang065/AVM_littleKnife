@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBoxOpen, faCartArrowDown, faChartPie, faChevronDown, faClipboard, faCommentDots, faDownload, faFileAlt, faMagic, faPlus, faRocket, faStore, faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Button, Dropdown, Form, Tab ,Nav } from '@themesberg/react-bootstrap';
-import { ValuetargetsTable, RankingTable , TransactionsTable} from "../../components/Tables";
+import { ValuetargetsTable} from "../../components/ValueTargetCustomerTable";
 // import api from "../../api/api";
 import ExcelJs from "exceljs";
-import ValueFormModal from './ValueFormModal';
+import axios from "axios";
+
+import ValueTargetFormModal from './ValueTargetFormModal';
 
 
 import Profile3 from "../../assets/img/team/profile-picture-3.jpg";
@@ -13,7 +15,13 @@ import Profile3 from "../../assets/img/team/profile-picture-3.jpg";
 
 export default () => {
   const [excelFile, setExcelFile] = useState(null);
-  const [showSupplierModal, setShowSupplierModal] = useState(false);
+  const [showValueTargetModal, setShowValueTargetModal] = useState(false);
+  const [resultP, setResultP] = useState([]);
+  const [resultC, setResultC] = useState([]);
+  const [resultM, setResultM] = useState([]);
+  const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
+  const [type, setType] = useState("")
+
 
   const handleExcelUpload = (event) => {
     const file = event.target.files[0];
@@ -34,17 +42,17 @@ export default () => {
 
 
   const handleSingleAdd = () => {
-    setShowSupplierModal(true);
+    setShowValueTargetModal(true);
   };
 
-  const handleCloseSupplierModal = () => {
-    setShowSupplierModal(false);
+  const handleCloseValueTargetModal = () => {
+    setShowValueTargetModal(false);
   };
 
-  const handleSaveSupplier = (supplierData) => {
-    // Handle the logic to save the supplier data
-    console.log("Supplier Data:", supplierData);
-    setShowSupplierModal(false);
+  const handleSaveValueTarget = (ValueTargetData) => {
+    // Handle the logic to save the ValueTarget data
+    console.log("Value Target Data:", ValueTargetData);
+    setShowValueTargetModal(false);
   };
 
   const handleExceldownload = async () => {
@@ -75,6 +83,27 @@ export default () => {
 	  });
       
   }
+  const handleViewValueTarget= async (task) => {
+    switch(task){
+      case "原料":{
+        setResultM(await instance.get('/sel_value_target_material'));
+        setType("原料")
+      }
+      case "顧客":{
+        setResultC(await instance.get('/sel_value_target_customer'));
+        setType("顧客")
+      }
+      case "產品":{
+        setResultP(await instance.get('/sel_value_target_product'));
+        setType("產品")
+        
+      }
+      default:{
+        break;
+      }
+    }
+    // console.log(result);
+  }
 
   return (
     <>
@@ -92,13 +121,13 @@ export default () => {
                 <Nav.Link eventKey="upload">上傳</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="ingred">原料</Nav.Link>
+                <Nav.Link eventKey="ingred"onClick={() => handleViewValueTarget("原料")}>原料</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="customer">顧客</Nav.Link>
+                <Nav.Link eventKey="customer"onClick={() => handleViewValueTarget("顧客")}>顧客</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="product">產品</Nav.Link>
+                <Nav.Link eventKey="product"onClick={() => handleViewValueTarget("產品")}>產品</Nav.Link>
               </Nav.Item>
             </Nav>
 
@@ -137,7 +166,7 @@ export default () => {
                   單筆新增
                 </Button>
               </div>
-              <ValuetargetsTable />
+              <ValuetargetsTable valueTarget={resultM}/>
               </Tab.Pane>
               <Tab.Pane eventKey="ingred">
               {/* Browse content here */}
@@ -149,7 +178,7 @@ export default () => {
                   單筆新增
                 </Button>
               </div>
-              <ValuetargetsTable />
+              <ValuetargetsTable valueTarget={resultC}/>
               </Tab.Pane>
               <Tab.Pane eventKey="customer">
               {/* Browse content here */}
@@ -161,7 +190,7 @@ export default () => {
                   單筆新增
                 </Button>
               </div>
-              <ValuetargetsTable />
+              <ValuetargetsTable valueTarget={resultP}/>
               </Tab.Pane>
 
             </Tab.Content>
@@ -172,10 +201,12 @@ export default () => {
       </Tab.Container>
 
       {/* Supplier Form Modal */}
-      <ValueFormModal
-        show={showSupplierModal}
-        onClose={handleCloseSupplierModal}
-        onSave={handleSaveSupplier}
+      <ValueTargetFormModal
+        show={showValueTargetModal}
+        type={type}
+        onClose={handleCloseValueTargetModal}
+        onSave={handleSaveValueTarget}
+        
       />
     </>
   );

@@ -79,7 +79,42 @@ router.post('/mod_account_subjects', async (req, res) => {
 });
 
 
+router.get('/sel_value_target_customer', async (req, res) => {
+    try {
+        const result = await sel_value_target("顧客");
+        res.json(result);
+    } catch (error) {
+        console.error('發生錯誤：', error);
+        res.status(500).send('伺服器發生錯誤');
 
+    }
+});
+router.get('/sel_value_target_material', async (req, res) => {
+    try {
+        const result = await sel_value_target("原料");
+        res.json(result);
+    } catch (error) {
+        console.error('發生錯誤：', error);
+        res.status(500).send('伺服器發生錯誤');
+
+    }
+});
+router.get('/sel_value_target_product', async (req, res) => {
+    try {
+        const result = await sel_value_target("產品");
+        res.json(result);
+    } catch (error) {
+        console.error('發生錯誤：', error);
+        res.status(500).send('伺服器發生錯誤');
+
+    }
+});
+
+router.post('/add_value_target', async (req, res) => {
+    console.log(JSON.parse(req.body.ID))
+    await add_value_target(JSON.parse(req.body.ID))
+    res.send('已成功新增價值標的');
+});
 
 
 router.get('/sel_supplier', async (req, res) => {
@@ -191,6 +226,24 @@ function sel_account_subjects() {
         });
     });
 }
+
+function sel_value_target(task) {
+
+    console.log(task)
+    const findingQuery = 'SELECT * FROM `value_target` WHERE `value_target`.`category` = ?';
+    return new Promise((resolve, reject) => {
+        connection.query(findingQuery, task, (error, results, fields) => {
+            if (error) {
+                console.error('查詢錯誤：', error);
+                reject(error);
+            } else {
+                let arr = obj_to_dict(results);
+                console.log('查詢結果：', arr);
+                resolve(arr);
+            }
+        });
+    });
+}
 function sel_supplier() {
     return new Promise((resolve, reject) => {
         connection.query('SELECT * FROM supplier', (error, results, fields) => {
@@ -208,6 +261,21 @@ function sel_supplier() {
 function add_supplier(data) {
 
     const id = '0';
+    // console.log(data.productCode);
+    connection.query('INSERT INTO supplier (`id`, `supplier_name`, `supplier_num`, `update_user`, `update_time`) VALUES (?, ?, ?, ?, ?)', [id, data.name, data.supplierCode, data.updateUsr, data.updateTime], (error, results, fields) => {
+        if (error) {
+            console.error('查詢錯誤：', error);
+        } else {
+            console.log("added")
+            // let arr = obj_to_dict(results)
+            // console.log('查詢結果：', arr);
+        }
+    });
+}
+
+function add_value_target(data) {
+
+    // const id = '0';
     // console.log(data.productCode);
     connection.query('INSERT INTO supplier (`id`, `supplier_name`, `supplier_num`, `update_user`, `update_time`) VALUES (?, ?, ?, ?, ?)', [id, data.name, data.supplierCode, data.updateUsr, data.updateTime], (error, results, fields) => {
         if (error) {
