@@ -6,7 +6,6 @@ import { ValuetargetsTable} from "../../components/ValueTargetCustomerTable";
 // import api from "../../api/api";
 import ExcelJs from "exceljs";
 import axios from "axios";
-
 import ValueTargetFormModal from './ValueTargetFormModal';
 
 
@@ -41,7 +40,8 @@ export default () => {
 
 
 
-  const handleSingleAdd = () => {
+  const handleSingleAdd = (task) => {
+    console.log(task)
     setShowValueTargetModal(true);
   };
 
@@ -84,25 +84,29 @@ export default () => {
       
   }
   const handleViewValueTarget= async (task) => {
+    console.log("task", task)
     switch(task){
       case "原料":{
         setResultM(await instance.get('/sel_value_target_material'));
         setType("原料")
+        // console.log(type)
       }
       case "顧客":{
         setResultC(await instance.get('/sel_value_target_customer'));
         setType("顧客")
+        // console.log(type)
+
       }
       case "產品":{
         setResultP(await instance.get('/sel_value_target_product'));
         setType("產品")
-        
+        // console.log(type)
       }
       default:{
         break;
       }
     }
-    // console.log(result);
+    // console.log(resultP);
   }
 
   return (
@@ -120,14 +124,14 @@ export default () => {
               <Nav.Item>
                 <Nav.Link eventKey="upload">上傳</Nav.Link>
               </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="ingred"onClick={() => handleViewValueTarget("原料")}>原料</Nav.Link>
+              <Nav.Item onClick={() => {handleViewValueTarget("原料")}}>
+                <Nav.Link eventKey="ingred">原料</Nav.Link>
               </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="customer"onClick={() => handleViewValueTarget("顧客")}>顧客</Nav.Link>
+              <Nav.Item onClick={() => {handleViewValueTarget("顧客")}}>
+                <Nav.Link eventKey="customer">顧客</Nav.Link>
               </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="product"onClick={() => handleViewValueTarget("產品")}>產品</Nav.Link>
+              <Nav.Item onClick={() => {handleViewValueTarget("產品")}}>
+                <Nav.Link eventKey="product">產品</Nav.Link>
               </Nav.Item>
             </Nav>
 
@@ -161,36 +165,36 @@ export default () => {
               {/* You can display a table or a list of files here */}
               <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
                 {/* 單筆新增按鈕 */}
-                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={() => handleSingleAdd("產品")}>
                   <FontAwesomeIcon icon={faPlus} className="me-2" />
                   單筆新增
                 </Button>
               </div>
-              <ValuetargetsTable valueTarget={resultM}/>
+              <ValuetargetsTable valueTarget={resultP}/>
               </Tab.Pane>
               <Tab.Pane eventKey="ingred">
               {/* Browse content here */}
               {/* You can display a table or a list of files here */}
               <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
                 {/* 單筆新增按鈕 */}
-                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={() => handleSingleAdd("原料")}>
                   <FontAwesomeIcon icon={faPlus} className="me-2" />
                   單筆新增
                 </Button>
               </div>
-              <ValuetargetsTable valueTarget={resultC}/>
+              <ValuetargetsTable valueTarget={resultM}/>
               </Tab.Pane>
               <Tab.Pane eventKey="customer">
               {/* Browse content here */}
               {/* You can display a table or a list of files here */}
               <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
                 {/* 單筆新增按鈕 */}
-                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={() => handleSingleAdd("顧客")}>
                   <FontAwesomeIcon icon={faPlus} className="me-2" />
                   單筆新增
                 </Button>
               </div>
-              <ValuetargetsTable valueTarget={resultP}/>
+              <ValuetargetsTable valueTarget={resultC}/>
               </Tab.Pane>
 
             </Tab.Content>

@@ -7,6 +7,8 @@ import { faAngleDown, faAngleUp, faArrowDown, faArrowUp, faEdit, faEllipsisH, fa
 import { Form, Nav, Card, Button, Table, Dropdown, ProgressBar,  InputGroup, Pagination, ButtonGroup } from '@themesberg/react-bootstrap';
 import { Link } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
+import moment from "moment";
+
 
 import { Routes } from "../routes";
 import transactions from "../data/transactions";
@@ -43,12 +45,12 @@ export const ValuetargetsTable = (props) => {
           </td>
           <td>
             <span className="fw-normal">
-              {parseFloat(target_status).toFixed(0)}
+              {target_status === null?"---":parseFloat(target_status).toFixed(0)}
             </span>
           </td>
           <td>
             <span className="fw-normal">
-              {parseFloat(update_time).toFixed(0)}
+              {update_time === null?"---":moment(update_time).format('YYYY-MM-DD HH:mm:ss')}
             </span>
           </td>
           <td>

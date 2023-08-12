@@ -24,6 +24,7 @@ const router = express.Router();
 
 const connection = mysql.createConnection({
     host: 'localhost', // 資料庫主機名稱
+    port: 3308,
     user: 'root', // 資料庫使用者名稱
     password: '', // 資料庫密碼
     database: 'avm_little_knife', // 資料庫名稱
@@ -275,9 +276,10 @@ function add_supplier(data) {
 
 function add_value_target(data) {
 
-    // const id = '0';
+    const id = '0';
+    const status = '1'
     // console.log(data.productCode);
-    connection.query('INSERT INTO supplier (`id`, `supplier_name`, `supplier_num`, `update_user`, `update_time`) VALUES (?, ?, ?, ?, ?)', [id, data.name, data.supplierCode, data.updateUsr, data.updateTime], (error, results, fields) => {
+    connection.query('INSERT INTO value_target (`id`, `category`, `target_num`, `target_name`, `target_status`, `update_time`) VALUES (?, ?, ?, ?, ?, ?)', [id, data.category, data.valueTargetCode, data.name, status, data.updateTime], (error, results, fields) => {
         if (error) {
             console.error('查詢錯誤：', error);
         } else {
