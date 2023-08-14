@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2023-07-19 07:09:10
+-- 產生時間： 2023-08-14 10:08:34
 -- 伺服器版本： 10.4.27-MariaDB
 -- PHP 版本： 8.2.0
 
@@ -189,6 +189,14 @@ CREATE TABLE `bom_first` (
   `update_time` datetime DEFAULT NULL COMMENT '更新時間'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- 傾印資料表的資料 `bom_first`
+--
+
+INSERT INTO `bom_first` (`id`, `product_id`, `product_name`, `product_sec_id`, `use_quantity`, `update_user`, `update_time`) VALUES
+(1, 'P001', '小刀產品1', 'P001-1', 5, '測試人員', '2023-08-08 00:00:00'),
+(2, 'P001', '小刀產品1', 'P001-2', 6, '測試人員', '2023-08-08 00:00:00');
+
 -- --------------------------------------------------------
 
 --
@@ -204,6 +212,34 @@ CREATE TABLE `bom_second` (
   `use_quantity` int(11) NOT NULL COMMENT '使用量',
   `update_user` varchar(25) DEFAULT NULL COMMENT '更新人員',
   `update_time` datetime DEFAULT NULL COMMENT '更新時間'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- 傾印資料表的資料 `bom_second`
+--
+
+INSERT INTO `bom_second` (`id`, `product_id`, `product_sec_id`, `product_sec_name`, `material_id`, `use_quantity`, `update_user`, `update_time`) VALUES
+(1, 'P001', 'P001-1', '小刀產品1-1', 'M001', 2, '測試人員', '2023-08-08 00:00:00'),
+(2, 'P001', 'P001-1', '小刀產品1-1', 'M002', 3, '測試人員', '2023-08-08 00:00:00'),
+(3, 'P001', 'P001-2', '小刀產品1-2', 'M001', 2, '測試人員', '2023-08-08 00:00:00'),
+(4, 'P001', 'P001-2', '小刀產品1-2', 'M002', 3, '測試人員', '2023-08-08 00:00:00'),
+(5, 'P001', 'P001-2', '小刀產品1-2', 'M003', 1, '測試人員', '2023-08-08 00:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `customer_expense`
+--
+
+CREATE TABLE `customer_expense` (
+  `id` int(11) NOT NULL,
+  `date` date NOT NULL COMMENT '日期',
+  `cust_num` varchar(50) NOT NULL COMMENT '顧客代碼',
+  `cust_name` varchar(50) NOT NULL COMMENT '顧客名稱',
+  `unit_price` int(11) NOT NULL COMMENT '單價',
+  `service_time` int(11) NOT NULL COMMENT '服務次數',
+  `total_expense` int(11) NOT NULL COMMENT '總花費',
+  `create_user` varchar(50) NOT NULL COMMENT '使用者'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -223,6 +259,15 @@ CREATE TABLE `m_inventory_setup` (
   `start_cost` int(11) NOT NULL COMMENT '期初成本'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- 傾印資料表的資料 `m_inventory_setup`
+--
+
+INSERT INTO `m_inventory_setup` (`id`, `m_id`, `m_name`, `date`, `start_quantity`, `start_unit`, `start_unit_price`, `start_cost`) VALUES
+(1, 'M001', '材料1', '2023-07-25', 30, '瓶', 100, 3000),
+(2, 'M002', '材料2', '2023-07-25', 40, '包', 50, 2000),
+(3, 'M003', '材料3', '2023-07-25', 50, '罐', 25, 1250);
+
 -- --------------------------------------------------------
 
 --
@@ -238,6 +283,17 @@ CREATE TABLE `m_purchase` (
   `purchase_unit` varchar(25) NOT NULL COMMENT '採購單位	',
   `purchase_price` int(11) NOT NULL COMMENT '採購成本'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- 傾印資料表的資料 `m_purchase`
+--
+
+INSERT INTO `m_purchase` (`id`, `date`, `purchase_id`, `purchase_name`, `purchase_quantity`, `purchase_unit`, `purchase_price`) VALUES
+(1, '2023-08-09', 'M001', '小刀材料1', 100, '包', 10000),
+(2, '2023-08-09', 'M002', '小刀材料2', 50, '瓶', 8000),
+(3, '2023-08-09', 'M003', '小刀材料3', 75, '罐', 9000),
+(4, '2023-08-09', 'M004', '小刀材料4', 90, '箱', 3600),
+(5, '2023-08-09', 'M005', '小刀材料5', 100, '箱', 12000);
 
 -- --------------------------------------------------------
 
@@ -315,32 +371,49 @@ CREATE TABLE `supplier` (
   `supplier_num` varchar(25) NOT NULL COMMENT '供應商代碼',
   `supplier_name` varchar(50) NOT NULL COMMENT '供應商名稱',
   `update_user` varchar(25) DEFAULT NULL COMMENT '更新人員',
-  `update_time` datetime DEFAULT NULL
+  `update_time` datetime DEFAULT NULL,
+  `status` int(11) NOT NULL COMMENT '狀態(1:true 0:false)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- 傾印資料表的資料 `supplier`
 --
 
-INSERT INTO `supplier` (`id`, `supplier_num`, `supplier_name`, `update_user`, `update_time`) VALUES
-(1, '0001', '小刀測試1', NULL, NULL),
-(2, '0002', '小刀測試2', NULL, NULL),
-(3, '0003', '小刀測試3', NULL, NULL),
-(4, '0004', '小刀測試4', NULL, NULL),
-(5, '0005', '小刀測試5', NULL, NULL),
-(6, '0006', '小刀測試6', NULL, NULL),
-(7, '0007', '小刀測試7', NULL, NULL),
-(8, '0008', '小刀測試8', NULL, NULL),
-(9, '0009', '小刀測試9', NULL, NULL),
-(10, '0010', '小刀測試10', NULL, NULL),
-(11, '0011', '小刀測試11', NULL, NULL),
-(12, '0012', '小刀測試12', NULL, NULL),
-(13, '0013', '小刀測試13', NULL, NULL),
-(14, '0014', '小刀測試14', NULL, NULL),
-(15, '0015', '小刀測試15', NULL, NULL),
-(16, '0016', '小刀測試16', NULL, NULL),
-(17, '0017', '小刀測試17', NULL, NULL),
-(18, '0018', '小刀測試18', NULL, NULL);
+INSERT INTO `supplier` (`id`, `supplier_num`, `supplier_name`, `update_user`, `update_time`, `status`) VALUES
+(75, '0001', '小刀測試1', 'test', '2023-07-25 09:35:17', 1),
+(76, '0002', '小刀測試2', 'test', '2023-07-25 09:35:17', 1),
+(77, '0003', '小刀測試3', 'test', '2023-07-25 09:35:17', 1),
+(78, '0004', '小刀測試4', 'test', '2023-07-25 09:35:17', 1),
+(79, '0005', '小刀測試5', 'test', '2023-07-25 09:35:17', 1),
+(80, '0006', '小刀測試6', 'test', '2023-07-25 09:35:17', 1),
+(81, '0007', '小刀測試7', 'test', '2023-07-25 09:35:17', 1),
+(82, '0008', '小刀測試8', 'test', '2023-07-25 09:35:17', 1),
+(83, '0009', '小刀測試9', 'test', '2023-07-25 09:35:17', 1),
+(84, '0010', '小刀測試10', 'test', '2023-07-25 09:35:17', 1),
+(85, '0011', '小刀測試11', 'test', '2023-07-25 09:35:17', 1),
+(86, '0012', '小刀測試12', 'test', '2023-07-25 09:35:17', 1),
+(87, '0013', '小刀測試13', 'test', '2023-07-25 09:35:17', 1),
+(88, '0014', '小刀測試14', 'test', '2023-07-25 09:35:17', 1),
+(89, '0015', '小刀測試15', 'test', '2023-07-25 09:35:17', 1),
+(90, '0016', '小刀測試16', 'test', '2023-07-25 09:35:17', 1),
+(91, '0017', '小刀測試17', 'test', '2023-07-25 09:35:17', 1),
+(92, '0018', '小刀測試18', 'test', '2023-07-25 09:35:17', 1);
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `user`
+--
+
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL COMMENT '使用者名稱',
+  `account` varchar(50) NOT NULL COMMENT '帳號',
+  `password` varchar(50) NOT NULL COMMENT '密碼',
+  `email` varchar(50) NOT NULL COMMENT '信箱',
+  `permission` int(11) NOT NULL COMMENT '權限',
+  `status` int(11) NOT NULL COMMENT '狀態(1:true 0:false)'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -356,6 +429,15 @@ CREATE TABLE `value_target` (
   `target_status` int(1) NOT NULL COMMENT '狀態(0:false, 1:true)',
   `update_time` datetime DEFAULT NULL COMMENT '更新時間'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- 傾印資料表的資料 `value_target`
+--
+
+INSERT INTO `value_target` (`id`, `category`, `target_num`, `target_name`, `target_status`, `update_time`) VALUES
+(1, '顧客', 'C001', '小刀測試1', 1, '2023-07-25 09:38:01'),
+(2, '原料', 'M001', '小刀測試2', 1, '2023-07-25 09:38:01'),
+(3, '產品', 'P001', '小刀測試3', 1, '2023-07-25 09:38:01');
 
 --
 -- 已傾印資料表的索引
@@ -377,6 +459,12 @@ ALTER TABLE `bom_first`
 -- 資料表索引 `bom_second`
 --
 ALTER TABLE `bom_second`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- 資料表索引 `customer_expense`
+--
+ALTER TABLE `customer_expense`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -422,6 +510,12 @@ ALTER TABLE `supplier`
   ADD PRIMARY KEY (`id`);
 
 --
+-- 資料表索引 `user`
+--
+ALTER TABLE `user`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- 資料表索引 `value_target`
 --
 ALTER TABLE `value_target`
@@ -441,25 +535,31 @@ ALTER TABLE `account_subjects`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `bom_first`
 --
 ALTER TABLE `bom_first`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號';
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號', AUTO_INCREMENT=3;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `bom_second`
 --
 ALTER TABLE `bom_second`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號';
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號', AUTO_INCREMENT=6;
+
+--
+-- 使用資料表自動遞增(AUTO_INCREMENT) `customer_expense`
+--
+ALTER TABLE `customer_expense`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `m_inventory_setup`
 --
 ALTER TABLE `m_inventory_setup`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號';
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號', AUTO_INCREMENT=4;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `m_purchase`
 --
 ALTER TABLE `m_purchase`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `m_useage`
@@ -489,13 +589,19 @@ ALTER TABLE `p_useage`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `supplier`
 --
 ALTER TABLE `supplier`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號', AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號', AUTO_INCREMENT=96;
+
+--
+-- 使用資料表自動遞增(AUTO_INCREMENT) `user`
+--
+ALTER TABLE `user`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `value_target`
 --
 ALTER TABLE `value_target`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
