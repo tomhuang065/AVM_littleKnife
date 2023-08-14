@@ -42,7 +42,9 @@ export default () => {
 
   const handleSingleAdd = (task) => {
     console.log(task)
+    setType(task)
     setShowValueTargetModal(true);
+    
   };
 
   const handleCloseValueTargetModal = () => {
@@ -170,7 +172,7 @@ export default () => {
                   單筆新增
                 </Button>
               </div>
-              <ValuetargetsTable valueTarget={resultP}/>
+              <ValuetargetsTable valueTarget={resultP} type ={type}/>
               </Tab.Pane>
               <Tab.Pane eventKey="ingred">
               {/* Browse content here */}
@@ -182,7 +184,7 @@ export default () => {
                   單筆新增
                 </Button>
               </div>
-              <ValuetargetsTable valueTarget={resultM}/>
+              <ValuetargetsTable valueTarget={resultM} type ={type}/>
               </Tab.Pane>
               <Tab.Pane eventKey="customer">
               {/* Browse content here */}
@@ -194,7 +196,7 @@ export default () => {
                   單筆新增
                 </Button>
               </div>
-              <ValuetargetsTable valueTarget={resultC}/>
+              <ValuetargetsTable valueTarget={resultC} type ={type}/>
               </Tab.Pane>
 
             </Tab.Content>

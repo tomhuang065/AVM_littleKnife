@@ -18,7 +18,8 @@ import transactions from "../data/transactions";
 export const ValuetargetsTable = (props) => {
     const totalTransactions = transactions.length;
     const value = props.valueTarget.data
-    console.log(value)
+    const type = props.type
+    // console.log(value)
 
     const TableRow = (props) => {
       const { id, category, target_num, target_name, target_status, update_time } = props;
@@ -81,9 +82,9 @@ export const ValuetargetsTable = (props) => {
             <thead>
               <tr>
                 <th className="border-bottom">編號</th>
-                <th className="border-bottom">價值標的代碼</th>
-                <th className="border-bottom">價值標的名稱</th>
-                <th className="border-bottom">價值標的狀態</th>
+                <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}代碼</th>
+                <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}名稱</th>
+                <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}狀態</th>
                 <th className="border-bottom">更新時間</th>
                 <th className="border-bottom">選項</th>
               </tr>

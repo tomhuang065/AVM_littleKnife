@@ -45,12 +45,12 @@ const ValueTargetFormModal = ({ show, type, onClose, onSave}) => {
   return (
     <Modal show={show} onHide={onClose}>
       <Modal.Header closeButton>
-        <Modal.Title>新增價值標的</Modal.Title>
+        <Modal.Title>新增{type === "原料"?"原料":type === "產品"?"產品":"顧客"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="valueTargetName">
-            <Form.Label>價值標的名稱</Form.Label>
+            <Form.Label>{type === "原料"?"原料":type === "產品"?"產品":"顧客"}名稱</Form.Label>
             <Form.Control
               type="text"
               name="name"
@@ -60,7 +60,7 @@ const ValueTargetFormModal = ({ show, type, onClose, onSave}) => {
             />
           </Form.Group>
           <Form.Group controlId="valueTargetCode">
-            <Form.Label>價值標的代碼</Form.Label>
+            <Form.Label>{type === "原料"?"原料":type === "產品"?"產品":"顧客"}代碼</Form.Label>
             <Form.Control
               type="text"
               name="valueTargetCode"
