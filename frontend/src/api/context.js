@@ -2,6 +2,7 @@ import { useState,useContext,createContext } from "react";
 import React from "react";
 import axios from 'axios';
 
+
 // import logging 
 import {value} from "../pages/Posystem"
 // import { useUserDispatch} from "./UserContext";
@@ -17,12 +18,6 @@ let client=new WebSocket(WS_URL);
 // let interval;
 
 const sendData=async (data)=>{
-    // console.log("sendData")
-    // console.log(client)    if(client.readyState === 1){
-    // client.onclose = function(e){
-    //     logger.error("websocket disconnected")
-    //     logger.info(e.code+" "+e.reason+" " +e.wasClean)
-    // }
     if(client.readyState === 1){
         client.send(
             JSON.stringify(data)
@@ -31,11 +26,13 @@ const sendData=async (data)=>{
 };
 const ChatContext = createContext({
     val:'', 
-    // buf
-    // accRows:[],
+    stat:'',
     accColumns:[],
+    task:'',
     accLink:'',
     setVal:()=>{},
+    setStat:()=>{},
+    setTask:()=>{},
     sendValue:()=>{},
     accountDownload:()=>{},
     handleAccountDownload:()=>{},
@@ -48,11 +45,12 @@ const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
 const ChatProvider = (props) => {
     const [val, setVal] = useState("");
     const [suppliers, setSuppliers] = useState([]);
-    // const [accDownload, setAccDownload] = useState([]);
     const [accLink, setAccLink] = useState("");
     const [ accRows, setAccRows] = useState([]);
     const [ accColumns, setAccColumns] = useState([]);
-    // const [ buf, setBuf] = useState("");
+
+    const [task, setTask] = useState("");
+    const [stat, setStat] = useState(null);
 
 
     
@@ -117,6 +115,10 @@ const ChatProvider = (props) => {
         <ChatContext.Provider
             value={{
                 val,
+                task,
+                setTask,
+                stat,
+                setStat,
                 sendValue,
                 setVal,
                 signIn,

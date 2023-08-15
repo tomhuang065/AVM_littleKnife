@@ -18,6 +18,8 @@ export default () => {
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [result, setResult] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
+  const {stat, setStat} = useChat();
+
 
 
   const onHandleAccountDownload = async () => {
@@ -55,40 +57,6 @@ export default () => {
     setResult(await instance.get('/sel_account_subjects'))
     console.log(result.data)
   }
-   
-  
-
-
-
-  const handleDownload = () =>{
-    const workbook = new ExcelJs.Workbook(); // 創建試算表檔案
-    const sheet = workbook.addWorksheet('會計科目'); //在檔案中新增工作表 參數放自訂名稱
-  
-    sheet.addTable({ // 在工作表裡面指定位置、格式並用columsn與rows屬性填寫內容
-      // name: 'table名稱',  // 表格內看不到的，讓你之後想要針對這個table去做額外設定的時候，可以指定到這個table
-      ref: 'A1', // 從A1開始
-      columns: [
-        { name: '三階代碼' },
-        { name: '三階中文名' },
-        { name: '三階英文名' },
-        { name: '四階代碼' },
-        { name: '四階中文名' },
-        { name: '四階英文名' }
-    ],
-      // rows: accRows,
-      rows: [accRows],
-    });
-
-    workbook.xlsx.writeBuffer().then((content) => {
-    const link = document.createElement("a");
-      const blobData = new Blob([content], {
-        type: "application/vnd.ms-excel;charset=utf-8;"
-      });
-      link.download = '會計科目.xlsx';
-      link.href = URL.createObjectURL(blobData);
-      link.click();
-    });
-  }
 
   const handleExcelUpload = (event) => {
     setSelectedFile(event.target.files[0]);
@@ -113,13 +81,11 @@ export default () => {
       };
     }
   }
-
-  const handleExceldownload = () => {
-    // 在這裡處理下載的邏輯
-    // 可以使用表單資料或其他資料來源
-  };
-
-  
+  useEffect(()=>{
+    handleViewAccount()
+    
+    
+  },[stat])
 
   return (
     <>

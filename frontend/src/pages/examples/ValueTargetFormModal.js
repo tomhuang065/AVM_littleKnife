@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState} from "react";
 import { Modal, Button, Form } from '@themesberg/react-bootstrap'
 import axios from "axios";
 import moment from "moment";
+import { useChat } from "../../api/context";
+
 
 
 const ValueTargetFormModal = ({ show, type, onClose, onSave}) => {
@@ -13,6 +15,10 @@ const ValueTargetFormModal = ({ show, type, onClose, onSave}) => {
     category:"", // Updated field name to "供應商代碼"
     // Add other fields as needed
   });
+  const [response, setResponse] = useState("")
+  // const [, setVtype] = useState("")
+  const {task, setTask} = useChat();
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,8 +44,14 @@ const ValueTargetFormModal = ({ show, type, onClose, onSave}) => {
       ID:JSON.stringify(valueTargetData)
     }
   )
-  alert("已新曾價值標的")
-  window.location.reload(false)
+  console.log(response)
+  // setResponse(response)
+  setTask(response.data)
+  alert("已新增價值標的")
+  setValueTargetData({name: "",
+  valueTargetCode: ""})
+
+  // window.location.reload(false)
   };
 
   return (
@@ -64,6 +76,8 @@ const ValueTargetFormModal = ({ show, type, onClose, onSave}) => {
             <Form.Control
               type="text"
               name="valueTargetCode"
+              // placeholder ="M"
+              placeholder = {type === "原料"?"M":type === "產品"?"P":"C"}
               value={valueTargetData.valueTargetCode}
               onChange={handleChange}
               required

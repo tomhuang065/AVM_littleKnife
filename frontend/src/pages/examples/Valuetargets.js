@@ -1,15 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBoxOpen, faCartArrowDown, faChartPie, faChevronDown, faClipboard, faCommentDots, faDownload, faFileAlt, faMagic, faPlus, faRocket, faStore, faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Button, Dropdown, Form, Tab ,Nav } from '@themesberg/react-bootstrap';
 import { ValuetargetsTable} from "../../components/ValueTargetCustomerTable";
+import { useChat } from "../../api/context";
 // import api from "../../api/api";
 import ExcelJs from "exceljs";
 import axios from "axios";
 import ValueTargetFormModal from './ValueTargetFormModal';
 
-
-import Profile3 from "../../assets/img/team/profile-picture-3.jpg";
 
 
 export default () => {
@@ -20,12 +19,17 @@ export default () => {
   const [resultM, setResultM] = useState([]);
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [type, setType] = useState("")
-
+  
+  const {task, setTask} = useChat();
 
   const handleExcelUpload = (event) => {
     const file = event.target.files[0];
     setExcelFile(file);
   };
+
+  useEffect(()=>{
+    handleViewValueTarget(task)
+  },[task])
 
   const handleExcelUploadSubmit = async () => {
     const formData = new FormData();
@@ -172,7 +176,7 @@ export default () => {
                   單筆新增
                 </Button>
               </div>
-              <ValuetargetsTable valueTarget={resultP} type ={type}/>
+              <ValuetargetsTable valueTarget={resultP} type ={"產品"}/>
               </Tab.Pane>
               <Tab.Pane eventKey="ingred">
               {/* Browse content here */}
@@ -184,7 +188,7 @@ export default () => {
                   單筆新增
                 </Button>
               </div>
-              <ValuetargetsTable valueTarget={resultM} type ={type}/>
+              <ValuetargetsTable valueTarget={resultM} type ={"原料"}/>
               </Tab.Pane>
               <Tab.Pane eventKey="customer">
               {/* Browse content here */}
@@ -196,7 +200,7 @@ export default () => {
                   單筆新增
                 </Button>
               </div>
-              <ValuetargetsTable valueTarget={resultC} type ={type}/>
+              <ValuetargetsTable valueTarget={resultC} type ={"顧客"}/>
               </Tab.Pane>
 
             </Tab.Content>
