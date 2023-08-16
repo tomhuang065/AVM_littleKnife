@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, {useState} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faEnvelope, faUnlockAlt } from "@fortawesome/free-solid-svg-icons";
 import { faFacebookF, faGithub, faTwitter } from "@fortawesome/free-brands-svg-icons";
@@ -8,9 +8,22 @@ import { Link } from 'react-router-dom';
 
 import { Routes } from "../../routes";
 import BgImage from "../../assets/img/illustrations/signin.svg";
+import axios from "axios"
+import {useHistory} from "react-router-dom"
+
+
+
 
 
 export default () => {
+  const [userName, setUserName] = useState("")
+  const [password, setPassWord] = useState("")
+  
+  const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
+
+  let history = useHistory();
+  console.log(history)
+
   return (
     <main>
       <section className="d-flex align-items-center my-5 mt-lg-6 mb-lg-5">
@@ -27,13 +40,22 @@ export default () => {
                   <h3 className="mb-0">Create an account</h3>
                 </div>
                 <Form className="mt-4">
-                  <Form.Group id="email" className="mb-4">
+                  {/* <Form.Group id="email" className="mb-4">
                     <Form.Label>Your Email</Form.Label>
                     <InputGroup>
                       <InputGroup.Text>
                         <FontAwesomeIcon icon={faEnvelope} />
                       </InputGroup.Text>
                       <Form.Control autoFocus required type="email" placeholder="example@company.com" />
+                    </InputGroup>
+                  </Form.Group> */}
+                  <Form.Group id="password" className="mb-4">
+                    <Form.Label>Your Password</Form.Label>
+                    <InputGroup>
+                      <InputGroup.Text>
+                        <FontAwesomeIcon icon={faUnlockAlt} />
+                      </InputGroup.Text>
+                      <Form.Control required type="password" placeholder="UserName" />
                     </InputGroup>
                   </Form.Group>
                   <Form.Group id="password" className="mb-4">
@@ -61,7 +83,7 @@ export default () => {
                     </FormCheck.Label>
                   </FormCheck>
 
-                  <Button variant="primary" type="submit" className="w-100">
+                  <Button variant="primary" type="submit" className="w-100"onClick={() => history.push("/possystem")}>
                     Sign up
                   </Button>
                 </Form>

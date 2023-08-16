@@ -121,7 +121,7 @@ export const AccountTable = (props) => {
   <div>
     {typeof(Acc)=== 'undefined' ?<div></div>:<Card border="light" className="overflow-auto table-wrapper table-responsive shadow-sm" style ={{width:"115%"}}>
       <Card.Body className="pt-0">
-        <Table hover className="user-table align-items-center">
+        <Table hover className="user-table align-items-center table-striped">
           <thead>
             <tr>
               <th className="border-bottom">三階代碼</th>
@@ -226,7 +226,7 @@ export const TransactionsTable = () => {
   return (
     <Card border="light" className="table-wrapper table-responsive shadow-sm">
       <Card.Body className="pt-0">
-        <Table hover className="user-table align-items-center">
+        <Table hover className="user-table align-items-center table-striped">
           <thead>
             <tr>
               <th className="border-bottom">編號</th>
@@ -588,7 +588,7 @@ export const RawMaterialInventoryTable = (props) => {
       ) : (
         <Card border="light" className="table-wrapper table-responsive shadow-sm">
           <Card.Body className="pt-0">
-            <Table hover className="user-table align-items-center">
+            <Table hover className="user-table align-items-center table-striped">
               <thead>
                 <tr>
                   <th className="border-bottom">編號</th>
@@ -702,7 +702,7 @@ export const BomTable = (props) => {
   return (
     <Card border="light" className="table-wrapper table-responsive shadow-sm">
       <Card.Body className="pt-0">
-        <Table hover className="user-table align-items-center">
+        <Table hover className="user-table align-items-center table-striped">
           <thead>
             <tr>
               <th className="border-bottom">編號</th>

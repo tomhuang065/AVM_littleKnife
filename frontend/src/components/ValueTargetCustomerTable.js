@@ -105,7 +105,9 @@ export const ValuetargetsTable = (props) => {
             </span>
           </td>
           <td>
-            <Dropdown as={ButtonGroup}>
+            <Button variant="outline-primary" onClick={() => {handleChangeState(target_num, target_status)}}>變更</Button>
+
+            {/* <Dropdown as={ButtonGroup}>
               <Dropdown.Toggle as={Button} split variant="link" className="text-dark m-0 p-0">
                 <span className="icon icon-sm">
                   <FontAwesomeIcon icon={faEllipsisH} className="icon-dark" />
@@ -119,7 +121,7 @@ export const ValuetargetsTable = (props) => {
                   <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> 刪除
                 </Dropdown.Item>
               </Dropdown.Menu>
-            </Dropdown>
+            </Dropdown> */}
           </td>
         </tr>
       );
@@ -128,15 +130,15 @@ export const ValuetargetsTable = (props) => {
     return (
       <Card border="light" className="table-wrapper table-responsive shadow-sm">
         <Card.Body className="pt-0">
-          <Table hover className="user-table align-items-center">
+          <Table hover className="user-table align-items-center table-striped">
             <thead>
               <tr>
                 <th className="border-bottom">編號</th>
                 <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}代碼</th>
                 <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}名稱</th>
                 <th className="border-bottom">更新時間</th>
-                <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}狀態</th>
-                <th className="border-bottom">選項</th>
+                <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}狀態（1:顯示）</th>
+                <th className="border-bottom">變更狀態</th>
               </tr>
             </thead>
             <tbody>

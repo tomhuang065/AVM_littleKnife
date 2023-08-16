@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 
 import { Routes } from "../../routes";
 import BgImage from "../../assets/img/illustrations/signin.svg";
+import {useHistory} from "react-router-dom"
 
 
 export default () => {

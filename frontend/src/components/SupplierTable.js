@@ -190,8 +190,8 @@ export const SupplierTable = (props) => {
         //: status === "Canceled" ? "danger" : "primary";
   
       return (
-        <tr>
-          <td>
+        <tr >
+          <td >
             <Card.Link as={Link} to={Routes.Invoice.path} className="fw-normal">
               {supplier_num}
             </Card.Link>
@@ -311,7 +311,7 @@ export const SupplierTable = (props) => {
     return (
       <Card border="light" className="table-wrapper table-responsive shadow-sm">
         <Card.Body className="pt-0">
-          <Table hover className="user-table align-items-center">
+          <Table hover className="user-table align-items-center table-striped">
             <thead>
               <tr>
                 <th className="border-bottom">供應商代碼</th>
