@@ -964,15 +964,17 @@ async function calculateProductCost() {
 
 //供應商新增(data由前端拋來)
 function add_supplier(data) {
-    connection.query('INSERT INTO supplier SET ?', data, (error, results, fields) => {
+    const query = 'INSERT INTO `supplier`(`supplier_num`, `supplier_name`, `update_user`, `update_time`, `status`) VALUES ?'
+    data = [data]
+    connection.query(query, [data], (error, results, fields) => {
         if (error) {
-            console.error('查詢錯誤：', error);
+            console.error('新增錯誤', error);
         } else {
-            let arr = obj_to_dict(results)
-            console.log('查詢結果：', arr);
+            console.log('新增成功', arr);
         }
     });
 }
+
 
 //供應商修改(條件、data由前端拋來)
 function update_supplier(condition, updatedata) {
@@ -1001,12 +1003,14 @@ function del_supplier(condition) {
 
 //價值標的新增(data由前端拋來)
 function add_target(data) {
-    connection.query('INSERT INTO value_target SET ?', data, (error, results, fields) => {
+    const query = 'INSERT INTO  `value_target`(`category`, `target_num`, `target_name`, `target_status`, `update_time`) VALUES ?'
+    data = [data]
+    connection.query(query, [data], (error, results, fields) => {
         if (error) {
-            console.error('查詢錯誤：', error);
+            console.error('新增錯誤');
         } else {
             let arr = obj_to_dict(results)
-            console.log('查詢結果：', arr);
+            console.log('新增成功');
         }
     });
 }
@@ -1037,30 +1041,38 @@ function del_target(condition, updatedata) {
 
 //期初庫存新增(data由前端傳回來)
 function add_inventory(data) {
-    connection.query('INSERT INTO m_inventory_setup SET ?', data, (error, results, fields) => {
+    const query = 'INSERT INTO `m_inventory_setup`(`m_id`, `m_name`, `date`, `start_quantity`, `start_unit`, `start_unit_price`, `start_cost`) VALUES  ?'
+    data = [data]
+    connection.query(query, [data], (error, results, fields) => {
         if (error) {
-            console.error('查詢錯誤：', error);
+            console.error('新增錯誤');
         } else {
             let arr = obj_to_dict(results)
-            console.log('查詢結果：', arr);
+            console.log('新增成功');
         }
     });
 }
 
 //期初庫存修改(條件、updatedata(希望是array)由前端傳回來)
 function update_inventory(condition, updatedata) {
-    const data = updatedata.map(item => ({
-        ...item,
-        start_cost: item.start_quantity * item.start_unit_price
-    }));
     const updateQuery = 'UPDATE m_inventory_setup SET ? WHERE ?';
-    connection.query(updateQuery, [data, condition], (error, results, fields) => {
-        if (error) {
-            console.error('修改資料庫錯誤：', error);
-        } else {
-            console.log('已成功修改資料');
-        }
-    });
+
+    for (let i = 0; i < updatedata.length; i++) {
+        const data = updatedata[i];
+
+        // const updatedData = {
+        //     ...data,
+        //     start_cost: data.start_quantity * data.start_unit_price
+        // };
+
+        connection.query(updateQuery, [data, condition[0]], (error, results, fields) => {
+            if (error) {
+                console.error('修改資料庫錯誤：', error);
+            } else {
+                console.log('已成功修改資料');
+            }
+        });
+    }
 }
 
 //期初庫存刪除(條件由前端傳回來)
@@ -1133,7 +1145,11 @@ function getInventorySetupData() {
 
 //BOM第一階新增(對應到bom_first table)
 function add_bom_first(data) {
-    connection.query('INSERT INTO bom_first SET ?', data, (error, results, fields) => {
+    query = 'INSERT INTO `bom_first`(`product_id`, `product_name`, `product_sec_id`, `use_quantity`, `update_user`, `update_time`) VALUES ?'
+    const sqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
+    data.push(sqlDatetime)
+    data = [data]
+    connection.query(query, [data], (error, results, fields) => {
         if (error) {
             console.error('新增錯誤', error);
         } else {
@@ -1145,7 +1161,11 @@ function add_bom_first(data) {
 
 //BOM第二階新增(對應到bom_second table)
 function add_bom_second(data) {
-    connection.query('INSERT INTO bom_second SET ?', data, (error, results, fields) => {
+    query = 'INSERT INTO `bom_second`(`product_id`, `product_sec_id`, `product_sec_name`, `material_id`, `use_quantity`, `update_user`, `update_time`) VALUES  ?'
+    const sqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
+    data.push(sqlDatetime)
+    data = [data]
+    connection.query(query, [data], (error, results, fields) => {
         if (error) {
             console.error('新增錯誤', error);
         } else {
@@ -1200,6 +1220,157 @@ function del_bom_second(condition){
             console.error('刪除資料庫錯誤：', error);
         } else {
             console.log('已成功刪除資料');
+        }
+    });
+}
+
+//login [帳號,密碼]
+async function login(data) {
+    try {
+        const password = data[1]
+        const account = data[0]
+        const userinfo = await getUserInfo(account)
+        // console.log(userinfo[0].password)
+
+        if (userinfo.length > 0 && password === userinfo[0].password) {
+            console.log('成功登入')
+        } else {
+            console.log('帳號或密碼有誤，請重新輸入')
+        }
+
+    }
+    catch (error) {
+        console.log(error)
+    }
+
+}
+
+//register[使用者名稱,帳號,密碼,信箱]
+async function register(data) {
+    try {
+        const username = data[0]
+        const account = data[1]
+        const password = data[2]
+        const permission = 1;
+        const status = 1;
+        data.push(permission)
+        data.push(status)
+        const check_username = await register_indtical_username(username)
+        const check_account = await register_indtical_account(account)
+        const query = 'INSERT INTO `user`(`username`, `account`, `password`, `email`, `permission`, `status`) VALUES  ?';
+        // console.log(data)
+        data = [data]
+
+        if (check_username.length > 0) {
+            console.log('使用者名稱以被註冊，請重新填寫')
+        } else if (check_account.length > 0) {
+            console.log('帳號以被註冊，請重新填寫')
+        } else {
+            if (password.length < 6) {
+                console.log('密碼長度至少需6位數字，請重新填寫')
+            } else {
+                connection.query(query, [data], (error, results, fields) => {
+                    if (error) {
+                        console.error(error)
+                    } else {
+                        console.log('成功註冊')
+
+                    }
+                });
+            }
+        }
+
+    }
+    catch (error) {
+        console.log(error)
+    }
+}
+
+//取login帳密
+function getUserInfo(data) {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM user WHERE `account` = ?', data, (error, results, fields) => {
+            if (error) {
+                // console.error('帳號有誤：', error);
+                reject(error);
+            } else {
+                // console.log(results)
+                resolve(results);
+            }
+        });
+    });
+}
+
+//註冊檢查重複使用者名稱
+function register_indtical_username(data) {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM user WHERE `username` = ?', data, (error, results, fields) => {
+            if (error) {
+                // console.error('帳號有誤：', error);
+                reject(error);
+            } else {
+                // console.log(results)
+                resolve(results);
+            }
+        });
+    });
+}
+
+//註冊檢查重複帳號
+function register_indtical_account(data) {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM user WHERE `account` = ?', data, (error, results, fields) => {
+            if (error) {
+                // console.error('帳號有誤：', error);
+                reject(error);
+            } else {
+                // console.log(results)
+                resolve(results);
+            }
+        });
+    });
+}
+
+//m_purchase(單筆新增)
+function add_m_purchase(data) {
+    // console.log(data)
+    const myDate = new Date();
+    const sqlDate = myDate.toISOString().substring(0, 10);
+    data.splice(0, 0, sqlDate);
+    data = [data]
+    const query = 'INSERT INTO `m_purchase`(`date`, `purchase_id`, `purchase_name`, `purchase_quantity`, `purchase_unit`, `purchase_price`) VALUES ?'
+
+    connection.query(query, [data], (error, results, fields) => {
+        if (error) {
+            console.error(error);
+        } else {
+            // let arr = obj_to_dict(results)
+            console.log('新增成功');
+        }
+    });
+}
+
+//價值標的選單二(第一個為category,第二個為各category內的名稱)
+//此choice為選單一選擇的category
+function sel_target_menu(category) {
+    if (category === '顧客') {
+        sel_target_cust()
+    } else if (category === '產品') {
+        sel_target_product()
+    } else if (category === '原料') {
+        sel_target_material()
+    }
+
+}
+
+//價值標的選單一(第一個為category,第二個為各category內的名稱)
+function sel_target_category() {
+    query = 'SELECT DISTINCT `category` FROM `value_target` WHERE 1';
+    connection.query(query, (error, results, fields) => {
+        if (error) {
+            console.error(error);
+        } else {
+            console.log(results)
         }
     });
 }
