@@ -3,7 +3,7 @@ import React, {useState} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faEnvelope, faUnlockAlt } from "@fortawesome/free-solid-svg-icons";
 import { faFacebookF, faGithub, faTwitter } from "@fortawesome/free-brands-svg-icons";
-import { Col, Row, Form, Card, Button, FormCheck, Container, InputGroup } from '@themesberg/react-bootstrap';
+import { Col, Row, Form, Card, Button, FormCheck, Container, InputGroup, input } from '@themesberg/react-bootstrap';
 import { Link } from 'react-router-dom';
 
 import { Routes } from "../../routes";
@@ -16,13 +16,56 @@ import {useHistory} from "react-router-dom"
 
 
 export default () => {
-  const [userName, setUserName] = useState("")
-  const [password, setPassWord] = useState("")
-  
+  // const [userName, setUserName] = useState("")
+  // const [password, setPassWord] = useState("")
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
-
   let history = useHistory();
-  console.log(history)
+  const [memberData, setMemberData] = useState({
+    Username: "",
+    Account: "",
+    Email: "",
+    Password: "",
+    Password2:"",
+    Permission: "1",
+    Status: "1"
+});
+
+const handleChange = (event) => {
+  setMemberData({
+      ...memberData,
+      [event.target.name]: event.target.value
+  })
+};
+
+const handleSubmit = async(event, onSave) => {
+  event.preventDefault();
+  console.log(memberData);
+  // onSave(memberData);
+  const response = await instance.post('/add_user', {
+    ID:JSON.stringify(memberData)
+    }
+  )
+  if(response.data === '登入成功'){
+    alert('註冊成功')
+
+    history.push("/possystem")
+  }
+  else{
+    alert('註冊失敗')
+  }
+
+};
+
+
+  
+
+ 
+  // console.log(history)
+
+  const handleSignUp = () =>{
+
+
+  }
 
   return (
     <main>
@@ -39,7 +82,7 @@ export default () => {
                 <div className="text-center text-md-center mb-4 mt-md-0">
                   <h3 className="mb-0">Create an account</h3>
                 </div>
-                <Form className="mt-4">
+                <Form className="mt-4" >
                   {/* <Form.Group id="email" className="mb-4">
                     <Form.Label>Your Email</Form.Label>
                     <InputGroup>
@@ -49,31 +92,49 @@ export default () => {
                       <Form.Control autoFocus required type="email" placeholder="example@company.com" />
                     </InputGroup>
                   </Form.Group> */}
-                  <Form.Group id="password" className="mb-4">
-                    <Form.Label>Your Password</Form.Label>
+                    <Form.Group id="email" className="mb-4">
+                      <Form.Label>姓名</Form.Label>
+                      <InputGroup>
+                        <InputGroup.Text>
+                          <FontAwesomeIcon icon={faEnvelope} />
+                        </InputGroup.Text>
+                        <Form.Control autoFocus required type="email" placeholder="名字" name="Username" value={memberData.Username} onChange={handleChange} />
+                      </InputGroup>
+                    </Form.Group>
+                  <Form.Group id="email" className="mb-4">
+                    <Form.Label>帳號</Form.Label>
+                    <InputGroup>
+                      <InputGroup.Text>
+                        <FontAwesomeIcon icon={faEnvelope}  />
+                      </InputGroup.Text>
+                      <Form.Control required type="email" placeholder="帳號" name="Account" value={memberData.Account} onChange={handleChange}/>
+                    </InputGroup>
+                  </Form.Group>
+                  <Form.Group id="email" className="mb-4">
+                    <Form.Label>電子信箱</Form.Label>
                     <InputGroup>
                       <InputGroup.Text>
                         <FontAwesomeIcon icon={faUnlockAlt} />
                       </InputGroup.Text>
-                      <Form.Control required type="password" placeholder="UserName" />
+                      <Form.Control  autoFocus required type="email" placeholder="Email" name="Email" value={memberData.Email} onChange={handleChange}/>
                     </InputGroup>
                   </Form.Group>
                   <Form.Group id="password" className="mb-4">
-                    <Form.Label>Your Password</Form.Label>
+                    <Form.Label>密碼</Form.Label>
                     <InputGroup>
                       <InputGroup.Text>
                         <FontAwesomeIcon icon={faUnlockAlt} />
                       </InputGroup.Text>
-                      <Form.Control required type="password" placeholder="Password" />
+                      <Form.Control required type="password" placeholder="密碼" name = "Password" value={memberData.Password} onChange={handleChange}/>
                     </InputGroup>
                   </Form.Group>
                   <Form.Group id="confirmPassword" className="mb-4">
-                    <Form.Label>Confirm Password</Form.Label>
+                    <Form.Label>確認密碼</Form.Label>
                     <InputGroup>
                       <InputGroup.Text>
                         <FontAwesomeIcon icon={faUnlockAlt} />
                       </InputGroup.Text>
-                      <Form.Control required type="password" placeholder="Confirm Password" />
+                      <Form.Control required type="password" placeholder="確認密碼"  name = "Password2" value={memberData.Password2} onChange={handleChange}/>
                     </InputGroup>
                   </Form.Group>
                   <FormCheck type="checkbox" className="d-flex mb-4">
@@ -83,7 +144,7 @@ export default () => {
                     </FormCheck.Label>
                   </FormCheck>
 
-                  <Button variant="primary" type="submit" className="w-100"onClick={() => history.push("/possystem")}>
+                  <Button variant="primary" type="submit" className="w-100"onClick={handleSubmit}>
                     Sign up
                   </Button>
                 </Form>

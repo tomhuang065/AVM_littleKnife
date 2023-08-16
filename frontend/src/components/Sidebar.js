@@ -78,6 +78,22 @@ export default (props = {}) => {
       </Nav.Item>
     );
   };
+  // const handleSubmit = async(event, onSave) => {
+  //   event.preventDefault();
+  //   console.log(memberData);
+  //   // onSave(memberData);
+  //   const response = await instance.post('/get_user', {
+  //     ID:JSON.stringify(memberData)
+  //     }
+  //   )
+  //   if(response.data === '登入成功'){
+  //     alert('登入成功')
+  //     history.push("/possystem")
+  //   }
+  //   else{
+  //     alert('登入失敗')
+  //   }
+  // };
 
   return (
     <>
@@ -86,7 +102,7 @@ export default (props = {}) => {
           {/* px : distance to the left, pt : distance to the top */}
           <div className="sidebar-inner px-4 pt-3"> 
             <Nav className="flex-column pt-3 pt-md-0">
-              <NavItem title="智慧小刀" link={Routes.Presentation.path} image={ReactHero} />
+              <NavItem title="您好！ 黃語棠" link={Routes.Presentation.path} image={ReactHero} />
               <NavItem title="首頁" link={Routes.DashboardOverview.path} icon={faChartPie} />
               <CollapsableNavItem eventKey="examples/" title="設定" icon={faCog}>
                 <CollapsableNavItem eventKey="examples/" title="財會系統資料庫">

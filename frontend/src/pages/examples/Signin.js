@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, {useState} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faUnlockAlt } from "@fortawesome/free-solid-svg-icons";
 import { Col, Row, Form, Card, Button, FormCheck, Container, InputGroup } from '@themesberg/react-bootstrap';
@@ -8,9 +8,43 @@ import { Link } from 'react-router-dom';
 import { Routes } from "../../routes";
 import BgImage from "../../assets/img/illustrations/signin.svg";
 import {useHistory} from "react-router-dom"
+import axios from 'axios'
 
 
 export default () => {
+
+  const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
+  let history = useHistory();
+
+  const [memberData, setMemberData] = useState({
+    Account: "",
+    Password: "",
+});
+
+const handleChange = (event) => {
+  setMemberData({
+      ...memberData,
+      [event.target.name]: event.target.value
+  })
+};
+
+const handleSubmit = async(event, onSave) => {
+  event.preventDefault();
+  console.log(memberData);
+  // onSave(memberData);
+  const response = await instance.post('/check_user', {
+    ID:JSON.stringify(memberData)
+    }
+  )
+  if(response.data === '登入成功'){
+    alert('登入成功')
+    history.push("/possystem")
+  }
+  else{
+    alert('登入失敗')
+  }
+};
+
   return (
     <main>
       <section className="d-flex align-items-center my-5 mt-lg-6 mb-lg-5">
@@ -26,22 +60,22 @@ export default () => {
                 </div>
                 <Form className="mt-4">
                   <Form.Group id="email" className="mb-4">
-                    <Form.Label>Your Email</Form.Label>
+                    <Form.Label>帳號</Form.Label>
                     <InputGroup>
                       <InputGroup.Text>
                         <FontAwesomeIcon icon={faEnvelope} />
                       </InputGroup.Text>
-                      <Form.Control autoFocus required type="email" placeholder="example@company.com" />
+                      <Form.Control autoFocus required type="email" placeholder="帳號" name="Account" value={memberData.Account} onChange={handleChange} />
                     </InputGroup>
                   </Form.Group>
                   <Form.Group>
                     <Form.Group id="password" className="mb-4">
-                      <Form.Label>Your Password</Form.Label>
+                      <Form.Label>密碼</Form.Label>
                       <InputGroup>
                         <InputGroup.Text>
                           <FontAwesomeIcon icon={faUnlockAlt} />
                         </InputGroup.Text>
-                        <Form.Control required type="password" placeholder="Password" />
+                        <Form.Control required type="password" placeholder="密碼" name="Password" value={memberData.Password} onChange={handleChange}/>
                       </InputGroup>
                     </Form.Group>
                     <div className="d-flex justify-content-between align-items-center mb-4">
@@ -52,11 +86,11 @@ export default () => {
                       <Card.Link className="small text-end">Lost password?</Card.Link>
                     </div>
                   </Form.Group>
-                  <Button as={Link} to={Routes.DashboardOverview.path} variant="primary" type="submit" className="w-100">
+                  <Button as={Link} variant="primary" type="submit" className="w-100" onClick ={handleSubmit}>
                     Sign in
                   </Button>
                 </Form>
-
+                {/* to={Routes.DashboardOverview.path}  */}
                 <div className="d-flex justify-content-center align-items-center mt-4">
                   <span className="fw-normal">
                     Not registered?

@@ -59,7 +59,28 @@ router.post('/upload', (req, res) => {
     });
 });
 
+router.post('/add_user', async (req, res) => {
+    try {
+        const result = await register(JSON.parse(req.body.ID));
+        res.json('登入成功');
+    } catch (error) {
+        console.error('發生錯誤：', error);
+        res.status(500).send('伺服器發生錯誤');
 
+    }
+});
+
+router.post('/check_user', async (req, res) => {
+    try {
+        const result = await getUserInfo(JSON.parse(req.body.ID));
+        console.log(result)
+        res.json('登入成功');
+    } catch (error) {
+        console.error('發生錯誤：', error);
+        res.status(500).send('伺服器發生錯誤');
+
+    }
+});
 
 router.get('/sel_account_subjects', async (req, res) => {
     try {const result = await sel_account_subjects();
@@ -200,6 +221,20 @@ router.post('/del_inventory', async (req, res) => {
 
 export default router
 
+function getUserInfo(data) {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM user WHERE `account` = ?', data.Account, (error, results, fields) => {
+            if (error) {
+                // console.error('帳號有誤：', error);
+                reject(error);
+            } else {
+                // console.log(results)
+                resolve(results);
+            }
+        });
+    });
+}
+
 function del_account_subjects(condition) {
     console.log(condition)
     const deleteQuery = "DELETE FROM `account_subjects` WHERE `account_subjects`.`fourth` = ?";
@@ -249,6 +284,78 @@ function sel_account_subjects() {
                 let arr = obj_to_dict(results);
                 // console.log('查詢結果：', arr);
                 resolve(arr);
+            }
+        });
+    });
+}
+
+async function register(data) {
+    console.log(data.Username)
+    try {
+        const username = data.Username
+        const account = data.Account
+        const password = data.Password
+        const email = data.Email
+        const permission = 1;
+        const status = 1;
+        // data.push(permission)
+        // data.push(status)
+        const check_username = await register_indtical_username(username)
+        const check_account = await register_indtical_account(account)
+        const query = 'INSERT INTO `user`(`username`, `account`, `password`, `email`, `permission`, `status`) VALUES  (?, ?, ?, ?, ?, ?)';
+        // console.log(data)
+        // data = [data]
+
+        if (check_username.length > 0) {
+            console.log('使用者名稱以被註冊，請重新填寫')
+        } else if (check_account.length > 0) {
+            console.log('帳號以被註冊，請重新填寫')
+        } else {
+            if (password.length < 6) {
+                console.log('密碼長度至少需6位數字，請重新填寫')
+            } else {
+                connection.query(query, [data.Username, account, password, email, permission, status], (error, results, fields) => {
+                    if (error) {
+                        console.error(error)
+                    } else {
+                        console.log('成功註冊')
+
+                    }
+                });
+            }
+        }
+
+    }
+    catch (error) {
+        console.log(error)
+    }
+}
+
+//註冊檢查重複使用者名稱
+function register_indtical_username(data) {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM user WHERE `username` = ?', data, (error, results, fields) => {
+            if (error) {
+                // console.error('帳號有誤：', error);
+                reject(error);
+            } else {
+                // console.log(results)
+                resolve(results);
+            }
+        });
+    });
+}
+
+//註冊檢查重複帳號
+function register_indtical_account(data) {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM user WHERE `account` = ?', data, (error, results, fields) => {
+            if (error) {
+                // console.error('帳號有誤：', error);
+                reject(error);
+            } else {
+                // console.log(results)
+                resolve(results);
             }
         });
     });
