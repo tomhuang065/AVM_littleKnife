@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faFileAlt,  faPlus,  faUpload } from '@fortawesome/free-solid-svg-icons';
@@ -13,7 +13,7 @@ import { useChat } from "../../api/context";
 
 export default () => {
   const [excelFile, setExcelFile] = useState(null);
-  const {val, setVal, sendValue, signIn, suppliers, msg} = useChat();
+  const {sup, setSup} = useChat();
   const [showSupplierModal, setShowSupplierModal] = useState(false);
   const [result, setResult] = useState("")
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
@@ -82,6 +82,11 @@ export default () => {
     console.log(result);
   }
 
+  useEffect(()=>{
+      handleViewSupplier(sup)
+      setSup(null)
+  },[sup])
+
 
 
   return (
@@ -143,7 +148,7 @@ export default () => {
               </div>
               {/* <TransactionsTable /> */}
               <SupplierTable supplier = {result.data} />
-              {suppliers}
+              {/* {suppliers} */}
             </Tab.Pane>
             </Tab.Content>
 

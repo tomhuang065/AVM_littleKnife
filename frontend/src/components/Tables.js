@@ -1,12 +1,15 @@
 
 import React from "react";
 import axios from 'axios';
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp, faArrowDown, faArrowUp, faEdit, faEllipsisH, faExternalLinkAlt, faEye, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { Form, Nav, Card, Button, Table, Dropdown, ProgressBar,  InputGroup, Pagination, ButtonGroup } from '@themesberg/react-bootstrap';
 import { Link } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
+import { useChat } from "../api/context";
+import moment from "moment";
+
 
 import { Routes } from "../routes";
 import transactions from "../data/transactions";
@@ -28,256 +31,46 @@ const ValueChange = ({ value, suffix }) => {
 
 export const AccountTable = (props) => {
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
-  const [removeModal, setRemoveModal] = useState(false);
   const totalTransactions = transactions.length;
-  const [third, setThird] = useState("");
-  const [thirdCn, setThirdCn] = useState("");
-  const [thirdEng, setThirdEng] = useState("");
-  const [fourth, setFourth] = useState("");
-  const [fourthCn, setFourthCn] = useState("");
-  const [fourthEng, setFourthEng] = useState("");
+  const [orig, setOrig] = useState("") 
+  const {stat, setStat} = useChat();
 
-  const [state, setState] = useState("")
-  const [editing, setEditing] = useState(false)
-  const [index, setIndex] = useState("選擇修改項目")
-  const [orig, setOrig] = useState("")
-  
-  const handleRowEdit = (third, third_subjects_cn, third_subjects_eng, fourth, fourth_subjects_cn, fourth_subjects_eng) => {
-    console.log("edit row")
-    setState("editing")
-    setRemoveModal(true);
-    setThird(third)
-    setThirdCn(third_subjects_cn)
-    setThirdEng(third_subjects_eng)
-    setFourth(fourth)
-    setFourthCn(fourth_subjects_cn)
-    setFourthEng(fourth_subjects_eng)
-    setRemoveModal(true);
-    setOrig(fourth)
-  }
-  const handleClick = (response) =>{
-    alert(response);
-    window.location.reload(false)
-    
-  }
-  const handleDeleteAccount = async()=>{
-    console.log(fourth)
-    const jsonData = {
-      content: `${fourth}`
-    };
-    const response = await instance.post('/del_account_subjects', {
-      ID:JSON.stringify(jsonData)
+  const Acc = props.accounts
+
+  useEffect(()=>{
+    console.log(stat)
+    if(orig !== ''){
+      handleEditAccount(stat)
     }
-  )
-    console.log(response.data)
-    setRemoveModal(false)
-    handleClick(response.data);
+    setOrig("")    
+  },[stat])
+
+
+  const handleChangeState = (orig, status) =>{
+    setOrig(orig)
+    // if(status === 1){
+    setStat(!status)
+    // }
 
   }
 
-  const handleEditAccount = async()=>{
-  //   console.log(fourth)
+  const handleEditAccount = async(stat)=>{
     const jsonData = {
       orig: `${orig}`,
-      third: `${third}`,
-      thirdCn: `${thirdCn}`,
-      thirdEng: `${thirdEng}`,
-      fourth: `${fourth}`,
-      fourthCn: `${fourthCn}`,
-      fourthEng: `${fourthEng}`,
-      // orig: `${orig}`,
-      // third: `third = "${third}"`,
-      // thirdCn: `third_subjects_cn = "${thirdCn}"`,
-      // thirdEng: `third_subjects_eng = "${thirdEng}"`,
-      // fourth: `fourth = "${fourth}"`,
-      // fourthCn: `fourth_subjects_cn = "${fourthCn}"`,
-      // fourthEng: `fourth_subjects_eng = "${fourthEng}"`,
+      status:`${stat}`,
     };
     const response = await instance.post('/mod_account_subjects', {
       ID:JSON.stringify(jsonData)
     }
-  )
-    console.log(response.data)
-    console.log(orig, " ", third ," ", thirdCn, " ", thirdEng, " ", fourth, " ", fourthCn, " ", fourthEng)
-    setRemoveModal(false)
-    setEditing(false);
-    setIndex("選擇修改項目")
-    handleClick(response.data);
-
-
-  }
-
-  const editMaterialInventory = (content) =>{
-    setEditing(true)
-    switch(content) {
-      case "三階代碼" :{
-        setIndex(content)
-        break;
-      }
-      case "三階科目中文名稱" :{
-        setIndex(content)
-        break;
-      }
-      case "三階科目英文名稱" :{
-        setIndex(content)
-        break;
-      }
-      case "四階代碼" :{
-        setIndex(content)
-        break;
-      }
-      case "四階科目中文名稱" :{
-        setIndex(content)
-        break;
-      }
-      case "四階科目英文名稱" :{
-        setIndex(content)
-        break;
-      }
-      default:{
-        break;
-      }
-    }
-  }
-
-  const modifyMaterialInventory = (event) =>{
-    // setEditing(false);
-    console.log(event.target.value)
-    if(event !== ""){
-      switch(index) {
-        case "三階代碼" :{
-          setThird(event.target.value)
-          // setPlaceHolder("")
-          break;
-        }
-        case "三階科目中文名稱" :{
-          setThirdCn(event.target.value)
-          // setPlaceHolder("")
-          break;
-        }
-        case "三階科目英文名稱" :{
-          setThirdEng(event.target.value)
-          // setPlaceHolder("")
-          break;
-        }
-        case "四階代碼" :{
-          setFourth(event.target.value)
-          // setPlaceHolder("")
-          break;
-        }
-        case "四階科目中文名稱" :{
-          setFourthCn(event.target.value)
-          // setPlaceHolder("")
-          break;
-        }
-        case "四階科目英文名稱" :{
-          setFourthEng(event.target.value)
-          break;
-        }
-        default:{
-          break;
-        }
-    }
-    
-    }
-
-  }
-
-  const handleRowDelete = (third, third_subjects_cn, third_subjects_eng, fourth, fourth_subjects_cn, fourth_subjects_eng) => {
-    console.log("delete row")
-    setState("deleting")
-    setRemoveModal(true);
-    setThird(third)
-    setThirdCn(third_subjects_cn)
-    setThirdEng(third_subjects_eng)
-    setFourth(fourth)
-    setFourthCn(fourth_subjects_cn)
-    setFourthEng(fourth_subjects_eng)
-    setOrig(fourth)
-    // console.log(removeModal)
-  }
-  const Acc = props.accounts
-  // console.log(Acc)
-
-  const RemoveModal = ({ onHide, show, state }) =>{
-
-    return(
-    <Modal
-        size="lg"
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-        {...{ onHide, show }}
-
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          {state === "deleting" ? "確定要刪除此會計科目？" : "你正在編輯會計科目"}
-        </Modal.Title>
-      </Modal.Header>
-      {state === "deleting"?
-        <Modal.Body>
-          三階代碼 : {third} / 三階科目中文名稱 : {thirdCn} / 三階科目英文名稱 : {thirdEng} /<br></br> 四階代碼 : {fourth} / 四階科目中文名稱 : {fourthCn} / 四階科目英文名稱 :{fourthEng}
-        </Modal.Body>
-        :
-        <Modal.Body>
-          <Dropdown className = "btn-group dropleft"id = "dropdown-button-drop-start" as={ButtonGroup}>
-            <Dropdown.Toggle as={Button} split variant="link"  className="text-dark m-0 p-0" style ={{color :"red"}}>
-              {/* <span className="icon icon-sm">
-                <FontAwesomeIcon icon={faEllipsisH} className="icon-dark" />
-                  "選擇修改項目"
-              </span> */}
-              <Button variant="outline-primary" >{index}</Button>
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              <Dropdown.Item onClick={() => {editMaterialInventory("三階代碼")}}>
-                <FontAwesomeIcon icon={faEdit} className="me-2" /> 三階代碼
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => {editMaterialInventory("三階科目中文名稱")}}>
-                <FontAwesomeIcon icon={faEdit} className="me-2" /> 三階科目中文名稱
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => {editMaterialInventory("三階科目英文名稱")}}>
-                <FontAwesomeIcon icon={faEdit} className="me-2" /> 三階科目英文名稱
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => {editMaterialInventory("四階代碼")}}>
-                <FontAwesomeIcon icon={faEdit} className="me-2" /> 四階代碼
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => {editMaterialInventory("四階科目中文名稱")}}>
-                <FontAwesomeIcon icon={faEdit} className="me-2" /> 四階科目中文名稱
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => {editMaterialInventory("四階科目英文名稱")}}>
-                <FontAwesomeIcon icon={faEdit} className="me-2" /> 四階科目英文名稱
-              </Dropdown.Item>
-              {/* <Dropdown.Item className="text-danger" onClick={console.log("button2")} >
-                <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> Option1 onClick={() => console.log("searching")} 
-              </Dropdown.Item> */}
-            </Dropdown.Menu>
-          </Dropdown>
-          {editing? 
-          <Form >
-            <InputGroup >
-              <InputGroup.Text>
-                <FontAwesomeIcon  />
-              </InputGroup.Text>
-              <Form.Control type="text" onClick ={e => modifyMaterialInventory(e)} onChange={e => console.log(e.target.value)} />
-              {/* <FontAwesomeIcon icon={faEdit} className="me-2" />  */}
-            </InputGroup>
-          </Form>:null}
-        </Modal.Body>
-      }
-      <Modal.Footer>
-        {state === "deleting"?<Button variant="outline-secondary" onClick={handleDeleteAccount}>確認</Button> :<Button variant="outline-secondary" onClick={handleEditAccount}>修改</Button>  }
-        <Button variant="outline-primary" onClick={() => {setRemoveModal(false)}}>取消</Button>
-      </Modal.Footer>
-    </Modal>
     )
-  };
+    alert(response.data);
+  }
+
+
+ 
       
   const TableRow = (props) => {
-    // const { invoiceNumber, subscription, price, issueDate,  status } = props;
-    const { third, third_subjects_cn, third_subjects_eng, fourth, fourth_subjects_cn, fourth_subjects_eng, } = props;
-    // const statusVariant = status === "Paid" ? "success"
-    //   : status === "Due" ? "warning"
-    //     : status === "Canceled" ? "danger" : "primary";
+    const { third, third_subjects_cn, third_subjects_eng, fourth, fourth_subjects_cn, fourth_subjects_eng,status} = props;
 
     return (
       <tr>
@@ -312,21 +105,12 @@ export const AccountTable = (props) => {
           </span>
         </td>
         <td>
-          <Dropdown className = "btn-group dropleft"id = "dropdown-button-drop-start" as={ButtonGroup}>
-            <Dropdown.Toggle as={Button} split variant="link" className="text-dark m-0 p-0">
-              <span className="icon icon-sm">
-                <FontAwesomeIcon icon={faEllipsisH} className="icon-dark" />
-              </span>
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              <Dropdown.Item onClick={() => {handleRowEdit(third, third_subjects_cn, third_subjects_eng, fourth, fourth_subjects_cn, fourth_subjects_eng)}}>
-                <FontAwesomeIcon icon={faEdit} className="me-2" /> Edit
-              </Dropdown.Item>
-              <Dropdown.Item className="text-danger" onClick={() => {handleRowDelete(third, third_subjects_cn, third_subjects_eng, fourth, fourth_subjects_cn, fourth_subjects_eng)}} >
-                <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> Remove
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
+          <span className={`fw-normal`}>
+            {status}
+          </span>
+        </td>
+        <td>
+          <Button variant="outline-primary" onClick={() => {handleChangeState(fourth, status)}}>變更</Button>
         </td> 
         
       </tr>
@@ -346,7 +130,8 @@ export const AccountTable = (props) => {
               <th className="border-bottom">四階代碼</th>
               <th className="border-bottom">四階科目中文名稱</th>
               <th className="border-bottom">四階科目英文名稱</th>
-              <th className="border-bottom">選項</th>
+              <th className="border-bottom">顯示狀態（1：顯示）</th>
+              <th className="border-bottom">編輯顯示狀態</th>
             </tr>
           </thead>
           <tbody>
@@ -375,12 +160,6 @@ export const AccountTable = (props) => {
           </small>
         </Card.Footer>
       </Card.Body>
-      {removeModal?
-          <RemoveModal /** 編輯視窗 */
-            show={removeModal}
-            onHide={() => setRemoveModal(false)}
-            state={state}
-        />:<div></div>}
     </Card>} 
   </div>
     
@@ -508,6 +287,8 @@ export const RawMaterialInventoryTable = (props) => {
   const [orig, setOrig] = useState("")
   const [state, setState] = useState("")
   const [index, setIndex] = useState("選擇修改項目")
+  const {mat, setMat} = useChat();
+
 
   
   const [editing, setEditing] = useState(false)
@@ -515,7 +296,7 @@ export const RawMaterialInventoryTable = (props) => {
   console.log(Acc);
   const handleClick = (response) =>{
     alert(response);
-    window.location.reload(false)
+    // window.location.reload(false)
     
   }
 
@@ -619,6 +400,7 @@ export const RawMaterialInventoryTable = (props) => {
     console.log(response.data)
     setRemoveModal(false)
     handleClick(response.data);
+    setMat("del")
 
   }
 
@@ -644,8 +426,7 @@ export const RawMaterialInventoryTable = (props) => {
     setEditing(false);
     setIndex("選擇修改項目")
     handleClick(response.data);
-
-
+    setMat("edit")
   }
 
   const handleRowEdit = (id, m_id, m_name, date, start_quantity,start_unit, start_unit_price, start_cost) => {
@@ -708,18 +489,18 @@ export const RawMaterialInventoryTable = (props) => {
               <Button variant="outline-primary" >{index}</Button>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item onClick={() => {editMaterialInventory("編號")}}>
+              {/* <Dropdown.Item onClick={() => {editMaterialInventory("編號")}}>
                 <FontAwesomeIcon icon={faEdit} className="me-2" /> 編號
-              </Dropdown.Item>
+              </Dropdown.Item> */}
               <Dropdown.Item onClick={() => {editMaterialInventory("材料代碼")}}>
                 <FontAwesomeIcon icon={faEdit} className="me-2" /> 材料代碼
               </Dropdown.Item>
               <Dropdown.Item onClick={() => {editMaterialInventory("材料名稱")}}>
                 <FontAwesomeIcon icon={faEdit} className="me-2" /> 材料名稱
               </Dropdown.Item>
-              <Dropdown.Item onClick={() => {editMaterialInventory("日期")}}>
+              {/* <Dropdown.Item onClick={() => {editMaterialInventory("日期")}}>
                 <FontAwesomeIcon icon={faEdit} className="me-2" /> 日期
-              </Dropdown.Item>
+              </Dropdown.Item> */}
               <Dropdown.Item onClick={() => {editMaterialInventory("期初數量")}}>
                 <FontAwesomeIcon icon={faEdit} className="me-2" /> 期初數量
               </Dropdown.Item>
@@ -729,9 +510,9 @@ export const RawMaterialInventoryTable = (props) => {
               <Dropdown.Item onClick={() => {editMaterialInventory("期初單價")}}>
                 <FontAwesomeIcon icon={faEdit} className="me-2" /> 期初單價
               </Dropdown.Item>
-              <Dropdown.Item onClick={() => {editMaterialInventory("期初成本")}}>
+              {/* <Dropdown.Item onClick={() => {editMaterialInventory("期初成本")}}>
                 <FontAwesomeIcon icon={faEdit} className="me-2" /> 期初成本
-              </Dropdown.Item>
+              </Dropdown.Item> */}
               {/* <Dropdown.Item className="text-danger" onClick={console.log("button2")} >
                 <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> Option1 onClick={() => console.log("searching")} 
               </Dropdown.Item> */}
@@ -774,7 +555,7 @@ export const RawMaterialInventoryTable = (props) => {
         <td>{id}</td>
         <td>{m_id}</td>
         <td>{m_name}</td>
-        <td>{date}</td>
+        <td>{date === null?"---":moment(date).format('YYYY-MM-DD')}</td>
         <td>{start_quantity}</td>
         <td>{start_unit}</td>
         <td>{start_unit_price}</td>
@@ -813,7 +594,7 @@ export const RawMaterialInventoryTable = (props) => {
                   <th className="border-bottom">編號</th>
                   <th className="border-bottom">材料代碼</th>
                   <th className="border-bottom">材料名稱</th>
-                  <th className="border-bottom">日期</th>
+                  <th className="border-bottom">建立日期</th>
                   <th className="border-bottom">期初數量</th>
                   <th className="border-bottom">期初單位</th>
                   <th className="border-bottom">期初單價</th>

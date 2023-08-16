@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { Modal, Button, Form } from '@themesberg/react-bootstrap'
 import axios from "axios";
+import moment from "moment";
+import { useChat } from "../../api/context";
+
 
 
 const SupplierFormModal = ({ show, onClose, onSave }) => {
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
-
+  const {sup, setSup} = useChat();
   const [supplierData, setSupplierData] = useState({
     name: "",
     supplierCode: "", // Updated field name to "供應商代碼"
@@ -22,6 +25,9 @@ const SupplierFormModal = ({ show, onClose, onSave }) => {
 
   const handleSubmit = async(e) => {
     e.preventDefault();
+    const curDate = new Date();
+    supplierData.updateTime =  moment(curDate).format('YYYY-MM-DD HH:mm:ss');
+    
     onSave(supplierData);
     console.log(supplierData)
     const response = await instance.post('/add_supplier', {
@@ -29,7 +35,8 @@ const SupplierFormModal = ({ show, onClose, onSave }) => {
     }
   )
   alert("已新增供應商")
-  window.location.reload(false)
+  setSup("add_sup")
+  // window.location.reload(false)
   };
 
   return (

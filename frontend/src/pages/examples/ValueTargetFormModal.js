@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState} from "react";
 import { Modal, Button, Form } from '@themesberg/react-bootstrap'
 import axios from "axios";
 import moment from "moment";
+import { useChat } from "../../api/context";
+
 
 
 const ValueTargetFormModal = ({ show, type, onClose, onSave}) => {
@@ -13,6 +15,10 @@ const ValueTargetFormModal = ({ show, type, onClose, onSave}) => {
     category:"", // Updated field name to "供應商代碼"
     // Add other fields as needed
   });
+  const [response, setResponse] = useState("")
+  // const [, setVtype] = useState("")
+  const {task, setTask} = useChat();
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,19 +44,25 @@ const ValueTargetFormModal = ({ show, type, onClose, onSave}) => {
       ID:JSON.stringify(valueTargetData)
     }
   )
-  alert("已新曾價值標的")
-  window.location.reload(false)
+  console.log(response)
+  // setResponse(response)
+  setTask(response.data)
+  alert("已新增價值標的")
+  setValueTargetData({name: "",
+  valueTargetCode: ""})
+
+  // window.location.reload(false)
   };
 
   return (
     <Modal show={show} onHide={onClose}>
       <Modal.Header closeButton>
-        <Modal.Title>新增價值標的</Modal.Title>
+        <Modal.Title>新增{type === "原料"?"原料":type === "產品"?"產品":"顧客"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="valueTargetName">
-            <Form.Label>價值標的名稱</Form.Label>
+            <Form.Label>{type === "原料"?"原料":type === "產品"?"產品":"顧客"}名稱</Form.Label>
             <Form.Control
               type="text"
               name="name"
@@ -60,10 +72,12 @@ const ValueTargetFormModal = ({ show, type, onClose, onSave}) => {
             />
           </Form.Group>
           <Form.Group controlId="valueTargetCode">
-            <Form.Label>價值標的代碼</Form.Label>
+            <Form.Label>{type === "原料"?"原料":type === "產品"?"產品":"顧客"}代碼</Form.Label>
             <Form.Control
               type="text"
               name="valueTargetCode"
+              // placeholder ="M"
+              placeholder = {type === "原料"?"M":type === "產品"?"P":"C"}
               value={valueTargetData.valueTargetCode}
               onChange={handleChange}
               required

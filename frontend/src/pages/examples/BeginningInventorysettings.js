@@ -7,6 +7,8 @@ import { RawMaterialInventoryTable } from "../../components/Tables";
 import RawMaterialFormModal from "./InventoryForm";
 import ExcelJs from "exceljs";
 import axios from "axios";
+import { useChat } from "../../api/context";
+
 
 
 export default () => {
@@ -14,6 +16,8 @@ export default () => {
   const [showInventoryModal, setShowInventoryModal] = useState(false);
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [result, setResult] = useState([]);
+  const {mat, setMat} = useChat();
+
 
   const handleExcelUpload = (event) => {
     const file = event.target.files[0];
@@ -22,13 +26,7 @@ export default () => {
 
   const handleExcelUploadSubmit = async () => {
     const formData = new FormData();
-    // formData.append("file", excelFile);
-    // const res = await api.post("/api/excel", formData, {
-    //   headers: {
-    //     "Content-Type": "multipart/form-data",
-    //   },
-    // });
-    // console.log(res);
+
   };
 
   const handleExceldownload = async () => {
@@ -111,11 +109,13 @@ export default () => {
   ];
 
   const handleViewInventory = async () => {
-
     setResult(await instance.get('/sel_inventory'));
     console.log(result);
   }
 
+  useEffect(()=>{
+    handleViewInventory()
+  },[mat])
 
 
   return (
