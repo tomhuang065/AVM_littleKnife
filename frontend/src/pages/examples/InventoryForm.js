@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { Modal, Button, Form } from '@themesberg/react-bootstrap';
 import axios from "axios";
+import { useChat } from "../../api/context";
+
 
 const RawMaterialFormModal = ({ show, onClose, onSave }) => {
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
+  const {mat, setMat} = useChat();
+
   const [rawMaterialData, setRawMaterialData] = useState({
     productCode: "",
     productName: "",
@@ -25,14 +29,25 @@ const RawMaterialFormModal = ({ show, onClose, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    rawMaterialData.openingCost = `${Number(rawMaterialData.openingQuantity)*Number(rawMaterialData.openingUnitPrice)}`
+    console.log(rawMaterialData.openingCost)
     onSave(rawMaterialData);
     console.log(rawMaterialData)
     const response = await instance.post('/add_inventory', {
       ID:JSON.stringify(rawMaterialData)
     }
   )
-  alert("已新增原料資料")
-  window.location.reload(false)
+  alert("已新增期初庫存資料")
+  setMat(response.data)
+  setRawMaterialData({
+    productCode: "",
+    productName: "",
+    date: "",
+    openingQuantity: "",
+    openingUnit: "",
+    openingUnitPrice: "",
+    openingCost: "",
+  })
   };
 
   return (
@@ -102,7 +117,10 @@ const RawMaterialFormModal = ({ show, onClose, onSave }) => {
               required
             />
           </Form.Group>
-          <Form.Group controlId="openingCost">
+          {/* <Form.Group controlId="openingCost">
+            <Form.Label>期初成本</Form.Label>
+            <Form.Control
+              type="<Form.Group controlId="openingCost">
             <Form.Label>期初成本</Form.Label>
             <Form.Control
               type="number"
@@ -111,14 +129,20 @@ const RawMaterialFormModal = ({ show, onClose, onSave }) => {
               onChange={handleChange}
               required
             />
-          </Form.Group>
+          </Form.Group>number"
+              name="openingCost"
+              value={rawMaterialData.openingCost}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group> */}
           {/* Add other input fields for raw material details */}
           <Modal.Footer>
             <Button variant="secondary" onClick={onClose}>
               取消
             </Button>
             <Button type="submit" variant="primary">
-              儲存
+              新增
             </Button>
           </Modal.Footer>
         </Form>

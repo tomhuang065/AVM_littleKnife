@@ -1,13 +1,14 @@
 
 import React from "react";
 import axios from 'axios';
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp, faArrowDown, faArrowUp, faEdit, faEllipsisH, faExternalLinkAlt, faEye, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { Form, Nav, Card, Button, Table, Dropdown, ProgressBar,  InputGroup, Pagination, ButtonGroup } from '@themesberg/react-bootstrap';
 import { Link } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import moment from "moment";
+import { useChat } from "../api/context";
 
 
 import { Routes } from "../routes";
@@ -17,15 +18,64 @@ import transactions from "../data/transactions";
 
 export const ValuetargetsTable = (props) => {
     const totalTransactions = transactions.length;
+    const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
     const value = props.valueTarget.data
     const type = props.type
-    // console.log(value)
+    const [orig, setOrig] = useState("")
+    const {val, setVal, valType, setValType} = useChat()
+
+    const handleChangeState = (orig, status) =>{
+      console.log("change state", status)
+      console.log(type)
+      setValType(type)
+      setOrig(orig)
+      if(status === 1){
+        setVal(false)
+      }
+      else{
+        setVal(true)
+      }
+    }
+
+    useEffect(()=>{
+      console.log(val)
+      if(orig !== ''){
+        handleEditValueTarget(val)
+      }
+      setOrig("")    
+    },[val])
+
+    const handleEditValueTarget = async(stat)=>{
+      const jsonData = {
+        orig: `${orig}`,
+        status:`${stat}`,
+      };
+      const response = await instance.post('/mod_value_target', {
+        ID:JSON.stringify(jsonData)
+      }
+      )
+      alert(response.data);
+      setVal(null)
+    }
+    const handleDeleteValueTarget = async(targetNum)=>{
+      // console.log(fourth)
+      const jsonData = {
+        content: `${targetNum}`
+      };
+      const response = await instance.post('/del_value_target', {
+        ID:JSON.stringify(jsonData)
+      }
+    )
+      console.log("get repsonse dta",response.data)
+      // setRemoveModal(false)
+      alert("已刪除價值標的")
+      // handleClick(response.data);
+      setValType(type)
+  
+    }
 
     const TableRow = (props) => {
-      const { id, category, target_num, target_name, target_status, update_time } = props;
-    //   const statusVariant = status === "Paid" ? "success"
-    //     : status === "Due" ? "warning"
-    //       : status === "Canceled" ? "danger" : "primary";
+      const { id, target_num, target_name, target_status, update_time } = props;
   
       return (
         <tr>
@@ -46,12 +96,12 @@ export const ValuetargetsTable = (props) => {
           </td>
           <td>
             <span className="fw-normal">
-              {target_status === null?"---":parseFloat(target_status).toFixed(0)}
+              {update_time === null?"---":moment(update_time).format('YYYY-MM-DD HH:mm:ss')}
             </span>
           </td>
           <td>
             <span className="fw-normal">
-              {update_time === null?"---":moment(update_time).format('YYYY-MM-DD HH:mm:ss')}
+              {target_status === null?"---":parseFloat(target_status).toFixed(0)}
             </span>
           </td>
           <td>
@@ -62,11 +112,11 @@ export const ValuetargetsTable = (props) => {
                 </span>
               </Dropdown.Toggle>
               <Dropdown.Menu>
-                <Dropdown.Item>
-                  <FontAwesomeIcon icon={faEdit} className="me-2" /> Edit
+                <Dropdown.Item onClick={() => {handleChangeState(target_num, target_status)}}>
+                  <FontAwesomeIcon icon={faEdit} className="me-2" /> 變更狀態
                 </Dropdown.Item>
-                <Dropdown.Item className="text-danger">
-                  <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> Remove
+                <Dropdown.Item className="text-danger" onClick={() => {handleDeleteValueTarget(target_num)}}>
+                  <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> 刪除
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
@@ -84,8 +134,8 @@ export const ValuetargetsTable = (props) => {
                 <th className="border-bottom">編號</th>
                 <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}代碼</th>
                 <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}名稱</th>
-                <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}狀態</th>
                 <th className="border-bottom">更新時間</th>
+                <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}狀態</th>
                 <th className="border-bottom">選項</th>
               </tr>
             </thead>

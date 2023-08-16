@@ -14,26 +14,26 @@ import ReactHero from "../assets/img/technologies/react-hero-logo.svg";
 export default (props = {}) => {
   const location = useLocation();
   const { pathname } = location;
-  const {val, setVal, sendValue, signIn, suppliers} = useChat();
+  // const {val, setVal, sendValue, signIn, suppliers} = useChat();
 
 
-  const onSendValue = async () => {
-    // console.log(value)
-    // if(!value){
-    //     throw console.error("Some field missing");
-    // }
-    console.log("onsendvalue_wwwwww")
-    const payload = {
-        val : "from sidebar",  
-    }
-    // signIn(payload);
-    sendValue(payload);
-    console.log(payload)
+  // const onSendValue = async () => {
+  //   // console.log(value)
+  //   // if(!value){
+  //   //     throw console.error("Some field missing");
+  //   // }
+  //   console.log("onsendvalue_wwwwww")
+  //   const payload = {
+  //       val : "from sidebar",  
+  //   }
+  //   // signIn(payload);
+  //   sendValue(payload);
+  //   console.log(payload)
 
-  }
-  useEffect(() => {
-    onSendValue()
-  }, [location]);
+  // }
+  // useEffect(() => {
+  //   onSendValue()
+  // }, [location]);
   const CollapsableNavItem = (props) => {
     const { eventKey, title, icon, children = null } = props;
     const defaultKey = pathname.indexOf(eventKey) !== -1 ? eventKey : "";
@@ -98,7 +98,7 @@ export default (props = {}) => {
                   <NavItem title="單位轉換表(pending)" link={Routes.Settings.path} />
                   <NavItem title="原物料期初庫存設定" link={Routes.BeginningInventorysettings.path} />
                 </CollapsableNavItem>
-                <NavItem title="供應商基本資料設定" link={Routes.Supplierssettings.path}  sup={suppliers} />
+                <NavItem title="供應商基本資料設定" link={Routes.Supplierssettings.path}  />
                 <NavItem title="權限設定" link={Routes.Settings.path} />
               </CollapsableNavItem>            
               <NavItem title="Pos系統" icon={faHandHoldingUsd} link={Routes.Posystem.path} />

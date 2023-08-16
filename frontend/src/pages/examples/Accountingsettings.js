@@ -83,8 +83,6 @@ export default () => {
   }
   useEffect(()=>{
     handleViewAccount()
-    
-    
   },[stat])
 
   return (

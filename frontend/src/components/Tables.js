@@ -8,6 +8,7 @@ import { Form, Nav, Card, Button, Table, Dropdown, ProgressBar,  InputGroup, Pag
 import { Link } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import { useChat } from "../api/context";
+import moment from "moment";
 
 
 import { Routes } from "../routes";
@@ -286,6 +287,8 @@ export const RawMaterialInventoryTable = (props) => {
   const [orig, setOrig] = useState("")
   const [state, setState] = useState("")
   const [index, setIndex] = useState("選擇修改項目")
+  const {mat, setMat} = useChat();
+
 
   
   const [editing, setEditing] = useState(false)
@@ -293,7 +296,7 @@ export const RawMaterialInventoryTable = (props) => {
   console.log(Acc);
   const handleClick = (response) =>{
     alert(response);
-    window.location.reload(false)
+    // window.location.reload(false)
     
   }
 
@@ -397,6 +400,7 @@ export const RawMaterialInventoryTable = (props) => {
     console.log(response.data)
     setRemoveModal(false)
     handleClick(response.data);
+    setMat("del")
 
   }
 
@@ -422,8 +426,7 @@ export const RawMaterialInventoryTable = (props) => {
     setEditing(false);
     setIndex("選擇修改項目")
     handleClick(response.data);
-
-
+    setMat("edit")
   }
 
   const handleRowEdit = (id, m_id, m_name, date, start_quantity,start_unit, start_unit_price, start_cost) => {
@@ -486,18 +489,18 @@ export const RawMaterialInventoryTable = (props) => {
               <Button variant="outline-primary" >{index}</Button>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item onClick={() => {editMaterialInventory("編號")}}>
+              {/* <Dropdown.Item onClick={() => {editMaterialInventory("編號")}}>
                 <FontAwesomeIcon icon={faEdit} className="me-2" /> 編號
-              </Dropdown.Item>
+              </Dropdown.Item> */}
               <Dropdown.Item onClick={() => {editMaterialInventory("材料代碼")}}>
                 <FontAwesomeIcon icon={faEdit} className="me-2" /> 材料代碼
               </Dropdown.Item>
               <Dropdown.Item onClick={() => {editMaterialInventory("材料名稱")}}>
                 <FontAwesomeIcon icon={faEdit} className="me-2" /> 材料名稱
               </Dropdown.Item>
-              <Dropdown.Item onClick={() => {editMaterialInventory("日期")}}>
+              {/* <Dropdown.Item onClick={() => {editMaterialInventory("日期")}}>
                 <FontAwesomeIcon icon={faEdit} className="me-2" /> 日期
-              </Dropdown.Item>
+              </Dropdown.Item> */}
               <Dropdown.Item onClick={() => {editMaterialInventory("期初數量")}}>
                 <FontAwesomeIcon icon={faEdit} className="me-2" /> 期初數量
               </Dropdown.Item>
@@ -507,9 +510,9 @@ export const RawMaterialInventoryTable = (props) => {
               <Dropdown.Item onClick={() => {editMaterialInventory("期初單價")}}>
                 <FontAwesomeIcon icon={faEdit} className="me-2" /> 期初單價
               </Dropdown.Item>
-              <Dropdown.Item onClick={() => {editMaterialInventory("期初成本")}}>
+              {/* <Dropdown.Item onClick={() => {editMaterialInventory("期初成本")}}>
                 <FontAwesomeIcon icon={faEdit} className="me-2" /> 期初成本
-              </Dropdown.Item>
+              </Dropdown.Item> */}
               {/* <Dropdown.Item className="text-danger" onClick={console.log("button2")} >
                 <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> Option1 onClick={() => console.log("searching")} 
               </Dropdown.Item> */}
@@ -552,7 +555,7 @@ export const RawMaterialInventoryTable = (props) => {
         <td>{id}</td>
         <td>{m_id}</td>
         <td>{m_name}</td>
-        <td>{date}</td>
+        <td>{date === null?"---":moment(date).format('YYYY-MM-DD')}</td>
         <td>{start_quantity}</td>
         <td>{start_unit}</td>
         <td>{start_unit_price}</td>
@@ -591,7 +594,7 @@ export const RawMaterialInventoryTable = (props) => {
                   <th className="border-bottom">編號</th>
                   <th className="border-bottom">材料代碼</th>
                   <th className="border-bottom">材料名稱</th>
-                  <th className="border-bottom">日期</th>
+                  <th className="border-bottom">建立日期</th>
                   <th className="border-bottom">期初數量</th>
                   <th className="border-bottom">期初單位</th>
                   <th className="border-bottom">期初單價</th>

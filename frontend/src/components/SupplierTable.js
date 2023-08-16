@@ -1,11 +1,15 @@
 import React from "react";
 import axios from 'axios';
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp, faArrowDown, faArrowUp, faEdit, faEllipsisH, faExternalLinkAlt, faEye, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { Form, Nav, Card, Button, Table, Dropdown, ProgressBar,  InputGroup, Pagination, ButtonGroup } from '@themesberg/react-bootstrap';
 import { Link } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
+import moment from "moment";
+import { useChat } from "../api/context";
+
+
 
 import { Routes } from "../routes";
 import transactions from "../data/transactions";
@@ -23,6 +27,8 @@ export const SupplierTable = (props) => {
     const [updateUsr, setUpdateUsr] = useState("")
     const [updateTime, setUpdateTime] = useState("")
     const [orig, setOrig] = useState("")
+
+    const {sup, setSup} = useChat();
 
 
 
@@ -44,9 +50,7 @@ export const SupplierTable = (props) => {
         setOrig(supNum)
     }
     const handleRowDelete = (supNum, supName,  updateUsr, updateTime) => {
-        console.log("delete row")
         setState("deleting")
-        console.log(supName, supNum, updateTime, updateUsr)
         setRemoveModal(true);
         setSupName(supName)
         setSupNum(supNum)
@@ -116,8 +120,8 @@ export const SupplierTable = (props) => {
       }
 
       const handleClick = (response) =>{
-        alert(response);
-        window.location.reload(false)
+        alert("已變更供應商狀態");
+        // window.location.reload(false)
         
       }
       const handleDeleteSupplier= async()=>{
@@ -132,17 +136,15 @@ export const SupplierTable = (props) => {
         console.log(response.data)
         setRemoveModal(false)
         handleClick(response.data);
+        setSup(null)
     
       }
     
-      const handleEditSupplier = async()=>{
-      //   console.log(fourth)
+      const handleEditSupplier = async(sup)=>{
+        console.log("sup", sup)
         const jsonData = {
           orig: `${orig}`,
-          supName: `${supName}`,
-          supNum: `${supNum}`,
-          updatTime: `${updateTime}`,
-          updateUsr: `${updateUsr}`,
+          status:`${sup}`
 
         };
         const response = await instance.post('/update_supplier', {
@@ -158,9 +160,31 @@ export const SupplierTable = (props) => {
     
     
       }
+
+      const handleChangeState = (supNum, supName, updateUsr, updateTime, status) =>{
+        setOrig(supNum)
+        setSupName(supName)
+        setSupNum(supNum)
+        setUpdateTime(updateTime)
+        setUpdateUsr(updateUsr)
+        if(status === 1){
+          setSup(false)
+        }
+        else{
+          setSup(true)
+        }
+      }
+
+      useEffect(()=>{
+        console.log(sup)
+        if(orig !== ''){
+          handleEditSupplier(sup)
+        }
+        setOrig("")    
+      },[sup])
   
     const TableRow = (props) => {
-      const { supplier_num, supplier_name, id, update_user,  update_time } = props;
+      const { supplier_num, supplier_name, id, update_user,  update_time, status } = props;
       //const statusVariant = status === "Paid" ? "success"
       //: status === "Due" ? "warning"
         //: status === "Canceled" ? "danger" : "primary";
@@ -177,6 +201,12 @@ export const SupplierTable = (props) => {
               {supplier_name}
             </span>
           </td>
+          
+          <td>
+            <span className="fw-normal">
+            {update_time === null?"---":moment(update_time).format('YYYY-MM-DD HH:mm:ss')}
+            </span>
+          </td>
           <td>
             <span className="fw-normal">
             {parseFloat(update_user).toFixed(0)}
@@ -184,25 +214,31 @@ export const SupplierTable = (props) => {
           </td>
           <td>
             <span className="fw-normal">
-              {parseFloat(update_time).toFixed(0)}
+              {status}
             </span>
           </td>
           <td>
-            <Dropdown as={ButtonGroup}>
+          <Button variant="outline-primary" onClick={() => {handleChangeState(supplier_num, supplier_name, update_user, update_time, status)}}>變更</Button>
+
+            {/* <Dropdown as={ButtonGroup}>
               <Dropdown.Toggle as={Button} split variant="link" className="text-dark m-0 p-0">
                 <span className="icon icon-sm">
                   <FontAwesomeIcon icon={faEllipsisH} className="icon-dark" />
                 </span>
               </Dropdown.Toggle>
               <Dropdown.Menu>
+                <Dropdown.Item onClick={() => {handleChangeState(supplier_num, supplier_name, update_user, update_time, status)}}>
+                  <FontAwesomeIcon icon={faEdit} className="me-2" /> Change
+                </Dropdown.Item>
                 <Dropdown.Item onClick={() => {handleRowEdit(supplier_num, supplier_name, update_user, update_time)}}>
                   <FontAwesomeIcon icon={faEdit} className="me-2" /> Edit
                 </Dropdown.Item>
+
                 <Dropdown.Item className="text-danger"onClick={() => {handleRowDelete(supplier_num, supplier_name, update_user, update_time)}} >
                   <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> Remove
                 </Dropdown.Item>
               </Dropdown.Menu>
-            </Dropdown>
+            </Dropdown> */}
           </td>
         </tr>
       );
@@ -280,10 +316,10 @@ export const SupplierTable = (props) => {
               <tr>
                 <th className="border-bottom">供應商代碼</th>
                 <th className="border-bottom">供應商名稱</th>
-                <th className="border-bottom">更新人員</th>
                 <th className="border-bottom">更新時間</th>
-                {/* <th className="border-bottom">供應商狀態</th> */}
-                <th className="border-bottom">選項</th>
+                <th className="border-bottom">更新人員</th>
+                <th className="border-bottom">供應商狀態(1:顯示)</th>
+                <th className="border-bottom">變更供應商狀態</th>
               </tr>
             </thead>
             <tbody>

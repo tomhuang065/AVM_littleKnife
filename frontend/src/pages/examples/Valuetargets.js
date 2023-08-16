@@ -20,7 +20,7 @@ export default () => {
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [type, setType] = useState("")
   
-  const {task, setTask} = useChat();
+  const {val, task, setTask, valType, setValType} = useChat();
 
   const handleExcelUpload = (event) => {
     const file = event.target.files[0];
@@ -30,6 +30,11 @@ export default () => {
   useEffect(()=>{
     handleViewValueTarget(task)
   },[task])
+
+  useEffect(()=>{
+    console.log("get valType changed")
+    handleViewValueTarget(valType) //from table, changing status
+  },[val, valType])
 
   const handleExcelUploadSubmit = async () => {
     const formData = new FormData();
