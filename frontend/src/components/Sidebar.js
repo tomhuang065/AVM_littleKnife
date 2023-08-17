@@ -104,25 +104,25 @@ export default (props = {}) => {
             <Nav className="flex-column pt-3 pt-md-0">
               <NavItem title="您好！ 黃語棠" link={Routes.Presentation.path} image={ReactHero} />
               <NavItem title="首頁" link={Routes.DashboardOverview.path} icon={faChartPie} />
-              <CollapsableNavItem eventKey="examples/" title="設定" icon={faCog}>
-                <CollapsableNavItem eventKey="examples/" title="財會系統資料庫">
-                  <NavItem title="會計科目設定" link={Routes.Accountingsettings.path} />
-                  <NavItem title="價值標的設定" link={Routes.Valuetargets.path} />
-                </CollapsableNavItem>
-                <CollapsableNavItem eventKey="examples/" title="進銷存資料庫">
-                  <NavItem title="BOM 設定" link={Routes.Bomsettings.path} />
-                  <NavItem title="單位轉換表(pending)" link={Routes.Settings.path} />
-                  <NavItem title="原物料期初庫存設定" link={Routes.BeginningInventorysettings.path} />
-                </CollapsableNavItem>
+              <NavItem title="會計財務" icon={faHandHoldingUsd} link={Routes.Transactions.path} />
+              <CollapsableNavItem eventKey="examples/" title="進銷存">
+                <NavItem title="進貨" link={Routes.Posystem.path} />
+                <NavItem title="原物料期初庫存設定" link={Routes.BeginningInventorysettings.path} />
+              </CollapsableNavItem>
+              <CollapsableNavItem eventKey="examples/" title="基礎設定" icon={faCog}>
+                <NavItem title="會科設定" link={Routes.Accountingsettings.path} />
+                <NavItem title="價值標的設定" link={Routes.Valuetargets.path} />
                 <NavItem title="供應商基本資料設定" link={Routes.Supplierssettings.path}  />
-                <NavItem title="權限設定" link={Routes.Settings.path} />
+                <NavItem title="BOM 設定" link={Routes.Bomsettings.path} />
+                <NavItem title="單位轉換表(pending)" link={Routes.Settings.path} />
               </CollapsableNavItem>            
-              <NavItem title="Pos系統" icon={faHandHoldingUsd} link={Routes.Posystem.path} />
-              <NavItem title="財會系統" icon={faHandHoldingUsd} link={Routes.Transactions.path} />
-
               <CollapsableNavItem eventKey="tables/" title="管理報表" icon={faTable}>
-                <NavItem title="財會系統：損益表" link={Routes.BootstrapTables.path} />
+                <NavItem title="損益表" link={Routes.BootstrapTables.path} />
                 <NavItem title="進銷存管理報表" link={Routes.BootstrapTables.path} />
+              </CollapsableNavItem>
+              <CollapsableNavItem eventKey="tables/" title="使用者權限設定" icon={faTable}>
+                <NavItem title="使用者權限設定" link={Routes.Settings.path} />
+                <NavItem title="報表權限設定" link={Routes.Settings.path} />
               </CollapsableNavItem>
 
               <Dropdown.Divider className="my-3 border-indigo" />
