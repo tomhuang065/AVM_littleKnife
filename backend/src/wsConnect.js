@@ -35,7 +35,7 @@ const sendValue = async (payload, ws) => {
 
 
 //會計科目excel
-const excel_subjects = (paylaod, ws)  => {
+const excel_subjects = (paylaod, ws) => {
     const account_subjects = new ExcelJS.Workbook();
     const sheet = account_subjects.addWorksheet('會計科目');
     sheet.addTable({
@@ -316,18 +316,18 @@ const excel_subjects = (paylaod, ws)  => {
             ['821', '稅後純益（或純損） ', 'income after tax', '8211', '稅後純益（或純損） ', 'income after tax']
         ]
 
-        
+
     });
     account_subjects.xlsx.writeBuffer().then((content) => {
         const link = document.createElement("a");
-          const blobData = new Blob([content], {
+        const blobData = new Blob([content], {
             type: "application/vnd.ms-excel;charset=utf-8;"
-          });
-          link.download = '會計科目.xlsx';
-          link.href = URL.createObjectURL(blobData);
+        });
+        link.download = '會計科目.xlsx';
+        link.href = URL.createObjectURL(blobData);
     });
 
-    
+
     // sendData(['getAccountDownload', { Acc: account_subjects.xlsx.writeBuffer(), link: link }], ws);
     sendData(['getAccountDownload', { link: account_subjects }], ws);
     //等前端處理
@@ -1002,16 +1002,43 @@ function del_supplier(condition) {
 }
 
 //價值標的新增(data由前端拋來)
-function add_target(data) {
+async function add_target(data) {
+    target_num = data[1] //預設傳過來的data裡是這樣[`category`, `target_num`, `target_name`]
+    const check = await check_target_num(target_num)
+
+    const status = 1;
+    const now = new Date()
+    const sqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
+    data.push(status)
+    data.push(sqlDatetime)
+
     const query = 'INSERT INTO  `value_target`(`category`, `target_num`, `target_name`, `target_status`, `update_time`) VALUES ?'
     data = [data]
-    connection.query(query, [data], (error, results, fields) => {
-        if (error) {
-            console.error('新增錯誤');
-        } else {
-            let arr = obj_to_dict(results)
-            console.log('新增成功');
-        }
+    if (check.length > 0) {
+        console.log('已有相同的價值標的代碼，不可重複')
+    } else {
+        connection.query(query, [data], (error, results, fields) => {
+            if (error) {
+                console.error('新增錯誤');
+            } else {
+                let arr = obj_to_dict(results)
+                console.log('新增成功');
+            }
+        });
+    }
+
+}
+
+//價值標的代碼防呆
+function check_target_num(data) {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM value_target WHERE `target_num` = ?', data, (error, results, fields) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
     });
 }
 
@@ -1144,24 +1171,52 @@ function getInventorySetupData() {
 }
 
 //BOM第一階新增(對應到bom_first table)
-function add_bom_first(data) {
-    query = 'INSERT INTO `bom_first`(`product_id`, `product_name`, `product_sec_id`, `use_quantity`, `update_user`, `update_time`) VALUES ?'
-    const sqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
-    data.push(sqlDatetime)
-    data = [data]
-    connection.query(query, [data], (error, results, fields) => {
-        if (error) {
-            console.error('新增錯誤', error);
+async function add_bom_first(data) {
+    try {
+
+        id = data[0]
+        check = await bom_id_check(id)
+        if (check.length != 0) {
+            console.log('已有此產品代碼存在，請重新輸入新的產品代碼')
         } else {
-            // let arr = obj_to_dict(results)
-            console.log('新增成功');
+            query = 'INSERT INTO `bom_first`(`product_id`, `product_name`, `product_sec_id`, `use_quantity`, `update_user`, `update_time`) VALUES ?'
+            const now = new Date();
+            const sqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
+            data.push(sqlDatetime)
+            data = [data]
+            connection.query(query, [data], (error, results, fields) => {
+                if (error) {
+                    console.error('新增錯誤', error);
+                } else {
+                    // let arr = obj_to_dict(results)
+                    console.log('新增成功');
+                }
+            });
         }
-    });
+    } catch (error) {
+        console.log(error)
+    }
+
 }
 
+//BOM一階代碼防呆
+function bom_id_check(id) {
+    query = 'SELECT * FROM `bom_first` WHERE `product_id` = ?'
+    return new Promise((resolve, reject) => {
+        connection.query(query, id, (error, results, fields) => {
+            if (error) {
+                reject(error)
+            }
+            else {
+                resolve(results)
+            }
+        })
+    })
+}
 //BOM第二階新增(對應到bom_second table)
 function add_bom_second(data) {
     query = 'INSERT INTO `bom_second`(`product_id`, `product_sec_id`, `product_sec_name`, `material_id`, `use_quantity`, `update_user`, `update_time`) VALUES  ?'
+    const now = new Date();
     const sqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
     data.push(sqlDatetime)
     data = [data]
@@ -1189,7 +1244,7 @@ function update_bom_first(condition, updatedata) {
 }
 
 //BOM第二階修改(對應到bom_second table)
-function update_bom_second(condition, updatedata){
+function update_bom_second(condition, updatedata) {
     const updateQuery = 'UPDATE bom_second SET ? WHERE ?';
     connection.query(updateQuery, [updatedata, condition], (error, results, fields) => {
         if (error) {
@@ -1201,7 +1256,7 @@ function update_bom_second(condition, updatedata){
 }
 
 //BOM第一階刪除(對應到bom_first table)
-function del_bom_first(condition){
+function del_bom_first(condition) {
     const deleteQuery = 'DELETE FROM bom_first WHERE ?';
     connection.query(deleteQuery, condition, (error, results, fields) => {
         if (error) {
@@ -1213,7 +1268,7 @@ function del_bom_first(condition){
 }
 
 //BOM第二階刪除(對應到bom_second table)
-function del_bom_second(condition){
+function del_bom_second(condition) {
     const deleteQuery = 'DELETE FROM bom_second WHERE ?';
     connection.query(deleteQuery, condition, (error, results, fields) => {
         if (error) {
@@ -1245,14 +1300,16 @@ async function login(data) {
 
 }
 
-//register[使用者名稱,帳號,密碼,信箱]
+//register[使用者名稱,帳號,密碼,再次確認密碼,信箱]
 async function register(data) {
     try {
         const username = data[0]
         const account = data[1]
         const password = data[2]
+        const password_check = data[3]
         const permission = 1;
         const status = 1;
+        data.splice(3, 1)
         data.push(permission)
         data.push(status)
         const check_username = await register_indtical_username(username)
@@ -1265,6 +1322,8 @@ async function register(data) {
             console.log('使用者名稱以被註冊，請重新填寫')
         } else if (check_account.length > 0) {
             console.log('帳號以被註冊，請重新填寫')
+        } else if (password != password_check) {
+            console.log('兩次密碼不相同，請再次確認')
         } else {
             if (password.length < 6) {
                 console.log('密碼長度至少需6位數字，請重新填寫')
@@ -1284,6 +1343,37 @@ async function register(data) {
     catch (error) {
         console.log(error)
     }
+}
+
+//忘記密碼(密碼重設)[帳號,密碼,再次確認密碼]
+async function reset_password(data) {
+    try {
+
+        const account = data[0]
+        const userinfo = await getUserInfo(account)
+        const password = data[1]
+        const password_check = data[2]
+        if (userinfo.length > 0) {
+            if (password === password_check) {
+                const query = 'UPDATE `user` SET `password` = ? WHERE `account` = ? '
+                connection.query(query, [password, account], (error, results, fields) => {
+                    if (error) {
+                        console.error('修改資料庫錯誤：', error);
+                    } else {
+                        console.log('已成功重設密碼');
+                    }
+                });
+            }
+            else {
+                console.log('兩次密碼不相同，請再次確認')
+            }
+        } else {
+            console.log('帳號有誤，請重新確認')
+        }
+    } catch (error) {
+        console.log(error)
+    }
+
 }
 
 //取login帳密
