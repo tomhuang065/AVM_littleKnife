@@ -105,7 +105,7 @@ export default (props = {}) => {
               <NavItem title="您好！ 黃語棠" link={Routes.Presentation.path} image={ReactHero} />
               <NavItem title="首頁" link={Routes.DashboardOverview.path} icon={faChartPie} />
               <NavItem title="會計財務" icon={faHandHoldingUsd} link={Routes.Transactions.path} />
-              <CollapsableNavItem eventKey="examples/" title="進銷存">
+              <CollapsableNavItem eventKey="examples/" title="進銷存" icon={faCog}>
                 <NavItem title="進貨" link={Routes.Posystem.path} />
                 <NavItem title="原物料期初庫存設定" link={Routes.BeginningInventorysettings.path} />
               </CollapsableNavItem>

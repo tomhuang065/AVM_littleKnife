@@ -1,5 +1,5 @@
 
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faUnlockAlt } from "@fortawesome/free-solid-svg-icons";
 import { Col, Row, Form, Card, Button, FormCheck, Container, InputGroup } from '@themesberg/react-bootstrap';
@@ -36,14 +36,23 @@ const handleSubmit = async(event, onSave) => {
     ID:JSON.stringify(memberData)
     }
   )
-  if(response.data === '登入成功'){
-    alert('登入成功')
-    history.push("/possystem")
-  }
-  else{
-    alert('登入失敗')
-  }
+  console.log(response.data)
+  
 };
+
+// useEffect(()=>{
+//   // handleViewAccount()
+//   if(typeof(response !== "undefined")){
+//     if(response.data === '登入成功'){
+//       alert('登入成功')
+//       history.push("/possystem")
+//     }
+//     else{
+//       // console.log('failed')
+//       alert('登入失敗')
+//     }
+//   }
+// },[response])
 
   return (
     <main>
@@ -56,7 +65,7 @@ const handleSubmit = async(event, onSave) => {
             <Col xs={12} className="d-flex align-items-center justify-content-center">
               <div className="bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
                 <div className="text-center text-md-center mb-4 mt-md-0">
-                  <h3 className="mb-0">Sign in to our platform</h3>
+                  <h3 className="mb-0">登入智慧小刀系統</h3>
                 </div>
                 <Form className="mt-4">
                   <Form.Group id="email" className="mb-4">
@@ -65,7 +74,7 @@ const handleSubmit = async(event, onSave) => {
                       <InputGroup.Text>
                         <FontAwesomeIcon icon={faEnvelope} />
                       </InputGroup.Text>
-                      <Form.Control autoFocus required type="email" placeholder="帳號" name="Account" value={memberData.Account} onChange={handleChange} />
+                      <Form.Control autoFocus required type="email" placeholder="" name="Account" value={memberData.Account} onChange={handleChange} />
                     </InputGroup>
                   </Form.Group>
                   <Form.Group>
@@ -75,27 +84,27 @@ const handleSubmit = async(event, onSave) => {
                         <InputGroup.Text>
                           <FontAwesomeIcon icon={faUnlockAlt} />
                         </InputGroup.Text>
-                        <Form.Control required type="password" placeholder="密碼" name="Password" value={memberData.Password} onChange={handleChange}/>
+                        <Form.Control required type="password" placeholder="" name="Password" value={memberData.Password} onChange={handleChange}/>
                       </InputGroup>
                     </Form.Group>
                     <div className="d-flex justify-content-between align-items-center mb-4">
-                      <Form.Check type="checkbox">
+                      {/* <Form.Check type="checkbox">
                         <FormCheck.Input id="defaultCheck5" className="me-2" />
                         <FormCheck.Label htmlFor="defaultCheck5" className="mb-0">Remember me</FormCheck.Label>
-                      </Form.Check>
-                      <Card.Link className="small text-end">Lost password?</Card.Link>
+                      </Form.Check> */}
+                      <Card.Link className="small text-end" as={Link} to={Routes.ResetPassword.path}>忘記密碼?</Card.Link>
                     </div>
                   </Form.Group>
                   <Button as={Link} variant="primary" type="submit" className="w-100" onClick ={handleSubmit}>
-                    Sign in
+                    登入
                   </Button>
                 </Form>
                 {/* to={Routes.DashboardOverview.path}  */}
                 <div className="d-flex justify-content-center align-items-center mt-4">
                   <span className="fw-normal">
-                    Not registered?
+                    尚未註冊？
                     <Card.Link as={Link} to={Routes.Signup.path} className="fw-bold">
-                      {` Create account `}
+                      {` 建立帳號 `}
                     </Card.Link>
                   </span>
                 </div>

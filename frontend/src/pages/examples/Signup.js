@@ -45,22 +45,27 @@ const handleSubmit = async(event, onSave) => {
     ID:JSON.stringify(memberData)
     }
   )
-  if(response.data === '登入成功'){
+  console.log(response)
+  if(response.data === '註冊成功'){
     alert('註冊成功')
-
-    history.push("/possystem")
+    history.push("/dashboard/DashboardOverview")
   }
   else{
-    alert('註冊失敗')
+    console.log(response.data)
+    alert("註冊失敗 : "+ response.data)
+    setMemberData({
+      Username: "",
+      Account: "",
+      Email: "",
+      Password: "",
+      Password2:"",
+      Permission: "1",
+      Status: "1"
+  });
   }
 
 };
 
-
-  
-
- 
-  // console.log(history)
 
   const handleSignUp = () =>{
 
@@ -71,16 +76,16 @@ const handleSubmit = async(event, onSave) => {
     <main>
       <section className="d-flex align-items-center my-5 mt-lg-6 mb-lg-5">
         <Container>
-          <p className="text-center">
+          {/* <p className="text-center">
             <Card.Link as={Link} to={Routes.DashboardOverview.path} className="text-gray-700">
               <FontAwesomeIcon icon={faAngleLeft} className="me-2" /> Back to homepage
             </Card.Link>
-          </p>
+          </p> */}
           <Row className="justify-content-center form-bg-image" style={{ backgroundImage: `url(${BgImage})` }}>
             <Col xs={12} className="d-flex align-items-center justify-content-center">
               <div className="mb-4 mb-lg-0 bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
                 <div className="text-center text-md-center mb-4 mt-md-0">
-                  <h3 className="mb-0">Create an account</h3>
+                  <h3 className="mb-0">註冊新帳號</h3>
                 </div>
                 <Form className="mt-4" >
                   {/* <Form.Group id="email" className="mb-4">
@@ -92,31 +97,14 @@ const handleSubmit = async(event, onSave) => {
                       <Form.Control autoFocus required type="email" placeholder="example@company.com" />
                     </InputGroup>
                   </Form.Group> */}
-                    <Form.Group id="email" className="mb-4">
-                      <Form.Label>姓名</Form.Label>
-                      <InputGroup>
-                        <InputGroup.Text>
-                          <FontAwesomeIcon icon={faEnvelope} />
-                        </InputGroup.Text>
-                        <Form.Control autoFocus required type="email" placeholder="名字" name="Username" value={memberData.Username} onChange={handleChange} />
-                      </InputGroup>
-                    </Form.Group>
+                    
                   <Form.Group id="email" className="mb-4">
-                    <Form.Label>帳號</Form.Label>
+                    <Form.Label>帳號名稱</Form.Label>
                     <InputGroup>
                       <InputGroup.Text>
                         <FontAwesomeIcon icon={faEnvelope}  />
                       </InputGroup.Text>
-                      <Form.Control required type="email" placeholder="帳號" name="Account" value={memberData.Account} onChange={handleChange}/>
-                    </InputGroup>
-                  </Form.Group>
-                  <Form.Group id="email" className="mb-4">
-                    <Form.Label>電子信箱</Form.Label>
-                    <InputGroup>
-                      <InputGroup.Text>
-                        <FontAwesomeIcon icon={faUnlockAlt} />
-                      </InputGroup.Text>
-                      <Form.Control  autoFocus required type="email" placeholder="Email" name="Email" value={memberData.Email} onChange={handleChange}/>
+                      <Form.Control required type="email" placeholder="" name="Account" value={memberData.Account} onChange={handleChange}/>
                     </InputGroup>
                   </Form.Group>
                   <Form.Group id="password" className="mb-4">
@@ -125,7 +113,7 @@ const handleSubmit = async(event, onSave) => {
                       <InputGroup.Text>
                         <FontAwesomeIcon icon={faUnlockAlt} />
                       </InputGroup.Text>
-                      <Form.Control required type="password" placeholder="密碼" name = "Password" value={memberData.Password} onChange={handleChange}/>
+                      <Form.Control required type="password" placeholder="" name = "Password" value={memberData.Password} onChange={handleChange}/>
                     </InputGroup>
                   </Form.Group>
                   <Form.Group id="confirmPassword" className="mb-4">
@@ -134,22 +122,33 @@ const handleSubmit = async(event, onSave) => {
                       <InputGroup.Text>
                         <FontAwesomeIcon icon={faUnlockAlt} />
                       </InputGroup.Text>
-                      <Form.Control required type="password" placeholder="確認密碼"  name = "Password2" value={memberData.Password2} onChange={handleChange}/>
+                      <Form.Control required type="password" placeholder=""  name = "Password2" value={memberData.Password2} onChange={handleChange}/>
                     </InputGroup>
                   </Form.Group>
-                  <FormCheck type="checkbox" className="d-flex mb-4">
-                    <FormCheck.Input required id="terms" className="me-2" />
-                    <FormCheck.Label htmlFor="terms">
-                      I agree to the <Card.Link>terms and conditions</Card.Link>
-                    </FormCheck.Label>
-                  </FormCheck>
-
+                  <Form.Group id="email" className="mb-4">
+                      <Form.Label>姓名</Form.Label>
+                      <InputGroup>
+                        <InputGroup.Text>
+                          <FontAwesomeIcon icon={faEnvelope} />
+                        </InputGroup.Text>
+                        <Form.Control autoFocus required type="email" placeholder="" name="Username" value={memberData.Username} onChange={handleChange} />
+                      </InputGroup>
+                    </Form.Group>
+                  <Form.Group id="email" className="mb-4">
+                    <Form.Label>Email</Form.Label>
+                    <InputGroup>
+                      <InputGroup.Text>
+                        <FontAwesomeIcon icon={faUnlockAlt} />
+                      </InputGroup.Text>
+                      <Form.Control  autoFocus required type="email" placeholder="" name="Email" value={memberData.Email} onChange={handleChange}/>
+                    </InputGroup>
+                  </Form.Group>
                   <Button variant="primary" type="submit" className="w-100"onClick={handleSubmit}>
-                    Sign up
+                    註冊
                   </Button>
                 </Form>
 
-                <div className="mt-3 mb-4 text-center">
+                {/* <div className="mt-3 mb-4 text-center">
                   <span className="fw-normal">or</span>
                 </div>
                 <div className="d-flex justify-content-center my-4">
@@ -162,12 +161,12 @@ const handleSubmit = async(event, onSave) => {
                   <Button variant="outline-light" className="btn-icon-only btn-pil text-dark">
                     <FontAwesomeIcon icon={faGithub} />
                   </Button>
-                </div>
+                </div> */}
                 <div className="d-flex justify-content-center align-items-center mt-4">
                   <span className="fw-normal">
-                    Already have an account?
+                    您已經有帳號?
                     <Card.Link as={Link} to={Routes.Signin.path} className="fw-bold">
-                      {` Login here `}
+                      {` 按此登入 `}
                     </Card.Link>
                   </span>
                 </div>
