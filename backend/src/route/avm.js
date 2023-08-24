@@ -76,7 +76,7 @@ router.post('/check_user', async (req, res) => {
     try {
         const result = await getUserInfo(JSON.parse(req.body.ID));
         console.log(result)
-        res.json(result);
+        res.json({result:result, task:"登入成功"});
     } catch (error) {
         console.error('發生錯誤：', error);
         res.status(500).send('伺服器發生錯誤');

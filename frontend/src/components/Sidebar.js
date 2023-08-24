@@ -14,6 +14,7 @@ import ReactHero from "../assets/img/technologies/react-hero-logo.svg";
 export default (props = {}) => {
   const location = useLocation();
   const { pathname } = location;
+  const {userData, setUserData} = useChat();
   // const {val, setVal, sendValue, signIn, suppliers} = useChat();
 
 
@@ -57,7 +58,7 @@ export default (props = {}) => {
   };
 
   const NavItem = (props) => {
-    const { title, link, external, target, icon, image, badgeText, badgeBg = "secondary", badgeColor = "primary" } = props;
+    const { title, tag, permission, link, external, target, icon, image, badgeText, badgeBg = "secondary", badgeColor = "primary" } = props;
     const classNames = badgeText ? "d-flex justify-content-start align-items-center justify-content-between" : ""; //add a small icon like pro to an element of sidebar
     const navItemClassName = link === pathname ? "active" : "";
     const linkProps = external ? { href: link } : { as: Link, to: link };
@@ -68,8 +69,10 @@ export default (props = {}) => {
           <span>
             {icon ? <span className="sidebar-icon"><FontAwesomeIcon icon={icon} /> </span> : null}
             {image ? <Image src={image} width={20} height={20} className="sidebar-icon svg-icon" /> : null}
-
+            {tag === "tag"?<span className="sidebar-text">您好 ! {title} / {permission === 1    ? "Super User" : "Normal User"}</span>
+            :
             <span className="sidebar-text">{title}</span>
+            }
           </span>
           {badgeText ? (
             <Badge pill bg={badgeBg} text={badgeColor} className="badge-md notification-count ms-2">{badgeText}</Badge>
@@ -102,9 +105,9 @@ export default (props = {}) => {
           {/* px : distance to the left, pt : distance to the top */}
           <div className="sidebar-inner px-4 pt-3"> 
             <Nav className="flex-column pt-3 pt-md-0">
-              <NavItem title="您好！ 黃語棠" link={Routes.Presentation.path} image={ReactHero} />
+              <NavItem title={userData.Username} tag="tag" permission={userData.Permission} image={ReactHero} />
               <NavItem title="首頁" link={Routes.DashboardOverview.path} icon={faChartPie} />
-              <NavItem title="會計財務" icon={faHandHoldingUsd} link={Routes.Transactions.path} />
+              <NavItem title="財會系統" icon={faHandHoldingUsd} link={Routes.Transactions.path} />
               <CollapsableNavItem eventKey="examples/" title="進銷存" icon={faCog}>
                 <NavItem title="進貨" link={Routes.Posystem.path} />
                 <NavItem title="原物料期初庫存設定" link={Routes.BeginningInventorysettings.path} />
@@ -124,7 +127,7 @@ export default (props = {}) => {
                 <NavItem title="使用者權限設定" link={Routes.Settings.path} />
                 <NavItem title="報表權限設定" link={Routes.Settings.path} />
               </CollapsableNavItem>
-
+              <NavItem title="登出" link={Routes.Presentation.path}  />
               <Dropdown.Divider className="my-3 border-indigo" />
 
 

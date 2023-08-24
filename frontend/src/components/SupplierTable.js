@@ -214,7 +214,7 @@ export const SupplierTable = (props) => {
           </td>
           <td>
             <span className="fw-normal">
-              {status}
+              {status === 1? "開啟":"關閉"}
             </span>
           </td>
           <td>
@@ -318,7 +318,7 @@ export const SupplierTable = (props) => {
                 <th className="border-bottom">供應商名稱</th>
                 <th className="border-bottom">更新時間</th>
                 <th className="border-bottom">更新人員</th>
-                <th className="border-bottom">供應商狀態(1:顯示)</th>
+                <th className="border-bottom">供應商狀態</th>
                 <th className="border-bottom">變更供應商狀態</th>
               </tr>
             </thead>

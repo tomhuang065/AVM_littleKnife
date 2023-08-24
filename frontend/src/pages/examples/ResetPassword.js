@@ -58,7 +58,7 @@ export default () => {
           <Row className="justify-content-center">
             <p className="text-center">
               <Card.Link as={Link} to={Routes.Signin.path} className="text-gray-700">
-                <FontAwesomeIcon icon={faAngleLeft} className="me-2" /> Back to sign in
+                <FontAwesomeIcon icon={faAngleLeft} className="me-2" /> 回到登入
               </Card.Link>
             </p>
             <Col xs={12} className="d-flex align-items-center justify-content-center">
@@ -75,7 +75,7 @@ export default () => {
                     </InputGroup>
                   </Form.Group>
                   <Form.Group id="password" className="mb-4">
-                    <Form.Label>您的新密碼</Form.Label>
+                    <Form.Label>您的新密碼 ( 需大於六位元 )</Form.Label>
                     <InputGroup>
                       <InputGroup.Text>
                         <FontAwesomeIcon icon={faUnlockAlt} />

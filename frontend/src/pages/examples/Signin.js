@@ -9,17 +9,21 @@ import { Routes } from "../../routes";
 import BgImage from "../../assets/img/illustrations/signin.svg";
 import {useHistory} from "react-router-dom"
 import axios from 'axios'
+import { useChat } from "../../api/context";
+
 
 
 export default () => {
 
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
+  const {userData, setUserData} = useChat();
+
   let history = useHistory();
 
   const [memberData, setMemberData] = useState({
     Account: "",
     Password: "",
-});
+  });
 
 const handleChange = (event) => {
   setMemberData({
@@ -37,8 +41,33 @@ const handleSubmit = async(event, onSave) => {
     }
   )
   console.log(response.data)
+  if(response.data.result.length !== 0){
+    alert('登入成功')
+    console.log(response.data.result[0].username)
+    setUserData({
+        Username: response.data.result[0].username,
+        Account: response.data.result[0].account,
+        Email: response.data.result[0].email,
+        Password: response.data.result[0].password,
+        Permission: response.data.result[0].permission,
+        Status: response.data.result[0].status,
+    })
+    console.log(userData)
+    history.push("/dashboard/DashboardOverview")
+
+  }
+  else{
+    console.log(response.data)
+    alert("登入失敗 : "+ response.data)
+    setMemberData({
+      Account: "",
+      Password: "",
+  });
+  }
+
   
 };
+
 
 // useEffect(()=>{
 //   // handleViewAccount()

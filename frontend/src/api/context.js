@@ -13,12 +13,14 @@ const ChatContext = createContext({
     mat:'',
     val:'',
     valType:'',
+    userData:'',
     setMat:()=>{}, //fot material inventory
     setSup:()=>{}, // for suppliers
     setStat:()=>{}, //for account settings
     setTask:()=>{}, //for value target 3 categories
     setVal:()=>{}, //for value targets
     setValType:()=>{},
+    setUserData:()=>{},
     
 
 });
@@ -30,6 +32,17 @@ const ChatProvider = (props) => {
     const [mat, setMat] = useState("")
     const [val, setVal] = useState(null)
     const [valType, setValType] = useState("")
+
+    const [userData, setUserData] = useState({
+        Username: "",
+        Account: "",
+        Email: "",
+        Password: "",
+        Permission: "",
+        Status: "",
+    });
+
+    
 
     return (
         <ChatContext.Provider
@@ -47,6 +60,8 @@ const ChatProvider = (props) => {
                 setVal,
                 valType, 
                 setValType,
+                userData,
+                setUserData,
             }}
             {...props}
         />

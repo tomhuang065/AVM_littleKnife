@@ -108,7 +108,8 @@ const handleSubmit = async(event, onSave) => {
                     </InputGroup>
                   </Form.Group>
                   <Form.Group id="password" className="mb-4">
-                    <Form.Label>密碼</Form.Label>
+                    <Form.Label>密碼 ( 需大於六位元 )
+                    </Form.Label>
                     <InputGroup>
                       <InputGroup.Text>
                         <FontAwesomeIcon icon={faUnlockAlt} />

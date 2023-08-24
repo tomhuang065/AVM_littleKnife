@@ -101,7 +101,7 @@ export const ValuetargetsTable = (props) => {
           </td>
           <td>
             <span className="fw-normal">
-              {target_status === null?"---":parseFloat(target_status).toFixed(0)}
+              {target_status === 1?"開啟":"關閉"}
             </span>
           </td>
           <td>

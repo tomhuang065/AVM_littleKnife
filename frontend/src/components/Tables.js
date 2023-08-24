@@ -106,7 +106,7 @@ export const AccountTable = (props) => {
         </td>
         <td>
           <span className={`fw-normal`}>
-            {status}
+            {status === 1? "開啟":"關閉"}
           </span>
         </td>
         <td>
@@ -130,7 +130,7 @@ export const AccountTable = (props) => {
               <th className="border-bottom">四階代碼</th>
               <th className="border-bottom">四階科目中文名稱</th>
               <th className="border-bottom">四階科目英文名稱</th>
-              <th className="border-bottom">顯示狀態（1：顯示）</th>
+              <th className="border-bottom">顯示狀態</th>
               <th className="border-bottom">編輯顯示狀態</th>
             </tr>
           </thead>
