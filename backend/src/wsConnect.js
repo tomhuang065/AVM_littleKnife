@@ -448,18 +448,20 @@ function material_excel() {
         ref: 'A1',
         columns: [
             { name: '日期(請符合範例格式yyyy-mm-dd)' },
+            { name: '會計科目(四階代碼)' },
             { name: '材料代碼' },
             { name: '材料名稱' },
             { name: '採購數量' },
             { name: '採購單位' },
-            { name: '採購成本' }
+            { name: '採購成本' },
+            { name: '備註' }
         ],
         rows: [
-            ['2023-0809', 'M001', '小刀材料1', '100', '包', '10000'],
-            ['2023-0809', 'M002', '小刀材料2', '50', '瓶', '8000'],
-            ['2023-0809', 'M003', '小刀材料3', '75', '罐', '9000'],
-            ['2023-0809', 'M004', '小刀材料4', '90', '箱', '3600'],
-            ['2023-0809', 'M005', '小刀材料5', '100', '箱', '12000']
+            ['2023-0809', '4111', 'M001', '小刀材料1', '100', '包', '10000', ''],
+            ['2023-0809', '4111', 'M002', '小刀材料2', '50', '瓶', '8000', ''],
+            ['2023-0809', '4111', 'M003', '小刀材料3', '75', '罐', '9000', ''],
+            ['2023-0809', '4111', 'M004', '小刀材料4', '90', '箱', '3600', ''],
+            ['2023-0809', '4111', 'M005', '小刀材料5', '100', '箱', '12000', '']
         ]
     })
     //等前端處理
@@ -791,6 +793,8 @@ function upload_material(name) {
         Object.keys(item).forEach((key) => {
             if (key === '日期(請符合範例格式yyyy-mm-dd)') {
                 updatedItem['date'] = item[key];
+            } else if (key === '會計科目(四階代碼)') {
+                updatedItem['account_subjects_num'] = item[key];
             } else if (key === '材料代碼') {
                 updatedItem['purchase_id'] = item[key];
             } else if (key === '材料名稱') {
@@ -801,6 +805,8 @@ function upload_material(name) {
                 updatedItem['purchase_unit'] = item[key];
             } else if (key === '採購成本') {
                 updatedItem['purchase_price'] = item[key];
+            } else if (key === '備註') {
+                updatedItem['remark'] = item[key];
             } else {
                 updatedItem[key] = item[key];
             }
@@ -809,16 +815,20 @@ function upload_material(name) {
     })
     // console.log(updatedArr)
 
+    user = "test"//這邊到時候要回傳使用者給我
     const insertValues = updatedArr.map(element => [
         element.date,
+        element.account_subjects_num,
         element.purchase_id,
         element.purchase_name,
         element.purchase_quantity,
         element.purchase_unit,
         element.purchase_price,
+        element.remark,
+        user
     ]);
 
-    const query = 'INSERT INTO m_purchase (date, purchase_id, purchase_name, purchase_quantity, purchase_unit, purchase_price) VALUES ?';
+    const query = 'INSERT INTO m_purchase (date, account_subjects_num, purchase_id, purchase_name, purchase_quantity, purchase_unit, purchase_price, remark, create_user) VALUES ?';
     connection.query(query, [insertValues], (error, results, fields) => {
         if (error) {
             console.error('寫入資料庫錯誤：', error);
@@ -827,25 +837,25 @@ function upload_material(name) {
         console.log('已成功將資料寫入資料庫');
     });
 
-}
-//***********************
+}//***********************
 
 //呈現會科
 function sel_account_subjects() {
-    return new Promise((resolve, reject) => {
-        connection.query('SELECT * FROM account_subjects', (error, results, fields) => {
-            if (error) {
-                console.error('查詢錯誤：', error);
-                reject(error);
-            } else {
-                let arr = obj_to_dict(results);
-                console.log('查詢結果：', arr);
-                resolve(arr);
-            }
-        });
+    connection.query('SELECT * FROM account_subjects', (error, results, fields) => {
+        if (error) {
+            console.error('查詢錯誤：', error);
+        } else {
+            let arr = obj_to_dict(results)
+            console.log('查詢結果：', arr);
+
+            //會科下拉式選單
+            const subject_menu = arr.map(item => `${item.fourth}: ${item.fourth_subjects_cn} (${item.fourth_subjects_eng})`);
+            console.log(subject_menu)
+
+            return (arr)
+        }
     });
 }
-
 //呈現供應商
 function sel_supplier() {
     return new Promise((resolve, reject) => {
@@ -936,8 +946,8 @@ async function calculateProductCost() {
                 if (mInventorySetupRow) {
                     const { m_name, start_unit_price } = mInventorySetupRow;
                     productCosts_sec[productKey_sec].useage += bomSecondUseQuantity;
-                    productCosts_sec[productKey_sec].unit_price = start_unit_price;
-                    productCosts_sec[productKey_sec].total_price += bomSecondUseQuantity * start_unit_price;
+                    productCosts_sec[productKey_sec].unit_price = bomSecondUseQuantity * start_unit_price;
+                    productCosts_sec[productKey_sec].total_price += bomSecondUseQuantity * start_unit_price * use_quantity;
                     productCosts[productKey].product_cost += bomSecondUseQuantity * start_unit_price * use_quantity;
 
                     const productKey_third = `${productKey_sec}-${material_id}`;
