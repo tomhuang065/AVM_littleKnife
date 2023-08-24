@@ -6,6 +6,7 @@ import mysql from 'mysql2';
 const connection = mysql.createConnection({
     host: 'localhost', // 資料庫主機名稱
     user: 'root', // 資料庫使用者名稱
+    port: 3308,
     password: '', // 資料庫密碼
     database: 'avm_little_knife', // 資料庫名稱
 });
