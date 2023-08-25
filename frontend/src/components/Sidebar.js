@@ -15,26 +15,7 @@ export default (props = {}) => {
   const location = useLocation();
   const { pathname } = location;
   const {userData, setUserData} = useChat();
-  // const {val, setVal, sendValue, signIn, suppliers} = useChat();
-
-
-  // const onSendValue = async () => {
-  //   // console.log(value)
-  //   // if(!value){
-  //   //     throw console.error("Some field missing");
-  //   // }
-  //   console.log("onsendvalue_wwwwww")
-  //   const payload = {
-  //       val : "from sidebar",  
-  //   }
-  //   // signIn(payload);
-  //   sendValue(payload);
-  //   console.log(payload)
-
-  // }
-  // useEffect(() => {
-  //   onSendValue()
-  // }, [location]);
+  
   const CollapsableNavItem = (props) => {
     const { eventKey, title, icon, children = null } = props;
     const defaultKey = pathname.indexOf(eventKey) !== -1 ? eventKey : "";
@@ -56,6 +37,20 @@ export default (props = {}) => {
       </Accordion>
     );
   };
+
+  //prevent the state fom losing when refreshing the page
+  useEffect(() => {
+    if(userData.Username !== ""){
+      window.localStorage.setItem('data',JSON.stringify(userData));
+    }
+  });
+
+  useEffect(() => {
+    if(typeof(window.localStorage.getItem('data')) !=="undefined"){
+      setUserData(JSON.parse(window.localStorage.getItem('data')))
+    }
+  }, []);
+  
 
   const NavItem = (props) => {
     const { title, tag, permission, link, external, target, icon, image, badgeText, badgeBg = "secondary", badgeColor = "primary" } = props;
@@ -81,22 +76,6 @@ export default (props = {}) => {
       </Nav.Item>
     );
   };
-  // const handleSubmit = async(event, onSave) => {
-  //   event.preventDefault();
-  //   console.log(memberData);
-  //   // onSave(memberData);
-  //   const response = await instance.post('/get_user', {
-  //     ID:JSON.stringify(memberData)
-  //     }
-  //   )
-  //   if(response.data === '登入成功'){
-  //     alert('登入成功')
-  //     history.push("/possystem")
-  //   }
-  //   else{
-  //     alert('登入失敗')
-  //   }
-  // };
 
   return (
     <>
@@ -105,10 +84,10 @@ export default (props = {}) => {
           {/* px : distance to the left, pt : distance to the top */}
           <div className="sidebar-inner px-4 pt-3"> 
             <Nav className="flex-column pt-3 pt-md-0">
-              <NavItem title={userData.Username} tag="tag" permission={userData.Permission} image={ReactHero} />
+              <NavItem title={userData.Username} permission = {userData.Permission} tag="tag"  />
               <NavItem title="首頁" link={Routes.DashboardOverview.path} icon={faChartPie} />
               <NavItem title="財會系統" icon={faHandHoldingUsd} link={Routes.Transactions.path} />
-              <CollapsableNavItem eventKey="examples/" title="進銷存" icon={faCog}>
+              <CollapsableNavItem eventKey="examples/" title="進銷存" icon={faBoxOpen}>
                 <NavItem title="進貨" link={Routes.Posystem.path} />
                 <NavItem title="原物料期初庫存設定" link={Routes.BeginningInventorysettings.path} />
               </CollapsableNavItem>
@@ -123,11 +102,11 @@ export default (props = {}) => {
                 <NavItem title="損益表" link={Routes.BootstrapTables.path} />
                 <NavItem title="進銷存管理報表" link={Routes.BootstrapTables.path} />
               </CollapsableNavItem>
-              <CollapsableNavItem eventKey="tables/" title="使用者權限設定" icon={faTable}>
+              <CollapsableNavItem eventKey="tables/" title="使用者權限設定" icon={faBook}>
                 <NavItem title="使用者權限設定" link={Routes.Settings.path} />
                 <NavItem title="報表權限設定" link={Routes.Settings.path} />
               </CollapsableNavItem>
-              <NavItem title="登出" link={Routes.Presentation.path}  />
+              <NavItem title="登出" link={Routes.Presentation.path} icon={faSignOutAlt} />
               <Dropdown.Divider className="my-3 border-indigo" />
 
 

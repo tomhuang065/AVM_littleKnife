@@ -74,9 +74,16 @@ router.post('/add_user', async (req, res) => {
 
 router.post('/check_user', async (req, res) => {
     try {
-        const result = await getUserInfo(JSON.parse(req.body.ID));
-        console.log(result)
-        res.json({result:result, task:"登入成功"});
+        const task = await login(JSON.parse(req.body.ID));
+        let result =[];
+        if(task === '成功登入'){
+            result = await getUserInfo(JSON.parse(req.body.ID).Account)
+            console.log(result)
+            res.json({result:result, task:task});
+        }
+        else{
+            res.json({result:result, task:task});
+        }
     } catch (error) {
         console.error('發生錯誤：', error);
         res.status(500).send('伺服器發生錯誤');
@@ -235,9 +242,39 @@ router.post('/del_inventory', async (req, res) => {
 
 export default router
 
+
+async function login(data) {
+    try {
+        console.log(data)
+        const password = data.Password
+        const account = data.Account
+        const userinfo = await getUserInfo(account)
+        // console.log(userinfo[0)
+
+        if (userinfo.length > 0) {
+            if(password === userinfo[0].password){
+                console.log('成功登入') 
+                return('成功登入')
+            }
+            else{
+                console.log('密碼有誤，請重新輸入')
+                return('密碼有誤，請重新輸入')
+
+            }
+        } else {
+            console.log('無此帳號，請重新輸入')
+            return('無此帳號，請重新輸入')
+        }
+    }
+    catch (error) {
+        console.log(error)
+        return(error)
+    }
+}
+
 function getUserInfo(data) {
     return new Promise((resolve, reject) => {
-        connection.query('SELECT * FROM user WHERE `account` = ?', data.Account, (error, results, fields) => {
+        connection.query('SELECT * FROM user WHERE `account` = ?', data, (error, results, fields) => {
             if (error) {
                 // console.error('帳號有誤：', error);
                 reject(error);

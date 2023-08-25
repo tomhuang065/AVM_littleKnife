@@ -1298,17 +1298,20 @@ async function login(data) {
         const userinfo = await getUserInfo(account)
         // console.log(userinfo[0].password)
 
-        if (userinfo.length > 0 && password === userinfo[0].password) {
-            console.log('成功登入')
+        if (userinfo.length > 0) {
+            if(password === userinfo[0].password){
+                console.log('成功登入') 
+            }
+            else{
+                console.log('密碼有誤，請重新輸入')
+            }
         } else {
-            console.log('帳號或密碼有誤，請重新輸入')
+            console.log('無此帳號，請重新輸入')
         }
-
     }
     catch (error) {
         console.log(error)
     }
-
 }
 
 //register[使用者名稱,帳號,密碼,再次確認密碼,信箱]
