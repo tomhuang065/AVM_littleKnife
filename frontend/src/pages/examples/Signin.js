@@ -94,7 +94,7 @@ const handleSubmit = async(event, onSave) => {
                     </InputGroup>
                   </Form.Group>
                   <Form.Group>
-                    <Form.Group id="password" className="mb-4">
+                    <Form.Group id="confirmPassword" className="mb-4">
                       <Form.Label>密碼</Form.Label>
                       <InputGroup>
                         <InputGroup.Text>

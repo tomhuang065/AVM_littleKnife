@@ -37,9 +37,9 @@ export default () => {
       ID:JSON.stringify(memberData)
       }
     )
-    if(response.data === '修改成功'){
+    if(response.data === '修改成功，請重新登入'){
       alert('修改成功')
-      history.push("/dashboard/DashboardOverview")
+      history.push("/examples/Signin")
     }
     else{
       alert('修改失敗 : '+ response.data)
@@ -74,7 +74,7 @@ export default () => {
                       <Form.Control autoFocus required type="email" placeholder="" name="Account" value={memberData.Account} onChange={handleChange}/>
                     </InputGroup>
                   </Form.Group>
-                  <Form.Group id="password" className="mb-4">
+                  <Form.Group id="confirmPassword" className="mb-4">
                     <Form.Label>您的新密碼 ( 需大於六位元 )</Form.Label>
                     <InputGroup>
                       <InputGroup.Text>

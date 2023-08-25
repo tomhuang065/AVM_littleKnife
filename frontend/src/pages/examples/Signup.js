@@ -85,7 +85,7 @@ const handleSubmit = async(event, onSave) => {
                       <Form.Control required type="email" placeholder="" name="Account" value={memberData.Account} onChange={handleChange}/>
                     </InputGroup>
                   </Form.Group>
-                  <Form.Group id="password" className="mb-4">
+                  <Form.Group id="confirmPassword" className="mb-4">
                     <Form.Label>密碼 ( 需大於六位元 )
                     </Form.Label>
                     <InputGroup>
