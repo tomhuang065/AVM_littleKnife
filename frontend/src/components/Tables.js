@@ -119,7 +119,7 @@ export const AccountTable = (props) => {
 
   return (
   <div>
-    {typeof(Acc)=== 'undefined' ?<div></div>:<Card border="light" className="overflow-auto table-wrapper table-responsive shadow-sm" style ={{width:"115%"}}>
+    {typeof(Acc)=== 'undefined' ?<div></div>:<Card border="light" className="overflow-auto table-wrapper table-responsive shadow-sm" style ={{width:"120%"}}>
       <Card.Body className="pt-0">
         <Table hover className="user-table align-items-center table-striped">
           <thead>
@@ -700,7 +700,7 @@ export const BomTable = (props) => {
   };
 
   return (
-    <Card border="light" className="table-wrapper table-responsive shadow-sm">
+    <Card border="light" className="table-wrapper table-responsive shadow-sm" style ={{width:"120%"}}>
       <Card.Body className="pt-0">
         <Table hover className="user-table align-items-center table-striped">
           <thead>
