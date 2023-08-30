@@ -1442,7 +1442,7 @@ function add_m_purchase(data) {
     const sqlDate = myDate.toISOString().substring(0, 10);
     data.splice(0, 0, sqlDate);
     data = [data]
-    const query = 'INSERT INTO `m_purchase`(`date`, `purchase_id`, `purchase_name`, `purchase_quantity`, `purchase_unit`, `purchase_price`) VALUES ?'
+    const query = 'INSERT INTO `m_purchase`(`date`, `account_subjects_num`,purchase_id`, `purchase_name`, `purchase_quantity`, `purchase_unit`, `purchase_price`,`remark`,`create_user`) VALUES ?'
 
     connection.query(query, [data], (error, results, fields) => {
         if (error) {
@@ -1479,6 +1479,181 @@ function sel_target_category() {
     });
 }
 
+//新增產品購買
+function add_product_purchase(data){
+    const myDate = new Date();
+    const sqlDate = myDate.toISOString().substring(0, 10);
+    data.splice(0, 0, sqlDate);
+
+    data = [data]
+    const query = 'INSERT INTO `p_purchase`(`date`, `account_subjects_num`,purchase_id`, `purchase_name`, `purchase_quantity`, `purchase_unit`, `purchase_price`,`remark`,`create_user`) VALUES ?'
+
+    connection.query(query, [data], (error, results, fields) => {
+        if (error) {
+            console.error(error);
+        } else {
+            // let arr = obj_to_dict(results)
+            console.log('新增成功');
+        }
+    });
+}
+//新增產品購買(status:購買or生產,購買可直接新增，生產則需判斷原料是否充足且不需提供價格(由我們計算成本))
+function add_product_purchase(status, data) {
+    const remark = data[data.length - 2]//取備註
+    const user = data[data.length - 1]//取user
+    const product_id = data[1]//取product_id(purchase_id)
+    const quantity = data[3]//取生產or購買數量
+
+    const myDate = new Date();
+    const sqlDate = myDate.toISOString().substring(0, 10);
+    data.splice(0, 0, sqlDate);
+
+    const query = 'INSERT INTO `p_purchase`(`date`, `account_subjects_num`,`purchase_id`, `purchase_name`, `purchase_quantity`, `purchase_unit`, `purchase_price`,`remark`,`create_user`) VALUES ?'
+    if (status == "購買") {
+        data = [data]
+        connection.query(query, [data], (error, results, fields) => {
+            if (error) {
+                console.error(error);
+            } else {
+                // let arr = obj_to_dict(results)
+                console.log('新增成功');
+            }
+        });
+    } else {//若為生產
+        add_material_useage(product_id, quantity, remark, user)
+            .then(({ results, product_price }) => {
+                data.splice(6, 0, product_price);
+                console.log("==========");
+                console.log(data);
+                data = [data]
+                connection.query(query, [data], (error, results, fields) => {
+                    if (error) {
+                        console.error(error);
+                    } else {
+                        // let arr = obj_to_dict(results)
+                        console.log('新增成功');
+                    }
+                });
+            })
+            .catch(error => {
+                console.error(error); // 錯誤處理
+            });
+
+    }
+}
+
+//新增原料使用量
+async function add_material_useage(product_id, quantity, remark, user) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const bomFirstData = await getBomFirstData();
+            const bomSecondData = await getBomSecondData();
+            const mInventorySetupData = await getInventorySetupData();
+            // console.log(mInventorySetupData)
+
+            const myDate = new Date();
+            const lastDate = new Date();
+            lastDate.setDate(lastDate.getDate() - 1); // 減去一天
+            const sqlDate = myDate.toISOString().substring(0, 10);
+            const sqlLastDate = lastDate.toISOString().substring(0, 10);
+            const material_useage = {}
+            // console.log(sqlLastDate)
+            // console.log(sqlDate)
+
+
+            const bomFirstRows = bomFirstData.filter((bomFirstRow) => bomFirstRow.product_id === product_id);
+            // console.log(bomFirstRows)
+            bomFirstRows.forEach((bomFirstRow) => {
+                const { product_sec_id, use_quantity } = bomFirstRow;
+                // console.log(bomFirstRow)
+
+                const bomSecondRows = bomSecondData.filter((bomSecondRow) => bomSecondRow.product_sec_id === product_sec_id);
+                bomSecondRows.forEach((bomSecondRow) => {
+                    const { material_id, use_quantity: bomSecondUseQuantity } = bomSecondRow;
+                    // console.log("==================")
+                    // console.log(bomSecondRow)
+
+                    const mInventorySetupRow = mInventorySetupData.find((mInventoryRow) => mInventoryRow.m_id === material_id && mInventoryRow.date.toISOString().split('T')[0] === sqlLastDate);
+                    // console.log(mInventorySetupRow)
+                    if (mInventorySetupRow) {
+                        const { m_id, m_name, start_quantity, start_unit, start_unit_price } = mInventorySetupRow;
+                        if (!material_useage[m_id]) {
+                            material_useage[m_id] = {
+                                date: sqlDate,
+                                usage_id: m_id,
+                                usage_name: m_name,
+                                usage_quantity: 0,
+                                usage_unit: start_unit,
+                                usage_price: 0,
+                                remark: remark,
+                                create_user: user,
+                            }
+                        }
+                        material_useage[m_id].usage_quantity += use_quantity * bomSecondUseQuantity * quantity;
+                        material_useage[m_id].usage_price += use_quantity * bomSecondUseQuantity * quantity * start_unit_price;
+                    }
+                })
+
+            })
+
+            // console.log(material_useage);
+
+            //未處理update庫存
+            const updatedInventoryQuantities = {};
+            const recordsToInsert = [];
+            let available = true;
+            let product_price = 0;
+            // 判斷原料是否足夠
+            for (const usageId in material_useage) {
+                const usageRecord = material_useage[usageId];
+                const mInventoryRow = mInventorySetupData.find(row => row.m_id === usageRecord.usage_id);
+                // console.log(mInventoryRow)
+                if (mInventoryRow) {
+                    if (mInventoryRow.start_quantity >= usageRecord.usage_quantity) {
+                        recordsToInsert.push([
+                            usageRecord.date,
+                            usageRecord.usage_id,
+                            usageRecord.usage_name,
+                            usageRecord.usage_quantity,
+                            usageRecord.usage_unit,
+                            usageRecord.usage_price,
+                            usageRecord.remark,
+                            usageRecord.create_user
+                        ]);
+                        product_price += usageRecord.usage_price;
+                        // updatedInventoryQuantities[usageId] = mInventoryRow.start_quantity - usageRecord.usage_quantity;
+                    } else {
+                        available = false;
+                        console.log("原料庫存不足，請先補充原料");
+                        break;
+                    }
+                }
+            }
+
+
+            if (available) {
+                const query = "INSERT INTO `m_useage`(`date`, `usage_id`, `usage_name`, `usage_quantity`, `usage_unit`, `usage_price`, `remark`, `create_user`) VALUES ?";
+                connection.query(query, [recordsToInsert], (error, results, fields) => {
+                    if (error) {
+                        console.error(error);
+                        reject(error);
+                    } else {
+                        console.log('新增成功');
+                        resolve({ results, product_price }); // 同時傳回 results 和 product_price
+                    }
+                });
+            } else {
+                reject(new Error("原料庫存不足，請先補充原料")); // 返回錯誤以進一步處理
+            }
+
+
+        }
+        catch (error) {
+            console.log(error);
+            reject(error); // 返回錯誤以進一步處理
+        }
+    })
+}
 
 export default {
     onMessage: (ws, wss) => (
