@@ -106,22 +106,6 @@ export const ValuetargetsTable = (props) => {
           </td>
           <td>
             <Button variant="outline-primary" onClick={() => {handleChangeState(target_num, target_status)}}>變更</Button>
-
-            {/* <Dropdown as={ButtonGroup}>
-              <Dropdown.Toggle as={Button} split variant="link" className="text-dark m-0 p-0">
-                <span className="icon icon-sm">
-                  <FontAwesomeIcon icon={faEllipsisH} className="icon-dark" />
-                </span>
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <Dropdown.Item onClick={() => {handleChangeState(target_num, target_status)}}>
-                  <FontAwesomeIcon icon={faEdit} className="me-2" /> 變更狀態
-                </Dropdown.Item>
-                <Dropdown.Item className="text-danger" onClick={() => {handleDeleteValueTarget(target_num)}}>
-                  <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> 刪除
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown> */}
           </td>
         </tr>
       );

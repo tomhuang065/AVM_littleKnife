@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faFileAlt, faUpload } from '@fortawesome/free-solid-svg-icons';
@@ -10,29 +10,34 @@ import moment from "moment";
 import ExcelJs from "exceljs";
 var xlsx = require("xlsx")
 
+// FontAwesome.library.add(faCheckSquare, faCoffee);
 
 
 export default () => {
   const {val, setVal, sendValue, signIn, suppliers} = useChat();
-  const [resultP, setResultP] = useState([]);
-  const [resultC, setResultC] = useState([]);
-  const [resultM, setResultM] = useState([]);
+
+  const [valueResult, setValueResult] = useState([]);
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
-  const [type, setType] = useState("")
+  const [type, setType] = useState("選擇價值標種類")
   const [formType, setFormType] = useState("text")
-  const [showModal, setShowModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [accountResult, setAccountResult] = useState([]);
+  const [thirdAccountResult, setThirdAccountResult] = useState([]);
+  const [accountThird, setAccountThird] = useState({third :"", thirdCn : "選擇三階會計科目代碼"})
+  const [accountFourth, setAccountFourth] = useState({fourth: "", fourthCn :"選擇四階會計科目代碼"})
+  const [valueTarget, setValueTarget] = useState({tarNum:"", tarName:"選擇價值標的"})
 
   const [salesData, setSalesData] = useState({
-    productCode: "",
-    productName: "",
+    fourthAccountCode: "",
     date: moment(new Date()).format('MM/DD/YYYY'),
-    openingQuantity: "",
-    openingUnit: "",
-    openingUnitPrice: "",
-    openingCost: "",
+    quantity: "",
+    price: "",
+    comment: "",
+    valueTarget:"",
     // Add other fields as needed
   });
+
+  // const filteredData = data.filter(item => item.age > 25);
 
   const handleSalesChange = (e) => {
     const { name, value } = e.target;
@@ -42,46 +47,30 @@ export default () => {
     });
   };
   const handleCurrentDate = (e) => {
-    // const { name, value } = e.target;
     setFormType("date");
   };
 
-  const handleCloseValueTargetModal = () => {
-    setShowModal(false);
-  };
-
-  const handleSaveValueTarget = (ValueTargetData) => {
-    // Handle the logic to save the ValueTarget data
-    console.log("Value Target Data:", ValueTargetData);
-    setShowModal(false);
-  };
-
-  const handleViewValueTarget= async (task) => {
-    console.log("task", task)
-    setShowModal(true);
-
-    switch(task){
+  const handleViewValueTarget= async () => {
+    setValueResult([])
+    switch(type){
       case "原料":{
-        setResultM(await instance.get('/sel_value_target_material'));
-        setType("原料")
-        // console.log(type)
-      }
-      case "顧客":{
-        setResultC(await instance.get('/sel_value_target_customer'));
-        setType("顧客")
-        // console.log(type)
-
-      }
-      case "產品":{
-        setResultP(await instance.get('/sel_value_target_product'));
-        setType("產品")
-        // console.log(type)
-      }
-      default:{
+        const resM = await instance.get('/sel_value_target_material')
+        setValueResult(resM.data)
         break;
       }
+      case "顧客":{
+        const resC = await instance.get('/sel_value_target_customer')
+        setValueResult(resC.data)
+        break;
+      }
+      case "產品":{
+        const resP = await instance.get('/sel_value_target_product')
+        setValueResult(resP.data)
+        break;
+      }
+      default:
+        break;
     }
-    // console.log(resultP);
   }
 
   const handleExcelUpload = (event) => {
@@ -119,7 +108,21 @@ export default () => {
       
   }
 
-  
+  const handleViewAccount = async()=>{
+    const dat = await instance.get('/sel_account_subjects')
+    var account = dat.data[0].third
+    if(thirdAccountResult !== []){
+      setThirdAccountResult(thirdAccountResult => [...thirdAccountResult, dat.data[0]])
+    }
+    for(var i = 1; i < dat.data.length; i ++){
+      if(dat.data[i].third !== account && thirdAccountResult.length < 1){
+        setThirdAccountResult(thirdAccountResult => [...thirdAccountResult,dat.data[i]])
+        account = dat.data[i].third
+      }
+    }
+    setAccountResult(dat.data)
+  }
+
   const handleExcelUploadSubmit = async () => {
     if (selectedFile) {
       const fileReader = new FileReader();
@@ -138,101 +141,51 @@ export default () => {
       };
     }
   }
-const ValueFormModal = ({ show, onClose, onSave, result }) => {
-    const [supplierData, setSupplierData] = useState({
-      name: "",
-      supplierCode: "", // Updated field name to "供應商代碼"
-      // Add other fields as needed
-    });
-  const Acc =  result.data;
-  console.log(Acc)
-    
-    const handleChange = (e) => {
-      const { name, value } = e.target;
-      setSupplierData({
-        ...supplierData,
-        [name]: value,
-      });
-    };
-  
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      onSave(supplierData);
-    };
-    const TableRow = (props) => {
-      const {
-        target_num,
-        target_name,
 
-      } = props;
-  
-      return (
-        <tr>
-          <td>{target_num}</td>
-          <td>{target_name}</td>
-          <td>
-            {/* <Dropdown as={ButtonGroup}>
-              <Dropdown.Toggle as={Button} split variant="link" className="text-dark m-0 p-0">
-                <span className="icon icon-sm">
-                  <FontAwesomeIcon icon={faEllipsisH} className="icon-dark" />
-                </span>
-              </Dropdown.Toggle>
-              <Dropdown.Menu> */}
-              <Button variant="submit" onClick={onClose}>
-                選擇
-              </Button>
-              {/* </Dropdown.Menu> */}
-            {/* </Dropdown> */}
-          </td>
-        </tr>
-      );
-    };
-  
-  
+  const ThirdAccountRow = (props) => {
+    // console.log(props)
     return (
-      <Modal show={show} onHide={onClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>選擇價值標的</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleSubmit}>
-            {/* <Form.Group controlId="supplierName">
-              <Form.Label>價值標的名稱</Form.Label>
-              <Form.Control
-                type="text"
-                name="name"
-                value={supplierData.name}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group> */}
-            <Table hover className="user-table align-items-center table-striped">
-              <thead>
-                <tr>
-                  <th className="border-bottom">價值標的名稱</th>
-                  <th className="border-bottom">價值標的代碼</th>
-                </tr>
-                
-              </thead>
-              <tbody>
-                {typeof(Acc) === "undefined"?null: Acc.map((t) => (
-                  <TableRow key={`transaction-${t.id}`} {...t} />
-                ))}
-              </tbody>
-            </Table>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={onClose}>
-                取消
-              </Button>
-              <Button type="submit" variant="primary">
-                確定
-              </Button>
-            </Modal.Footer>
-          </Form>
-        </Modal.Body>
-      </Modal>
+      <>
+          <Dropdown.Item onClick={() => setAccountThird({third : props.third, thirdCn : props.third_subjects_cn})}>
+              <div className = "me-2">{props.third} {props.third_subjects_cn}</div>
+          </Dropdown.Item>
+      </>
+      
     );
-  };
+  }
+
+  const valTar = ["原料", "產品", "顧客"]
+
+  const handleSalesSubmit = ()=>{
+    // console.log(typeof(salesData.price))
+    if(accountFourth.fourth ===""){
+        alert("會計科目尚未填寫")
+    }
+    else{
+      if(valueTarget.valNum ===""){
+        alert("會計科目尚未填寫")
+      }
+      else{
+        if(Number(salesData.price) < 0 || Number(salesData.quantity) < 0){
+          alert("數量或單價不可為零")
+        }
+        else{
+          salesData.fourthAccountCode = accountFourth.fourth;
+          salesData.valueTarget = valueTarget.valNum;
+          alert("已新增銷售資料 : ")
+          console.log(salesData)
+          setSalesData({
+            fourthAccountCode: "",
+            date: moment(new Date()).format('MM/DD/YYYY'),
+            quantity: "",
+            price: "",
+            comment: "",
+            valueTarget:"",
+          });
+        }
+      }
+    }
+  }
 
   return (
     <>
@@ -252,16 +205,16 @@ const ValueFormModal = ({ show, onClose, onSave, result }) => {
               <Nav.Item>
                 <Nav.Link eventKey="add" >單筆新增</Nav.Link>
               </Nav.Item>
-              <Nav.Item>
+              {/* <Nav.Item>
                 <Nav.Link eventKey="browse" >瀏覽</Nav.Link>
-              </Nav.Item>
+              </Nav.Item> */}
             </Nav>
 
             {/* Tab Content */}
             <Tab.Content >
-              <Tab.Pane eventKey="browse" > 
-                  {/* <AccountTable accounts={result.data}/> */}
-              </Tab.Pane>
+              {/* <Tab.Pane eventKey="browse" > 
+                  <AccountTable accounts={result.data}/>
+              </Tab.Pane> */}
               <Tab.Pane eventKey="add" > 
                 <Form >
                     <Form.Group controlId="date">
@@ -275,121 +228,115 @@ const ValueFormModal = ({ show, onClose, onSave, result }) => {
                         onClick={handleCurrentDate}
                       />
                     </Form.Group>
-                    <Form.Group controlId="valueTargetName">
-                      <Form.Label>名稱</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="name"
-                        // value={valueTargetData.name}
-                        // onChange={handleChange}
-                        required
-                      />
-                    </Form.Group>
+                    <br></br>
                     <Form.Group controlId="valueTargetName">
                       <Form.Label>會計科目</Form.Label>
                       <br></br>
-                      <Dropdown className = "btn-group dropleft"id = "dropdown-button-drop-start" as={ButtonGroup}>
-                        <Dropdown.Toggle as={Button} split variant="link"  className="text-dark m-0 p-0" style ={{color :"red"}}>
-                          <Button variant="outline-primary" >選擇三階會計科目代碼</Button>
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                          <Dropdown.Item onClick={() => { console.log("產品")}}>
-                            <FontAwesomeIcon  className="me-2" /> 411 銷貨收入
-                          </Dropdown.Item>
-                          <Dropdown.Item onClick={() => {  console.log("顧客")}}>
-                            <FontAwesomeIcon  className="me-2" /> 417 銷貨退回
-                          </Dropdown.Item>
-                          <Dropdown.Item onClick={() => {  console.log("原料")}}>
-                            <FontAwesomeIcon  className="me-2" /> 419 銷貨折讓
-                          </Dropdown.Item>
-                          <Dropdown.Item onClick={() => {  console.log("原料")}}>
-                            <FontAwesomeIcon  className="me-2" /> 461 勞務收入
-                          </Dropdown.Item>
-                          <Dropdown.Item onClick={() => {  console.log("原料")}}>
-                            <FontAwesomeIcon  className="me-2" /> 471 業務收入
-                          </Dropdown.Item>
-                        </Dropdown.Menu>
-                      </Dropdown>
-                      <div> </div>
-                      <Dropdown className = "btn-group dropleft"id = "dropdown-button-drop-start" as={ButtonGroup}>
-                        <Dropdown.Toggle as={Button} split variant="link"  className="text-dark m-0 p-0" style ={{color :"red"}}>
-                          <Button variant="outline-primary" >選擇四階會計科目代碼</Button>
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                          <Dropdown.Item onClick={() => { console.log("產品")}}>
-                            <FontAwesomeIcon  className="me-2" /> 411 銷貨收入
-                          </Dropdown.Item>
-                          <Dropdown.Item onClick={() => {  console.log("顧客")}}>
-                            <FontAwesomeIcon  className="me-2" /> 417 銷貨退回
-                          </Dropdown.Item>
-                          <Dropdown.Item onClick={() => {  console.log("原料")}}>
-                            <FontAwesomeIcon  className="me-2" /> 419 銷貨折讓
-                          </Dropdown.Item>
-                          <Dropdown.Item onClick={() => {  console.log("原料")}}>
-                            <FontAwesomeIcon  className="me-2" /> 461 勞務收入
-                          </Dropdown.Item>
-                          <Dropdown.Item onClick={() => {  console.log("原料")}}>
-                            <FontAwesomeIcon  className="me-2" /> 471 業務收入
-                          </Dropdown.Item>
-                        </Dropdown.Menu>
-                      </Dropdown>
+                      <div>
+                        <Dropdown className = "btn-group dropleft"id = "dropdown-button-drop-start" as={ButtonGroup}>
+                          <Dropdown.Toggle as={Button} split variant="link"  className="text-dark m-0 p-0" style ={{color :"red"}}>
+                            <Button variant="outline-primary" onClick={handleViewAccount}>{accountThird.third} {accountThird.thirdCn}</Button>
+                          </Dropdown.Toggle>  
+                          <Dropdown.Menu>
+                            {thirdAccountResult === []? null:thirdAccountResult.map(t => <ThirdAccountRow  {...t} />)}
+                          </Dropdown.Menu>
+                        </Dropdown>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <Dropdown className = "btn-group dropleft"id = "dropdown-button-drop-start" as={ButtonGroup}>
+                          <Dropdown.Toggle as={Button} split variant="link"  className="text-dark m-0 p-0" style ={{color :"red"}}>
+                            <Button variant="outline-primary">{accountFourth.fourth} {accountFourth.fourthCn} </Button>
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu>
+                          {accountResult === []? null : accountResult.filter(account => account.third===accountThird.third).map(account=> (
+                            <Dropdown.Item onClick={()=> setAccountFourth({fourth: account.fourth, fourthCn:account.fourth_subjects_cn})}>
+                                <div className = "me-2">{account.fourth} {account.fourth_subjects_cn}</div>
+                            </Dropdown.Item>
+                          ))}
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </div>
                     </Form.Group>
-                    
+                    <br></br>
                     <Form.Group controlId="openingQuantity">
                       <Form.Label>數量</Form.Label>
                       <Form.Control
                         type="number"
-                        name="openingQuantity"
-                        // value={rawMaterialData.openingQuantity}
-                        // onChange={handleChange}
+                        name="quantity"
+                        value={salesData.quantity}
+                        placeholder={salesData.quantity}
+                        onChange={handleSalesChange}
                         required
                       />
                     </Form.Group>
+                    <br></br>
                     <Form.Group controlId="openingQuantity">
-                      <Form.Label>總價</Form.Label>
+                      <Form.Label>單價</Form.Label>
                       <Form.Control
                         type="number"
-                        name="openingQuantity"
-                        // value={rawMaterialData.openingQuantity}
-                        // onChange={handleChange}
+                        name="price"
+                        value={salesData.price}
+                        placeholder={salesData.price}
+                        onChange={handleSalesChange}
                         required
                       />
                     </Form.Group>
+                    
+                    <Form.Group controlId="openingQuantity">
+                      {((Number(salesData.price)>0)&&(Number(salesData.quantity)>0))?<div>總價: {Number(salesData.price)*Number(salesData.quantity)}</div>:<div>總價:</div  >}
+                    </Form.Group>
+                    <br></br>
                     <Form.Group controlId="valueTargetCode">
                       <Form.Label>價值標的</Form.Label>
                       <br></br>
                       <Dropdown className = "btn-group dropleft"id = "dropdown-button-drop-start" as={ButtonGroup}>
                         <Dropdown.Toggle as={Button} split variant="link"  className="text-dark m-0 p-0" style ={{color :"red"}}>
-                          <Button variant="outline-primary" >選擇價值標的</Button>
+                          <Button variant="outline-primary" >{type}</Button>
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
-                          <Dropdown.Item onClick={() => { handleViewValueTarget("產品")}}>
-                            <FontAwesomeIcon  className="me-2" /> 產品
-                          </Dropdown.Item>
-                          <Dropdown.Item onClick={() => { handleViewValueTarget("顧客")}}>
-                            <FontAwesomeIcon  className="me-2" /> 顧客
-                          </Dropdown.Item>
-                          <Dropdown.Item onClick={() => { handleViewValueTarget("原料")}}>
-                            <FontAwesomeIcon  className="me-2" /> 原料
-                          </Dropdown.Item>
+                            {valTar.map(v => {
+                                return (
+                                  <Dropdown.Item onClick={()=> setType(v)} >
+                                  <div className = "me-2">{v} </div>
+                                </Dropdown.Item>
+                                )
+                              })}
                         </Dropdown.Menu>
                       </Dropdown>
+                      &nbsp;&nbsp;&nbsp;&nbsp;
+                      <Dropdown className = "btn-group dropleft"id = "dropdown-button-drop-start" as={ButtonGroup}>
+                        <Dropdown.Toggle as={Button} split variant="link"  className="text-dark m-0 p-0" style ={{color :"red"}}>
+                          <Button variant="outline-primary" onClick={handleViewValueTarget} >{valueTarget.tarNum} {valueTarget.tarName}</Button>
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                          {typeof(valueResult) ==="undefined"? null : valueResult.filter(value => value.category===type).map(value=> (
+                            <Dropdown.Item onClick={()=> setValueTarget({tarNum: value.target_num, tarName:value.target_name})}>
+                                <div className = "me-2">{value.target_num} {value.target_name}</div>
+                            </Dropdown.Item>
+                          ))}
+                          {/* {valueResult} */}
+                        </Dropdown.Menu>
+                      </Dropdown>
+
+                    </Form.Group>
+                    <br></br>
+                    <Form.Group controlId="comment">
+                      <Form.Label>備註</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="comment"
+                        value={salesData.comment}
+                        placeholder={salesData.comment}
+                        onChange={handleSalesChange}
+                        required
+                      />
                     </Form.Group>
                   </Form>
                   <row>
                     <br></br>
-                    <Button type="submit" variant="primary">
+                    <Button type="submit" variant="primary" onClick={handleSalesSubmit}>
                       儲存
                     </Button>
                   </row> 
-                 <ValueFormModal
-                  show={showModal}
-                  type={type}
-                  result = {resultP}
-                  onClose={handleCloseValueTargetModal}
-                  onSave={handleSaveValueTarget}
-                  
-                />
               </Tab.Pane>
               <Tab.Pane eventKey="upload">
                 <br></br>
@@ -419,8 +366,6 @@ const ValueFormModal = ({ show, onClose, onSave, result }) => {
           </Col>
         </Row>
       </Tab.Container>
-     
-      {/* onSubmit={handleSubmit} */}
      
     </>
   );

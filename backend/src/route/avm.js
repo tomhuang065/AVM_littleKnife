@@ -492,7 +492,7 @@ function sel_value_target(task) {
                 reject(error);
             } else {
                 let arr = obj_to_dict(results);
-                // console.log('查詢結果：', arr);
+                console.log('查詢結果：', arr);
                 resolve(arr);
             }
         });
