@@ -3,7 +3,7 @@ import ExcelJS from "exceljs";
 import mysql from 'mysql2';
 import bodyParser from "body-parser";
 import multer from 'multer';
-import { checkPrime } from 'crypto';
+//import { checkPrime } from 'crypto';
 // import { genNumber, getNumber } from '../core/getNumber'
 
 // 配置文件上传
@@ -213,7 +213,8 @@ router.post('/add_inventory', async (req, res) => {
 
 router.get('/get_bom', async (req, res) => {
     try {
-        const result = await get_getBomFirstData();
+        const result = await calculateProductCost();
+        console.log('res',result)
         res.json(result);
     } catch (error) {
         console.error('發生錯誤：', error);
@@ -733,6 +734,106 @@ function getBomFirstData() {
     });
 }
 
+//取bom_second_id
+function getBomSecondData() {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM bom_second', (error, results, fields) => {
+            if (error) {
+                console.error('查詢 bom_second 錯誤：', error);
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+}
+
+//取m_invetory_setup
+function getInventorySetupData() {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM m_inventory_setup', (error, results, fields) => {
+            if (error) {
+                console.error('查詢 m_inventory_setup 錯誤：', error);
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+}
+
+
+// 計算BOM成本&呈現
+async function calculateProductCost() {
+    try {
+        const bomFirstData = await getBomFirstData();
+        const bomSecondData = await getBomSecondData();
+        const mInventorySetupData = await getInventorySetupData();
+
+        // 第一階產品成本
+        const productCosts = {};
+        // 第二階產品成本
+        const productCosts_sec = {};
+        // 第三階產品成本
+        const productCosts_third = {};
+
+        bomFirstData.forEach((row) => {
+            const { product_id, product_name, product_sec_id, use_quantity } = row;
+            const productKey = `${product_id}-${product_name}`;
+            if (!productCosts[productKey]) {
+                productCosts[productKey] = {
+                    product_name: product_name,
+                    product_cost: 0,
+                };
+            }
+
+            const bomSecondRows = bomSecondData.filter((bomSecondRow) => bomSecondRow.product_sec_id === product_sec_id);
+            bomSecondRows.forEach((bomSecondRow) => {
+                const { product_sec_id, product_sec_name, material_id, use_quantity: bomSecondUseQuantity } = bomSecondRow;
+                const productKey_sec = `${productKey}:${product_sec_id}-${product_sec_name}`;
+                if (!productCosts_sec[productKey_sec]) {
+                    productCosts_sec[productKey_sec] = {
+                        prev_level_name: productKey,
+                        product_sec_name: product_sec_name,
+                        useage: 0,
+                        unit_price: 0,
+                        total_price: 0,
+                    };
+                }
+
+                const mInventorySetupRow = mInventorySetupData.find((mInventoryRow) => mInventoryRow.m_id === material_id);
+                if (mInventorySetupRow) {
+                    const { m_name, start_unit_price } = mInventorySetupRow;
+                    productCosts_sec[productKey_sec].useage += bomSecondUseQuantity;
+                    productCosts_sec[productKey_sec].unit_price = bomSecondUseQuantity * start_unit_price;
+                    productCosts_sec[productKey_sec].total_price += bomSecondUseQuantity * start_unit_price * use_quantity;
+                    productCosts[productKey].product_cost += bomSecondUseQuantity * start_unit_price * use_quantity;
+
+                    const productKey_third = `${productKey_sec}-${material_id}`;
+                    if (!productCosts_third[productKey_third]) {
+                        productCosts_third[productKey_third] = {
+                            prev_level_name: productKey_sec,
+                            material_name: m_name,
+                            useage: bomSecondUseQuantity,
+                            unit_price: start_unit_price,
+                            total_price: bomSecondUseQuantity * start_unit_price,
+                        };
+                    }
+                }
+            });
+        });
+
+        // 最終呈現結果
+        return {
+            productCosts: productCosts,
+            productCosts_sec: productCosts_sec,
+            productCosts_third: productCosts_third
+        };
+
+    } catch (error) {
+        console.error(error);
+    }
+}
 
 function upload_account_subject(name) {
     let arr = read_excel(name)

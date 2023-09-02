@@ -8,6 +8,7 @@ import ExcelJs from "exceljs";
 import SupplierFormModal from './BomModal';
 import { useChat } from "../../api/context";
 import axios from 'axios';
+import ProductTable from "../../components/pl";
 
 
 export default () => {
@@ -16,6 +17,7 @@ export default () => {
   const [showSupplierModal, setShowSupplierModal] = useState(false);
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [result, setResult] = useState([]);
+  const [bomdata, setBomdata] = useState(null);
 
   const handleExcelUpload = (event) => {
     const file = event.target.files[0];
@@ -76,12 +78,29 @@ export default () => {
     console.log(result.data)
   };
 
-  const handleViewBom = (supplier) => {
-    // Handle the logic to view the BOM
-    console.log("View BOM for supplier:", supplier);
-  };
+  async function getBOMData() {
+    try {
+      const response = await instance.get('/get_bom');
+      console.log(response.data);
+      return response.data; // This should contain the data returned by the backend
+    } catch (error) {
+      console.error('Error fetching BOM data:', error);
+      throw error; // Rethrow the error to handle it at a higher level if needed
+    }
+  }
+  
+  // Call the getBOMData function when needed
+  async function handleViewBom() {
+    try {
+      const data = await getBOMData();
+      console.log('BOM data:', data);
+      setBomdata(data);
+    } catch (error) {
+      console.error('An error occurred:', error);
+    }
+  }
 
-
+  
 
 
   return (
@@ -142,8 +161,7 @@ export default () => {
                 </Button>
               </div>
               {/* <TransactionsTable /> */}
-              <BomTable supplier = {suppliers} />
-              {suppliers}
+              {bomdata !== null && <ProductTable data={bomdata} />}
             </Tab.Pane>
             </Tab.Content>
 
