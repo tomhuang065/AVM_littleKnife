@@ -94,11 +94,7 @@ export const ValuetargetsTable = (props) => {
               {target_name}
             </span>
           </td>
-          <td>
-            <span className="fw-normal">
-              {update_time === null?"---":moment(update_time).format('YYYY-MM-DD HH:mm:ss')}
-            </span>
-          </td>
+         
           <td>
             <span className="fw-normal">
               {target_status === 1?"開啟":"關閉"}
@@ -106,6 +102,11 @@ export const ValuetargetsTable = (props) => {
           </td>
           <td>
             <Button variant="outline-primary" onClick={() => {handleChangeState(target_num, target_status)}}>變更</Button>
+          </td>
+          <td>
+            <span className="fw-normal">
+              {update_time === null?"---":moment(update_time).format('YYYY-MM-DD HH:mm:ss')}
+            </span>
           </td>
         </tr>
       );
@@ -120,16 +121,17 @@ export const ValuetargetsTable = (props) => {
                 <th className="border-bottom">編號</th>
                 <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}代碼</th>
                 <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}名稱</th>
-                <th className="border-bottom">更新時間</th>
                 <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}狀態（1:顯示）</th>
                 <th className="border-bottom">變更狀態</th>
+                <th className="border-bottom">更新時間</th>
+
               </tr>
             </thead>
             <tbody>
               {typeof(value) === "undefined"? null:value.map(t => <TableRow  {...t} />)}
             </tbody>
           </Table>
-          <Card.Footer className="px-3 border-0 d-lg-flex align-items-center justify-event.target.value-between">
+          {/* <Card.Footer className="px-3 border-0 d-lg-flex align-items-center justify-event.target.value-between">
             <Nav>
               <Pagination className="mb-2 mb-lg-0">
                 <Pagination.Prev>
@@ -148,7 +150,7 @@ export const ValuetargetsTable = (props) => {
             <small className="fw-bold">
               Showing <b>{totalTransactions}</b> out of <b>25</b> entries
             </small>
-          </Card.Footer>
+          </Card.Footer> */}
         </Card.Body>
       </Card>
     );

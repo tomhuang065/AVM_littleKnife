@@ -25,13 +25,6 @@ export default () => {
 
   const handleExcelUploadSubmit = async () => {
     const formData = new FormData();
-    // formData.append("file", excelFile);
-    // const res = await api.post("/api/excel", formData, {
-    //   headers: {
-    //     "Content-Type": "multipart/form-data",
-    //   },
-    // });
-    // console.log(res);
   };
 
   const handleExceldownload = async () => {
@@ -72,7 +65,6 @@ export default () => {
   };
 
   const handleSaveSupplier = (supplierData) => {
-    // Handle the logic to save the supplier data
     console.log("Supplier Data:", supplierData);
     setShowSupplierModal(false);
   };
@@ -83,7 +75,7 @@ export default () => {
   }
 
   useEffect(()=>{
-      handleViewSupplier(sup)
+      handleViewSupplier()
       setSup(null)
   },[sup])
 

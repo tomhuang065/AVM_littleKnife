@@ -117,26 +117,9 @@ const RawMaterialFormModal = ({ show, onClose, onSave }) => {
               required
             />
           </Form.Group>
-          {/* <Form.Group controlId="openingCost">
-            <Form.Label>期初成本</Form.Label>
-            <Form.Control
-              type="<Form.Group controlId="openingCost">
-            <Form.Label>期初成本</Form.Label>
-            <Form.Control
-              type="number"
-              name="openingCost"
-              value={rawMaterialData.openingCost}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>number"
-              name="openingCost"
-              value={rawMaterialData.openingCost}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group> */}
-          {/* Add other input fields for raw material details */}
+          <Form.Group controlId="openingQuantity">
+                      {((Number(rawMaterialData.openingUnitPrice)>0)&&(Number(rawMaterialData.openingQuantity)>0))?<div>總價: {Number(rawMaterialData.openingUnitPrice)*Number(rawMaterialData.openingQuantity)}</div>:<div>總價:</div  >}
+                    </Form.Group>
           <Modal.Footer>
             <Button variant="secondary" onClick={onClose}>
               取消

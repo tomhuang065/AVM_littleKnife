@@ -309,7 +309,7 @@ export const SupplierTable = (props) => {
       };
 
     return (
-      <Card border="light" className="table-wrapper table-responsive shadow-sm">
+      <Card border="light" className="table-wrapper table-responsive shadow-sm" style ={{width:"120%"}}>
         <Card.Body className="pt-0">
           <Table hover className="user-table align-items-center table-striped">
             <thead>

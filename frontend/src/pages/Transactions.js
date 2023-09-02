@@ -167,12 +167,12 @@ export default () => {
       }
       else{
         if(Number(salesData.price) < 0 || Number(salesData.quantity) < 0){
-          alert("數量或單價不可為零")
+          alert("數量或單價不可小於零")
         }
         else{
           salesData.fourthAccountCode = accountFourth.fourth;
           salesData.valueTarget = valueTarget.valNum;
-          alert("已新增銷售資料 : ")
+          alert("已新增銷售資料 ")
           console.log(salesData)
           setSalesData({
             fourthAccountCode: "",
@@ -182,6 +182,9 @@ export default () => {
             comment: "",
             valueTarget:"",
           });
+          setAccountThird({third :"", thirdCn : "選擇三階會計科目代碼"})
+          setAccountFourth({fourth: "", fourthCn :"選擇四階會計科目代碼"})
+          setValueTarget({tarNum:"", tarName:"選擇價值標的"})
         }
       }
     }
@@ -205,16 +208,10 @@ export default () => {
               <Nav.Item>
                 <Nav.Link eventKey="add" >單筆新增</Nav.Link>
               </Nav.Item>
-              {/* <Nav.Item>
-                <Nav.Link eventKey="browse" >瀏覽</Nav.Link>
-              </Nav.Item> */}
             </Nav>
 
             {/* Tab Content */}
             <Tab.Content >
-              {/* <Tab.Pane eventKey="browse" > 
-                  <AccountTable accounts={result.data}/>
-              </Tab.Pane> */}
               <Tab.Pane eventKey="add" > 
                 <Form >
                     <Form.Group controlId="date">

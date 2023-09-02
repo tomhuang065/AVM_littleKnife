@@ -17,6 +17,8 @@ export default () => {
   const [resultP, setResultP] = useState([]);
   const [resultC, setResultC] = useState([]);
   const [resultM, setResultM] = useState([]);
+  const [resultD, setResultD] = useState([]);
+
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [type, setType] = useState("")
   
@@ -38,13 +40,6 @@ export default () => {
 
   const handleExcelUploadSubmit = async () => {
     const formData = new FormData();
-    // formData.append("file", excelFile);
-    // const res = await api.post("/api/excel", formData, {
-    //   headers: {
-    //     "Content-Type": "multipart/form-data",
-    //   },
-    // });
-    // console.log(res);
   };
 
 
@@ -81,8 +76,6 @@ export default () => {
         ]
 		});
 
-    // 表格裡面的資料都填寫完成之後，訂出下載的callback function
-		// 異步的等待他處理完之後，創建url與連結，觸發下載
 	  workbook.xlsx.writeBuffer().then((content) => {
 		const link = document.createElement("a");
 	    const blobData = new Blob([content], {
@@ -100,24 +93,23 @@ export default () => {
       case "原料":{
         setResultM(await instance.get('/sel_value_target_material'));
         setType("原料")
-        // console.log(type)
       }
       case "顧客":{
         setResultC(await instance.get('/sel_value_target_customer'));
         setType("顧客")
-        // console.log(type)
-
       }
       case "產品":{
         setResultP(await instance.get('/sel_value_target_product'));
         setType("產品")
-        // console.log(type)
+      }
+      case "部門":{
+        setResultD(await instance.get('/sel_value_target_department'));
+        setType("部門")
       }
       default:{
         break;
       }
     }
-    // console.log(resultP);
   }
 
   return (
@@ -143,6 +135,9 @@ export default () => {
               </Nav.Item>
               <Nav.Item onClick={() => {handleViewValueTarget("產品")}}>
                 <Nav.Link eventKey="product">產品</Nav.Link>
+              </Nav.Item>
+              <Nav.Item onClick={() => {handleViewValueTarget("部門")}}>
+                <Nav.Link eventKey="department">部門</Nav.Link>
               </Nav.Item>
             </Nav>
 
@@ -206,6 +201,18 @@ export default () => {
                 </Button>
               </div>
               <ValuetargetsTable valueTarget={resultC} type ={"顧客"}/>
+              </Tab.Pane>
+              <Tab.Pane eventKey="department">
+              {/* Browse content here */}
+              {/* You can display a table or a list of files here */}
+              <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+                {/* 單筆新增按鈕 */}
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={() => handleSingleAdd("部門")}>
+                  <FontAwesomeIcon icon={faPlus} className="me-2" />
+                  單筆新增
+                </Button>
+              </div>
+              <ValuetargetsTable valueTarget={resultD} type ={"部門"}/>
               </Tab.Pane>
 
             </Tab.Content>

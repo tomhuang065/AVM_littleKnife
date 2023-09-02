@@ -19,6 +19,10 @@ export default () => {
   const [result, setResult] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const {stat, setStat} = useChat();
+  const [searchInd, setSearchInd] = useState("")
+  const [filteredResult, setFilteredResult] = useState([]);
+
+
 
 
 
@@ -54,8 +58,14 @@ export default () => {
   }
 
   const handleViewAccount = async()=>{
-    setResult(await instance.get('/sel_account_subjects'))
-    console.log(result.data)
+    const res = await instance.get('/sel_account_subjects')
+    setResult(res.data)
+    if(searchInd === ''){
+      setFilteredResult(res.data)
+    }
+    if(result !== "undefined"){
+      handleSearchIndFilter()
+    }
   }
 
   const handleExcelUpload = (event) => {
@@ -81,8 +91,37 @@ export default () => {
       };
     }
   }
+
+  const handleSearchIndChange = (e) => {
+    setSearchInd(e.target.value)
+    // console.log(searchInd)
+    // setFilteredResult(result)
+
+  };
+
+  const handleSearchIndFilter = () => {
+    console.log("searchInd", searchInd)
+    var filteredObject = result.map(obj => ({...obj}));
+      for(var i = 0; i < filteredObject.length; i++){
+        if(!filteredObject[i].third_subjects_cn.includes(searchInd) &&
+        !filteredObject[i].third_subjects_cn.includes(searchInd) &&
+        !filteredObject[i].fourth_subjects_eng.includes(searchInd)&& 
+        !filteredObject[i].fourth_subjects_cn.includes(searchInd)&&
+        !String(filteredObject[i].third).includes(searchInd)&&
+        !String(filteredObject[i].fourth).includes(searchInd)
+        ){
+          filteredObject.splice(i, 1)
+          i--;
+         }
+      }
+    setFilteredResult(filteredObject)
+    console.log(filteredObject)
+    // setSearchInd("")
+  };
   useEffect(()=>{
     handleViewAccount()
+    console.log("called ")
+    console.log(filteredResult)
   },[stat])
 
   return (
@@ -110,7 +149,27 @@ export default () => {
             {/* Tab Content */}
             <Tab.Content >
               <Tab.Pane eventKey="browse" >
-                  <AccountTable accounts={result.data}/>
+                <div className="d-flex flex-wrap flex-md-nowrap align-items-center py-3">
+                  {/* <Button icon={faFileAlt} className="me-2" variant="light" >
+                    <FontAwesomeIcon icon={faDownload} className="me-2" />
+                    下載
+                  </Button> */}
+                  
+                  <Form className="d-flex me-2" style ={{position: "Absolute", top: 152, right: 7, width:300 }} >
+                    <Form.Control
+                      type="search"
+                      placeholder="搜尋會計科目"
+                      className="me-2"
+                      aria-label="Search"
+                      onChange={handleSearchIndChange}
+                      value={searchInd}
+                    />
+                    {/* <Button variant="primary"className="me-2" onClick={handleSearchIndFilter} style ={{width: 100 }} >搜尋</Button> */}
+                  </Form>
+                  <br></br>
+                </div>
+               
+                <AccountTable accounts={result} search ={searchInd}/>
               </Tab.Pane>
               <Tab.Pane eventKey="upload">
                 <div className="d-flex justify-content-center align-items-center mb-3">
