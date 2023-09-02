@@ -155,6 +155,16 @@ router.get('/sel_value_target_product', async (req, res) => {
     }
 });
 
+router.get('/sel_value_target_department', async (req, res) => {
+    try {
+        // const result = await sel_value_target("部門");
+        // res.json(result);
+    } catch (error) {
+        console.error('發生錯誤：', error);
+        res.status(500).send('伺服器發生錯誤');
+
+    }
+});
 router.post('/add_value_target', async (req, res) => {
     console.log(JSON.parse(req.body.ID))
     await add_value_target(JSON.parse(req.body.ID))
