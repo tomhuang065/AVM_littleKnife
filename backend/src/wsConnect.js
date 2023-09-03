@@ -357,11 +357,12 @@ function excel_target() {
     const sheet = value_target.addWorksheet('價值標的');
     sheet.addTable({
         ref: 'A1',
-        columns: [{ name: '標的種類(只可填"顧客"、"原料"或"產品")' }, { name: '標的代碼' }, { name: '標的名稱' }],
+        columns: [{ name: '標的種類(只可填"顧客"、"原料"、"產品"或"部門")' }, { name: '標的代碼' }, { name: '標的名稱' }],
         rows: [
             ["顧客", 'C001', '小刀測試1'],
             ["原料", 'M001', '小刀測試2'],
-            ["產品", 'P001', '小刀測試3']
+            ["產品", 'P001', '小刀測試3'],
+            ["部門", "D001", "小刀測試4"]
         ]
     })
     //等前端處理
@@ -1299,10 +1300,10 @@ async function login(data) {
         // console.log(userinfo[0].password)
 
         if (userinfo.length > 0) {
-            if(password === userinfo[0].password){
-                console.log('成功登入') 
+            if (password === userinfo[0].password) {
+                console.log('成功登入')
             }
-            else{
+            else {
                 console.log('密碼有誤，請重新輸入')
             }
         } else {
@@ -1463,6 +1464,8 @@ function sel_target_menu(category) {
         sel_target_product()
     } else if (category === '原料') {
         sel_target_material()
+    } else if (category === '部門') {
+        sel_target_department();
     }
 
 }
@@ -1479,8 +1482,59 @@ function sel_target_category() {
     });
 }
 
+//呈現價值標的(顧客)
+function sel_target_cust() {
+    connection.query('SELECT * FROM value_target WHERE `category` = \'顧客\'', (error, results, fields) => {
+        if (error) {
+            console.error('查詢錯誤：', error);
+        } else {
+            let arr = obj_to_dict(results)
+            console.log('查詢結果：', arr);
+            return (arr)
+        }
+    });
+}
+
+//呈現價值標的(產品)
+function sel_target_product() {
+    connection.query('SELECT * FROM value_target WHERE `category` = \'產品\'', (error, results, fields) => {
+        if (error) {
+            console.error('查詢錯誤：', error);
+        } else {
+            let arr = obj_to_dict(results)
+            console.log('查詢結果：', arr);
+            return (arr)
+        }
+    });
+}
+
+//呈現價值標的(原料)
+function sel_target_material() {
+    connection.query('SELECT * FROM value_target WHERE `category` = \'原料\'', (error, results, fields) => {
+        if (error) {
+            console.error('查詢錯誤：', error);
+        } else {
+            let arr = obj_to_dict(results)
+            console.log('查詢結果：', arr);
+            return (arr)
+        }
+    });
+}
+
+//呈現價值標的(部門)
+function sel_target_department() {
+    connection.query('SELECT * FROM value_target WHERE `category` = \'部門\'', (error, results, fields) => {
+        if (error) {
+            console.error('查詢錯誤：', error);
+        } else {
+            let arr = obj_to_dict(results)
+            console.log('查詢結果：', arr);
+            return (arr)
+        }
+    });
+}
 //新增產品購買
-function add_product_purchase(data){
+function add_product_purchase(data) {
     const myDate = new Date();
     const sqlDate = myDate.toISOString().substring(0, 10);
     data.splice(0, 0, sqlDate);
