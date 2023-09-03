@@ -13,10 +13,7 @@ const ValueTargetFormModal = ({ show, type, onClose, onSave}) => {
     name: "",
     valueTargetCode: "",
     category:"", // Updated field name to "供應商代碼"
-    // Add other fields as needed
   });
-  const [response, setResponse] = useState("")
-  // const [, setVtype] = useState("")
   const {task, setTask} = useChat();
 
 
@@ -29,12 +26,8 @@ const ValueTargetFormModal = ({ show, type, onClose, onSave}) => {
   };
 
   const handleSubmit = async(e) => {
-    console.log(type)
-    // console.log(new Date().getFullYear)
-    // const time = new Date().getFullYear +" "+new
     const date1 = new Date();
     var date = moment(date1 ).format('YYYY-MM-DD HH:mm:ss');
-    console.log(date)
     valueTargetData.category = type;
     valueTargetData.updateTime = date;
     e.preventDefault();
@@ -44,14 +37,12 @@ const ValueTargetFormModal = ({ show, type, onClose, onSave}) => {
       ID:JSON.stringify(valueTargetData)
     }
   )
-  console.log(response)
-  // setResponse(response)
+
   setTask(response.data)
   alert("已新增價值標的")
   setValueTargetData({name: "",
   valueTargetCode: ""})
 
-  // window.location.reload(false)
   };
 
   return (

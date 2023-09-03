@@ -17,6 +17,13 @@ export default () => {
   const [showSupplierModal, setShowSupplierModal] = useState(false);
   const [result, setResult] = useState("")
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
+  const [searchInd, setSearchInd] = useState("")
+
+
+
+  const handleSearchIndChange = (e) => {
+    setSearchInd(e.target.value)
+  };
 
   const handleExcelUpload = (event) => {
     const file = event.target.files[0];
@@ -131,19 +138,25 @@ export default () => {
               <Tab.Pane eventKey="browse">
               {/* Browse content here */}
               {/* You can display a table or a list of files here */}
-              <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-                {/* 單筆新增按鈕 */}
+              <div className="d-flex flex-wrap flex-md-nowrap align-items-center py-3">
+                <Form className="d-flex me-2" style ={{position: "Absolute", top: 170, right: 7, width:300 }} >
+                  <Form.Control
+                    type="search"
+                    placeholder="搜尋供應商"
+                    className="me-2"
+                    aria-label="Search"
+                    onChange={handleSearchIndChange}
+                    value={searchInd}
+                  />
+                </Form>
                 <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
-                  <FontAwesomeIcon icon={faPlus} className="me-2" />
-                  單筆新增
+                  <FontAwesomeIcon icon={faPlus} className="me-2" />單筆新增
                 </Button>
+                <br></br>
               </div>
-              {/* <TransactionsTable /> */}
-              <SupplierTable supplier = {result.data} />
-              {/* {suppliers} */}
+              <SupplierTable supplier = {result.data} searchInd={searchInd} />
             </Tab.Pane>
             </Tab.Content>
-
           </Col>
 
         </Row>

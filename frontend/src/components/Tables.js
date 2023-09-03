@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import { useChat } from "../api/context";
 import moment from "moment";
-import RemoveModal from "../pages/examples/InventoryEditForm"
+import RemoveModal from "../pages/examples/BeginningInventoryEditForm"
 
 
 import { Routes } from "../routes";

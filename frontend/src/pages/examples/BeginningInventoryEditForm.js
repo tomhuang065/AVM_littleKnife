@@ -13,6 +13,7 @@ const RemoveModal = ({ onHide, show, states, inventory, origs }) =>{
     const [placeHolder, setPlaceHolder] = useState("")
     const [editing, setEditing] = useState(false)
     const [index, setIndex] = useState("選擇修改項目")
+    const [forChange, setForChange] = useState("")
     const {mat, setMat} = useChat();
     const [newInventory, setNewInventory] = useState({
         id: inventory.id,
@@ -27,7 +28,7 @@ const RemoveModal = ({ onHide, show, states, inventory, origs }) =>{
 
     const handleInventoryChange =(e) =>{
         const { name, value } = e.target;
-        console.log(name, value)
+        // console.log(name, value)
         setNewInventory({
             ...newInventory,
             [name]: value,
@@ -35,45 +36,56 @@ const RemoveModal = ({ onHide, show, states, inventory, origs }) =>{
     }
 
     const editMaterialInventory = (content) =>{
+        console.log(forChange, placeHolder)
+        // setForChange("")
+        // setPlaceHolder("")
         setEditing(true)
         switch(content) {
           case "編號" :{
             setIndex(content)
-            setPlaceHolder("id")
+            setPlaceHolder(newInventory.id)
+            setForChange('id')
             break;
           }
           case "材料代碼" :{
+            setPlaceHolder(newInventory.mid)
             setIndex(content)
-            setPlaceHolder("mid")
+            setForChange("mid")
             break;
           }
           case "材料名稱" :{
             setIndex(content)
-            setPlaceHolder("mname")
+            setPlaceHolder(newInventory.mname)
+            setForChange("mname")
             break;
           }
           case "日期" :{
             setIndex(content)
-            setPlaceHolder("date")
+            setPlaceHolder(newInventory.date)
+            setForChange("date")
             break;
           }
           case "期初數量" :{
-            setPlaceHolder("startQ")
+            setPlaceHolder(newInventory.startQ)
+            setForChange("startQ")
             setIndex(content)
             break;
           }
           case "期初單位" :{
-            setPlaceHolder("startU")
+            setPlaceHolder(newInventory.startU)
+            setForChange("startU")
             setIndex(content)
             break;
           }
           case "期初單價" :{
-            setPlaceHolder("startP")
+            setPlaceHolder(newInventory.startP)
+            setForChange("startP")
             setIndex(content)
             break;
           }
           case "期初成本" :{
-            setPlaceHolder("startC")
+            setPlaceHolder(newInventory.startC)
+            setForChange("startC")
             setIndex(content)
             break;
           }
@@ -114,11 +126,15 @@ const RemoveModal = ({ onHide, show, states, inventory, origs }) =>{
       )
         setEditing(false); //not to show the input bar
         setPlaceHolder("") //placeholder in the modal input bar
+        setForChange("")
         setIndex("選擇修改項目") //the index button in the 
         alert(response.data);
         setMat("edit")
         onHide()
       }
+
+    const inventoryArray = ['材料代碼','材料名稱', '期初數量', '期初單位','期初單價']
+
     return(
     <Modal
         size="lg"
@@ -128,7 +144,7 @@ const RemoveModal = ({ onHide, show, states, inventory, origs }) =>{
     >
       <Modal.Header closeButton>
         <Modal.Title id="contained-modal-title-vcenter">
-          {states === "deleting" ? "確定要刪除此原料？" : "你正在編輯期初原料"}
+          {states === "deleting" ? "刪除期初原物料？" : "編輯期初原物料"}
         </Modal.Title>
       </Modal.Header>
       {states === "deleting"?
@@ -143,21 +159,11 @@ const RemoveModal = ({ onHide, show, states, inventory, origs }) =>{
               <Button variant="outline-primary" >{index}</Button>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item onClick={() => {editMaterialInventory("材料代碼")}}>
-                <FontAwesomeIcon icon={faEdit} className="me-2" /> 材料代碼
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => {editMaterialInventory("材料名稱")}}>
-                <FontAwesomeIcon icon={faEdit} className="me-2" /> 材料名稱
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => {editMaterialInventory("期初數量")}}>
-                <FontAwesomeIcon icon={faEdit} className="me-2" /> 期初數量
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => {editMaterialInventory("期初單位")}}>
-                <FontAwesomeIcon icon={faEdit} className="me-2" /> 期初單位
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => {editMaterialInventory("期初單價")}}>
-                <FontAwesomeIcon icon={faEdit} className="me-2" /> 期初單價
-              </Dropdown.Item>
+                {inventoryArray.map((inv) =>  (
+                    <Dropdown.Item onClick={() => {editMaterialInventory(inv)}}>
+                        <FontAwesomeIcon  className="me-2" /> {inv}
+                    </Dropdown.Item> 
+                  ))}
             </Dropdown.Menu>
           </Dropdown>
           &nbsp;
@@ -169,7 +175,7 @@ const RemoveModal = ({ onHide, show, states, inventory, origs }) =>{
               <InputGroup.Text>
                 <FontAwesomeIcon  />
               </InputGroup.Text>
-              <Form.Control type="text" style ={{width : 500}} placeholder = {placeHolder} name={placeHolder}  onChange={handleInventoryChange} />
+              <Form.Control type="text" style ={{width : 500}} placeholder = {placeHolder} name={forChange}  onChange={handleInventoryChange} />
             </InputGroup>
           </Form>:null}
         </Modal.Body>

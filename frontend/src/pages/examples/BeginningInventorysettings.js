@@ -4,7 +4,7 @@ import { faDownload, faFileAlt, faMagic, faPlus, faRocket, faSearch, faStore, fa
 import { Col, Row, Button, Dropdown, Form, Tab ,Nav } from '@themesberg/react-bootstrap';
 import { RawMaterialInventoryTable } from "../../components/InventoryTable";
 // import api from "../../api/api";
-import RawMaterialFormModal from "./InventoryForm";
+import RawMaterialFormModal from "./BeginningInventoryAddForm";
 import ExcelJs from "exceljs";
 import axios from "axios";
 import { useChat } from "../../api/context";
@@ -77,13 +77,6 @@ export default () => {
   // Function to close the modal
   const handleCloseModal = () => {
     setShowModal(false);
-  };
-
-  const handleSaveModalData = (rawMaterialData) => {
-    console.log("Raw material data:", rawMaterialData);
-
-    // Close the modal after saving
-    handleCloseModal();
   };
 
   const handleViewInventory = async () => {
@@ -177,7 +170,7 @@ export default () => {
       <RawMaterialFormModal
         show={showModal}
         onClose={handleCloseModal}
-        onSave={handleSaveModalData}
+        onSave={handleCloseModal}
       />
     </>
   );

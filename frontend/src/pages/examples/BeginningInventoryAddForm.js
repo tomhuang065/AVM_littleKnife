@@ -31,7 +31,7 @@ const RawMaterialFormModal = ({ show, onClose, onSave }) => {
     e.preventDefault();
     rawMaterialData.openingCost = `${Number(rawMaterialData.openingQuantity)*Number(rawMaterialData.openingUnitPrice)}`
     console.log(rawMaterialData.openingCost)
-    onSave(rawMaterialData);
+    // onSave(rawMaterialData);
     console.log(rawMaterialData)
     const response = await instance.post('/add_inventory', {
       ID:JSON.stringify(rawMaterialData)

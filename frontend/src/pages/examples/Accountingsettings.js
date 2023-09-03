@@ -22,10 +22,6 @@ export default () => {
   const [searchInd, setSearchInd] = useState("")
   const [filteredResult, setFilteredResult] = useState([]);
 
-
-
-
-
   const onHandleAccountDownload = async () => {
     const workbook = new ExcelJs.Workbook(); // 創建試算表檔案
     const sheet = workbook.addWorksheet('會計科目'); //在檔案中新增工作表 參數放自訂名稱
@@ -94,9 +90,6 @@ export default () => {
 
   const handleSearchIndChange = (e) => {
     setSearchInd(e.target.value)
-    // console.log(searchInd)
-    // setFilteredResult(result)
-
   };
 
   const handleSearchIndFilter = () => {

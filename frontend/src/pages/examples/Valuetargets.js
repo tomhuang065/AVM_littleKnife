@@ -2,31 +2,34 @@ import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBoxOpen, faCartArrowDown, faChartPie, faChevronDown, faClipboard, faCommentDots, faDownload, faFileAlt, faMagic, faPlus, faRocket, faStore, faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Button, Dropdown, Form, Tab ,Nav } from '@themesberg/react-bootstrap';
-import { ValuetargetsTable} from "../../components/ValueTargetCustomerTable";
+import { ValuetargetsTable} from "../../components/ValueTargetTable";
 import { useChat } from "../../api/context";
 // import api from "../../api/api";
 import ExcelJs from "exceljs";
 import axios from "axios";
-import ValueTargetFormModal from './ValueTargetFormModal';
+import ValueTargetFormModal from './ValueTargetAddModal';
 
 
 
 export default () => {
   const [excelFile, setExcelFile] = useState(null);
-  const [showValueTargetModal, setShowValueTargetModal] = useState(false);
-  const [resultP, setResultP] = useState([]);
-  const [resultC, setResultC] = useState([]);
-  const [resultM, setResultM] = useState([]);
-  const [resultD, setResultD] = useState([]);
-
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
-  const [type, setType] = useState("")
-  
   const {val, task, setTask, valType, setValType} = useChat();
-
+  const [showValueTargetModal, setShowValueTargetModal] = useState(false);
+  const [searchInd, setSearchInd] = useState("")
+  const [valResult, setValResult] = useState([]);
+  const [type, setType] = useState("") //for add form
+  const [searchPH, setSearchPH] = useState("")
+  
+  
   const handleExcelUpload = (event) => {
     const file = event.target.files[0];
     setExcelFile(file);
+  };
+
+  
+  const handleSearchIndChange = (e) => {
+    setSearchInd(e.target.value)
   };
 
   useEffect(()=>{
@@ -41,8 +44,6 @@ export default () => {
   const handleExcelUploadSubmit = async () => {
     const formData = new FormData();
   };
-
-
 
   const handleSingleAdd = (task) => {
     console.log(task)
@@ -91,26 +92,36 @@ export default () => {
     console.log("task", task)
     switch(task){
       case "原料":{
-        setResultM(await instance.get('/sel_value_target_material'));
+        setValResult(await instance.get('/sel_value_target_material'));
         setType("原料")
+        setSearchPH("搜尋原料")
+        break;
       }
       case "顧客":{
-        setResultC(await instance.get('/sel_value_target_customer'));
+        setValResult(await instance.get('/sel_value_target_customer'));
         setType("顧客")
+        setSearchPH("搜尋顧客")
+        break;
       }
       case "產品":{
-        setResultP(await instance.get('/sel_value_target_product'));
+        setValResult(await instance.get('/sel_value_target_product'));
+        setSearchPH("搜尋產品")
         setType("產品")
+        break;
       }
       case "部門":{
-        setResultD(await instance.get('/sel_value_target_department'));
+        setValResult(await instance.get('/sel_value_target_department'));
         setType("部門")
+        setSearchPH("搜尋部門")
+        break;
       }
       default:{
         break;
       }
     }
   }
+
+  const valueTarg = ['原料', "顧客", "產品", "部門"]
 
   return (
     <>
@@ -127,18 +138,11 @@ export default () => {
               <Nav.Item>
                 <Nav.Link eventKey="upload">上傳</Nav.Link>
               </Nav.Item>
-              <Nav.Item onClick={() => {handleViewValueTarget("原料")}}>
-                <Nav.Link eventKey="ingred">原料</Nav.Link>
-              </Nav.Item>
-              <Nav.Item onClick={() => {handleViewValueTarget("顧客")}}>
-                <Nav.Link eventKey="customer">顧客</Nav.Link>
-              </Nav.Item>
-              <Nav.Item onClick={() => {handleViewValueTarget("產品")}}>
-                <Nav.Link eventKey="product">產品</Nav.Link>
-              </Nav.Item>
-              <Nav.Item onClick={() => {handleViewValueTarget("部門")}}>
-                <Nav.Link eventKey="department">部門</Nav.Link>
-              </Nav.Item>
+              {valueTarg.map((val)=>( 
+                <Nav.Item onClick={() => {handleViewValueTarget(val)}}>
+                  <Nav.Link eventKey={val}>{val}</Nav.Link>
+                </Nav.Item>
+              ))}
             </Nav>
 
             {/* Tab Content */}
@@ -151,7 +155,6 @@ export default () => {
                       <Form.Control type="file" accept=".xlsx,.xls" onChange={handleExcelUpload} />
                     </Form.Group>
                   </Col>
-
                 </div>
                 <div className="d-flex justify-content-center align-items-center mb-3">
                 <Col xs={12} xl={5}>
@@ -166,59 +169,30 @@ export default () => {
                 </Col>
                 </div>
               </Tab.Pane>
-              <Tab.Pane eventKey="product">
-              {/* Browse content here */}
-              {/* You can display a table or a list of files here */}
-              <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-                {/* 單筆新增按鈕 */}
-                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={() => handleSingleAdd("產品")}>
-                  <FontAwesomeIcon icon={faPlus} className="me-2" />
-                  單筆新增
-                </Button>
-              </div>
-              <ValuetargetsTable valueTarget={resultP} type ={"產品"}/>
-              </Tab.Pane>
-              <Tab.Pane eventKey="ingred">
-              {/* Browse content here */}
-              {/* You can display a table or a list of files here */}
-              <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-                {/* 單筆新增按鈕 */}
-                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={() => handleSingleAdd("原料")}>
-                  <FontAwesomeIcon icon={faPlus} className="me-2" />
-                  單筆新增
-                </Button>
-              </div>
-              <ValuetargetsTable valueTarget={resultM} type ={"原料"}/>
-              </Tab.Pane>
-              <Tab.Pane eventKey="customer">
-              {/* Browse content here */}
-              {/* You can display a table or a list of files here */}
-              <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-                {/* 單筆新增按鈕 */}
-                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={() => handleSingleAdd("顧客")}>
-                  <FontAwesomeIcon icon={faPlus} className="me-2" />
-                  單筆新增
-                </Button>
-              </div>
-              <ValuetargetsTable valueTarget={resultC} type ={"顧客"}/>
-              </Tab.Pane>
-              <Tab.Pane eventKey="department">
-              {/* Browse content here */}
-              {/* You can display a table or a list of files here */}
-              <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-                {/* 單筆新增按鈕 */}
-                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={() => handleSingleAdd("部門")}>
-                  <FontAwesomeIcon icon={faPlus} className="me-2" />
-                  單筆新增
-                </Button>
-              </div>
-              <ValuetargetsTable valueTarget={resultD} type ={"部門"}/>
-              </Tab.Pane>
 
+              {valueTarg.map((val) =>(
+                <Tab.Pane eventKey={val}>
+                  <div className="d-flex flex-wrap flex-md-nowrap align-items-center py-3">
+                    <Form className="d-flex me-2" style ={{position: "Absolute", top: 170, right: 7, width:300 }} >
+                      <Form.Control
+                        type="search"
+                        placeholder={searchPH} 
+                        className="me-2"
+                        aria-label="Search"
+                        onChange={handleSearchIndChange}
+                        value={searchInd}
+                      />
+                    </Form>
+                    <Button icon={faFileAlt} className="me-2" variant="primary" onClick={() => handleSingleAdd(val)}>
+                      <FontAwesomeIcon icon={faPlus} className="me-2" />單筆新增
+                    </Button>
+                    <br></br>
+                  </div>
+                  <ValuetargetsTable valueTarget={valResult} type ={val} search ={searchInd}/>
+                </Tab.Pane>
+              ))}
             </Tab.Content>
-
           </Col>
-
         </Row>
       </Tab.Container>
 

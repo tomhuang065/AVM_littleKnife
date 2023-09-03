@@ -157,8 +157,8 @@ router.get('/sel_value_target_product', async (req, res) => {
 
 router.get('/sel_value_target_department', async (req, res) => {
     try {
-        // const result = await sel_value_target("部門");
-        // res.json(result);
+        const result = await sel_value_target("部門");
+        res.json([]);
     } catch (error) {
         console.error('發生錯誤：', error);
         res.status(500).send('伺服器發生錯誤');

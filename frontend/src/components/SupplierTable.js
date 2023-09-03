@@ -30,13 +30,8 @@ export const SupplierTable = (props) => {
 
     const {sup, setSup} = useChat();
 
-
-
-    const totalTransactions = props.length;
-    // const {supplier} = props;
-    // console.log(supplier)
-    console.log(props.supplier)
     const supplier = props.supplier
+    const Search = props.searchInd
 
     const handleRowEdit = (supNum, supName, updateUsr, updateTime) => {
         console.log("edit row")
@@ -185,10 +180,6 @@ export const SupplierTable = (props) => {
   
     const TableRow = (props) => {
       const { supplier_num, supplier_name, id, update_user,  update_time, status } = props;
-      //const statusVariant = status === "Paid" ? "success"
-      //: status === "Due" ? "warning"
-        //: status === "Canceled" ? "danger" : "primary";
-  
       return (
         <tr >
           <td >
@@ -201,11 +192,13 @@ export const SupplierTable = (props) => {
               {supplier_name}
             </span>
           </td>
-          
           <td>
             <span className="fw-normal">
-            {update_time === null?"---":moment(update_time).format('YYYY-MM-DD HH:mm:ss')}
+              {status === 1? "開啟":"關閉"}
             </span>
+          </td>
+          <td>
+            <Button variant="outline-primary" onClick={() => {handleChangeState(supplier_num, supplier_name, update_user, update_time, status)}}>變更</Button>
           </td>
           <td>
             <span className="fw-normal">
@@ -214,45 +207,21 @@ export const SupplierTable = (props) => {
           </td>
           <td>
             <span className="fw-normal">
-              {status === 1? "開啟":"關閉"}
+            {update_time === null?"---":moment(update_time).format('YYYY-MM-DD HH:mm:ss')}
             </span>
-          </td>
-          <td>
-          <Button variant="outline-primary" onClick={() => {handleChangeState(supplier_num, supplier_name, update_user, update_time, status)}}>變更</Button>
-
-            {/* <Dropdown as={ButtonGroup}>
-              <Dropdown.Toggle as={Button} split variant="link" className="text-dark m-0 p-0">
-                <span className="icon icon-sm">
-                  <FontAwesomeIcon icon={faEllipsisH} className="icon-dark" />
-                </span>
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <Dropdown.Item onClick={() => {handleChangeState(supplier_num, supplier_name, update_user, update_time, status)}}>
-                  <FontAwesomeIcon icon={faEdit} className="me-2" /> Change
-                </Dropdown.Item>
-                <Dropdown.Item onClick={() => {handleRowEdit(supplier_num, supplier_name, update_user, update_time)}}>
-                  <FontAwesomeIcon icon={faEdit} className="me-2" /> Edit
-                </Dropdown.Item>
-
-                <Dropdown.Item className="text-danger"onClick={() => {handleRowDelete(supplier_num, supplier_name, update_user, update_time)}} >
-                  <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> Remove
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown> */}
           </td>
         </tr>
       );
     };
   
     const RemoveModal = ({ onHide, show, state }) =>{
-
+        const rmtype = ["供應商代碼","供應商名稱","更新人員","更新時間" ]
         return(
         <Modal
             size="lg"
             aria-labelledby="contained-modal-title-vcenter"
             centered
             {...{ onHide, show }}
-    
         >
           <Modal.Header closeButton>
             <Modal.Title id="contained-modal-title-vcenter">
@@ -274,18 +243,11 @@ export const SupplierTable = (props) => {
                   <Button variant="outline-primary" >{index}</Button>
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-                  <Dropdown.Item onClick={() => {editSupplier("供應商代碼")}}>
-                    <FontAwesomeIcon icon={faEdit} className="me-2" /> 供應商代碼
-                  </Dropdown.Item>
-                  <Dropdown.Item onClick={() => {editSupplier("供應商名稱")}}>
-                    <FontAwesomeIcon icon={faEdit} className="me-2" /> 供應商名稱
-                  </Dropdown.Item>
-                  <Dropdown.Item onClick={() => {editSupplier("更新人員")}}>
-                    <FontAwesomeIcon icon={faEdit} className="me-2" /> 更新人員
-                  </Dropdown.Item>
-                  <Dropdown.Item onClick={() => {editSupplier("更新時間")}}>
-                    <FontAwesomeIcon icon={faEdit} className="me-2" /> 更新時間
-                  </Dropdown.Item>
+                  {rmtype.map((rm)=> (
+                    <Dropdown.Item onClick={() => {editSupplier(rm)}}>
+                      <FontAwesomeIcon icon={faEdit} className="me-2" /> {rm}
+                    </Dropdown.Item>
+                  ))}
                 </Dropdown.Menu>
               </Dropdown>
               {editing? 
@@ -316,36 +278,19 @@ export const SupplierTable = (props) => {
               <tr>
                 <th className="border-bottom">供應商代碼</th>
                 <th className="border-bottom">供應商名稱</th>
-                <th className="border-bottom">更新時間</th>
-                <th className="border-bottom">更新人員</th>
                 <th className="border-bottom">供應商狀態</th>
                 <th className="border-bottom">變更供應商狀態</th>
+                <th className="border-bottom">更新人員</th>
+                <th className="border-bottom">更新時間</th>
               </tr>
             </thead>
             <tbody>
-              {typeof(supplier) === "undefined" ? null : supplier.map(t => <TableRow key={`transaction-${t.id}`} {...t} />)}
+              {typeof(supplier) === "undefined" ? null : supplier.filter((sup) =>  
+                                   sup.supplier_num.includes(Search) ||
+                                   sup.supplier_name.includes(Search))
+                                .map(t => <TableRow key={`transaction-${t.id}`} {...t} />)}
             </tbody>
           </Table>
-          <Card.Footer className="px-3 border-0 d-lg-flex align-items-center justify-event.target.value-between">
-            <Nav>
-              <Pagination className="mb-2 mb-lg-0">
-                <Pagination.Prev>
-                  Previous
-                </Pagination.Prev>
-                <Pagination.Item active>1</Pagination.Item>
-                <Pagination.Item>2</Pagination.Item>
-                <Pagination.Item>3</Pagination.Item>
-                <Pagination.Item>4</Pagination.Item>
-                <Pagination.Item>5</Pagination.Item>
-                <Pagination.Next>
-                  Next
-                </Pagination.Next>
-              </Pagination>
-            </Nav>
-            <small className="fw-bold">
-              Showing <b>{totalTransactions}</b> out of <b>25</b> entries
-            </small>
-          </Card.Footer>
         </Card.Body>
         {removeModal?
           <RemoveModal /** 編輯視窗 */
@@ -357,3 +302,22 @@ export const SupplierTable = (props) => {
     );
   };
   
+  {/* <Dropdown as={ButtonGroup}>
+              <Dropdown.Toggle as={Button} split variant="link" className="text-dark m-0 p-0">
+                <span className="icon icon-sm">
+                  <FontAwesomeIcon icon={faEllipsisH} className="icon-dark" />
+                </span>
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={() => {handleChangeState(supplier_num, supplier_name, update_user, update_time, status)}}>
+                  <FontAwesomeIcon icon={faEdit} className="me-2" /> Change
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => {handleRowEdit(supplier_num, supplier_name, update_user, update_time)}}>
+                  <FontAwesomeIcon icon={faEdit} className="me-2" /> Edit
+                </Dropdown.Item>
+
+                <Dropdown.Item className="text-danger"onClick={() => {handleRowDelete(supplier_num, supplier_name, update_user, update_time)}} >
+                  <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> Remove
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown> */}
