@@ -117,8 +117,9 @@ const RawMaterialFormModal = ({ show, onClose, onSave }) => {
               required
             />
           </Form.Group>
+          <br></br>
           <Form.Group controlId="openingQuantity">
-                      {((Number(rawMaterialData.openingUnitPrice)>0)&&(Number(rawMaterialData.openingQuantity)>0))?<div>總價: {Number(rawMaterialData.openingUnitPrice)*Number(rawMaterialData.openingQuantity)}</div>:<div>總價:</div  >}
+                      {((Number(rawMaterialData.openingUnitPrice)>0)&&(Number(rawMaterialData.openingQuantity)>0))?<p style={{fontSize: 18}}><b>總價: {Number(rawMaterialData.openingUnitPrice)*Number(rawMaterialData.openingQuantity)}</b></p>:<p style={{fontSize: 17}}>總價:</p>}
                     </Form.Group>
           <Modal.Footer>
             <Button variant="secondary" onClick={onClose}>

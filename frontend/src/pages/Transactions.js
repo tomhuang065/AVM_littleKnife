@@ -277,11 +277,11 @@ export default () => {
                         required
                       />
                     </Form.Group>
-                    
-                    <Form.Group controlId="openingQuantity">
-                      {((Number(salesData.price)>0)&&(Number(salesData.quantity)>0))?<div>總價: {Number(salesData.price)*Number(salesData.quantity)}</div>:<div>總價:</div  >}
-                    </Form.Group>
                     <br></br>
+                    <Form.Group controlId="openingQuantity">
+                      {((Number(salesData.price)>0)&&(Number(salesData.quantity)>0))?<p style={{fontSize: 18}}><b>總價: {Number(salesData.price)*Number(salesData.quantity)}</b></p>:<p style={{fontSize: 17}}>總價:</p>}
+                    </Form.Group>
+                    {/* <br></br> */}
                     <Form.Group controlId="valueTargetCode">
                       <Form.Label>價值標的</Form.Label>
                       <br></br>
