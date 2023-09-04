@@ -46,14 +46,15 @@ export const RawMaterialInventoryTable = (props) => {
   
       return (
         <tr>
-          <td>{id}</td>
+          {/* <td>{id}</td> */}
           <td>{m_id}</td>
           <td>{m_name}</td>
-          <td>{date === null?"---":moment(date).format('YYYY-MM-DD')}</td>
+        
           <td>{start_quantity}</td>
           <td>{start_unit}</td>
           <td>{start_unit_price}</td>
           <td>{start_cost}</td>
+          <td>{date === null?"---":moment(date).format('YYYY-MM-DD')}</td>
           <td>
             <Button variant = "link"onClick={() => {handleRowEditDelete("editing", id, m_id, m_name, date, start_quantity,start_unit, start_unit_price, start_cost)}}>
               <FontAwesomeIcon icon={faEdit} className="me-0.5" /> 
@@ -76,26 +77,27 @@ export const RawMaterialInventoryTable = (props) => {
               <Table hover className="user-table align-items-center table-striped">
                 <thead>
                   <tr>
-                    <th className="border-bottom">編號</th>
+                    {/* <th className="border-bottom">編號</th> */}
                     <th className="border-bottom">原物料代碼</th>
                     <th className="border-bottom">原物料名稱</th>
-                    <th className="border-bottom">建立日期</th>
+                   
                     <th className="border-bottom">期初數量</th>
                     <th className="border-bottom">期初單位</th>
                     <th className="border-bottom">期初單價</th>
                     <th className="border-bottom">期初成本</th>
+                    <th className="border-bottom">建立日期</th>
                     <th className="border-bottom">  選項</th>
                   </tr>
                 </thead>
                 <tbody>
                   {Acc.filter((acc) => acc.m_id.includes(Search) ||
-                                   acc.m_name.includes(Search) ||
-                                   acc.start_unit.includes(Search) ||
-                                   acc.date.includes(Search) ||
-                                   String(acc.start_cost).includes(Search) ||
-                                   String(acc.start_quantity).includes(Search) ||
-                                   String(acc.start_unit_price).includes(Search) ||
-                                   String(acc.id).includes(Search)
+                                   acc.m_name.includes(Search) 
+                                  //  acc.start_unit.includes(Search) ||
+                                  //  acc.date.includes(Search) ||
+                                  //  String(acc.start_cost).includes(Search) ||
+                                  //  String(acc.start_quantity).includes(Search) ||
+                                  //  String(acc.start_unit_price).includes(Search) ||
+                                  //  String(acc.id).includes(Search)
                         ).map((t) => (
                     <TableRow key={`transaction-${t.id}`} {...t} />
                   ))}

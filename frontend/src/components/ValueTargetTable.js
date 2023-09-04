@@ -77,11 +77,11 @@ export const ValuetargetsTable = (props) => {
   
       return (
         <tr>
-          <td>
+          {/* <td>
             <Card.Link as={Link} to={Routes.Invoice.path} className="fw-normal">
               {id}
             </Card.Link>
-          </td>
+          </td> */}
           <td>
             <span className="fw-normal">
               {target_num}
@@ -116,7 +116,7 @@ export const ValuetargetsTable = (props) => {
           <Table hover className="user-table align-items-center table-striped">
             <thead>
               <tr>
-                <th className="border-bottom">編號</th>
+                {/* <th className="border-bottom">編號</th> */}
                 <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}代碼</th>
                 <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}名稱</th>
                 <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}狀態</th>

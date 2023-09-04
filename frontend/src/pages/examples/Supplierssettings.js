@@ -6,7 +6,7 @@ import { Col, Row, Button, Form , Tab ,Nav } from '@themesberg/react-bootstrap';
 import { SupplierTable } from "../../components/SupplierTable";
 // import api from "../../api/api";
 import ExcelJs from "exceljs";
-import SupplierFormModal from './SupplierFormModal';
+import SupplierFormModal from './SupplierAddFormModal';
 import { useChat } from "../../api/context";
 
 
@@ -71,10 +71,10 @@ export default () => {
     setShowSupplierModal(false);
   };
 
-  const handleSaveSupplier = (supplierData) => {
-    console.log("Supplier Data:", supplierData);
-    setShowSupplierModal(false);
-  };
+  // const handleSaveSupplier = (supplierData) => {
+  //   console.log("Supplier Data:", supplierData);
+  //   setShowSupplierModal(false);
+  // };
   const handleViewSupplier= async () => {
 
     setResult(await instance.get('/sel_supplier'));
@@ -166,7 +166,7 @@ export default () => {
       <SupplierFormModal
         show={showSupplierModal}
         onClose={handleCloseSupplierModal}
-        onSave={handleSaveSupplier}
+        // onSave={handleSaveSupplier}
       />
     </>
   );

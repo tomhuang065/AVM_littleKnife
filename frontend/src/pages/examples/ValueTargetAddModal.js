@@ -12,7 +12,8 @@ const ValueTargetFormModal = ({ show, type, onClose, onSave}) => {
   const [valueTargetData, setValueTargetData] = useState({
     name: "",
     valueTargetCode: "",
-    category:"", // Updated field name to "供應商代碼"
+    category:"",
+    updateTime:"", 
   });
   const {task, setTask} = useChat();
 
@@ -26,22 +27,38 @@ const ValueTargetFormModal = ({ show, type, onClose, onSave}) => {
   };
 
   const handleSubmit = async(e) => {
-    const date1 = new Date();
-    var date = moment(date1 ).format('YYYY-MM-DD HH:mm:ss');
-    valueTargetData.category = type;
-    valueTargetData.updateTime = date;
-    e.preventDefault();
-    onSave(valueTargetData);
-    console.log(typeof(valueTargetData))
-    const response = await instance.post('/add_value_target', {
-      ID:JSON.stringify(valueTargetData)
-    }
-  )
 
-  setTask(response.data)
-  alert("已新增價值標的")
-  setValueTargetData({name: "",
-  valueTargetCode: ""})
+  e.preventDefault();
+
+  if(valueTargetData.name === ''){
+    alert('尚未輸入價值標的名稱')
+  }
+  else{
+    if(valueTargetData.valueTargetCode === ''){
+      alert('尚未輸入價值標的代碼')
+    }
+    else{
+      valueTargetData.category = type;
+      valueTargetData.updateTime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+      setTask(null) //if continue adding value target of the same category, the window updates
+      const response = await instance.post('/add_value_target', {
+        ID:JSON.stringify(valueTargetData)
+      })
+
+      alert(response.data)
+      setValueTargetData({
+        name: "",
+        valueTargetCode: "",
+        category:"",
+        updateTime:"", 
+      })
+
+      if(response.data === "價值標的新增成功"){
+          setTask(valueTargetData.category)
+          onClose();
+      }
+    }
+  };
 
   };
 

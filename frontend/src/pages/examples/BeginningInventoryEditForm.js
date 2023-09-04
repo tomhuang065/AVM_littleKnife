@@ -99,6 +99,7 @@ const RemoveModal = ({ onHide, show, states, inventory, origs }) =>{
         const jsonData = {
           mid: `${newInventory.mid}`
         };
+        setMat(null)
         const response = await instance.post('/del_inventory', {
           ID:JSON.stringify(jsonData)
         }

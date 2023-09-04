@@ -115,12 +115,12 @@ router.get('/sel_account_subjects', async (req, res) => {
 
 router.post('/mod_account_subjects', async (req, res) => {
     await update_account_subjects(JSON.parse(req.body.ID))
-    res.send('已成功修改會計科目狀態');
+    res.send('已成功變更會計科目狀態');
 });
 
 router.post('/mod_value_target', async (req, res) => {
     await update_value_target(JSON.parse(req.body.ID))
-    res.send('已成功修改價值標的狀態');
+    res.send('已成功變更價值標的狀態');
 });
 
 
@@ -167,8 +167,8 @@ router.get('/sel_value_target_department', async (req, res) => {
 });
 router.post('/add_value_target', async (req, res) => {
     console.log(JSON.parse(req.body.ID))
-    await add_value_target(JSON.parse(req.body.ID))
-    res.send(JSON.parse(req.body.ID).category);
+    const result = await add_value_target(JSON.parse(req.body.ID))
+    res.send(result);
 });
 
 router.post('/del_value_target', async (req, res) => {
@@ -199,9 +199,9 @@ router.post('/update_supplier', async(req, res) => {
 
 });
 router.post('/add_supplier', async (req, res) => {
-    console.log(JSON.parse(req.body.ID).supplierCode)
-    await add_supplier(JSON.parse(req.body.ID))
-    res.send('已成功新增供應商');
+    console.log(JSON.parse(req.body.ID))
+    const result = await add_supplier(JSON.parse(req.body.ID))
+    res.send(result);
 });
 
 router.get('/sel_inventory', async (req, res) => {
@@ -217,8 +217,8 @@ router.get('/sel_inventory', async (req, res) => {
 
 router.post('/add_inventory', async (req, res) => {
     console.log(JSON.parse(req.body.ID).supplierCode)
-    await add_inventory(JSON.parse(req.body.ID))
-    res.send('已成功期初庫存');
+    const result = await add_inventory(JSON.parse(req.body.ID))
+    res.send(result);
 });
 
 router.get('/get_bom', async (req, res) => {
@@ -301,11 +301,6 @@ async function resetUserInfo(data) {
     console.log("reseting")
     const check_account = await find_account(data.Account)
     const check_old_password = await find_old_password(data.Account)
-    // const check_account = await register_indtical_account(account)
-    // console.log(check_account)
-    // if(check_old_password.length !== 0 ){
-    //     console.log(check_old_password[0].password)
-    // }
 
     if (data.Password !== data.Password2) {
         // console.log('密碼不一致，請重新填寫')
@@ -414,13 +409,9 @@ async function register(data) {
         const email = data.Email
         const permission = 1;
         const status = 1;
-        // data.push(permission)
-        // data.push(status)
         const check_email = await register_indtical_email(email)
         const check_account = await register_indtical_account(account)
         const query = 'INSERT INTO `user`(`username`, `account`, `password`, `email`, `permission`, `status`) VALUES  (?, ?, ?, ?, ?, ?)';
-        // console.log(data)
-        // data = [data]
 
         if (password !== password2) {
             // console.log('密碼不一致，請重新填寫')
@@ -432,19 +423,6 @@ async function register(data) {
                 // console.log('密碼長度至少需6位數字，請重新填寫')
                 return('密碼長度至少需6位數字，請重新填寫')
         } else {
-            // const reslt = await register_without_undefined(username, account, password, email, permission, status)
-                // await connection.promise().query(query, [username, account, password, email, permission, status], (error, results, fields) => {
-                //     if (error) {
-                //         console.log(error)
-                //         return(error)
-                //     } else {
-                //         // console.log("註冊成功")
-                //         return('註冊成功')
-
-                //     }
-                // });
-            // console.log("r",reslt)
-            // return(reslt)
             return new Promise((resolve, reject) => {
                 connection.query(query, [username, account, password, email, permission, status], (error, results, fields) => {
                     if (error) {
@@ -517,59 +495,192 @@ function sel_supplier() {
                 reject(error);
             } else {
                 let arr = obj_to_dict(results)
-                console.log('查詢結果：', arr);
+                // console.log('查詢結果：', arr);
                 resolve(arr);
             }
         });
     });
 }
-function add_supplier(data) {
+async function add_supplier(data) {
+    try {
+        const id = '0';
+        const status = '1';
 
-    const id = '0';
-    // console.log(data.productCode);
-    const status = '1';
-    connection.query('INSERT INTO supplier (`id`, `supplier_name`, `supplier_num`, `update_user`, `update_time`, `status`) VALUES (?, ?, ?, ?, ?, ?)', [id, data.name, data.supplierCode, data.updateUsr, data.updateTime, status], (error, results, fields) => {
-        if (error) {
-            console.error('查詢錯誤：', error);
+        const check_supplier_code = await identical_supplier_num(data.supplier_num)
+        const check_supplier_name = await identical_supplier_name(data.supplier_name)
+
+        if (check_supplier_code.length > 0) {
+            console.log('供應商代碼重複，請重新填寫')
+            return('供應商代碼重複，請重新填寫')
+        } else if (check_supplier_name.length > 0) {
+                console.log('供應商名稱重複，請重新填寫')
+                return('供應商名稱重複，請重新填寫')
         } else {
-            console.log("added")
-            // let arr = obj_to_dict(results)
-            // console.log('查詢結果：', arr);
+            return new Promise((resolve, reject) => {
+                connection.query('INSERT INTO supplier (`id`, `supplier_name`, `supplier_num`, `update_user`, `update_time`, `status`) VALUES (?, ?, ?, ?, ?, ?)', [id, data.supplier_name, data.supplier_num, data.update_user, data.update_time, status], (error, results, fields) => {
+                    if (error) {
+                        console.error('新增供應商錯誤：', error);
+                        reject(error);
+                    } else {
+                        console.log("供應商新增成功")
+                        resolve("供應商新增成功")
+                    }
+                });
+            });
         }
+    }
+    catch (error) {
+        console.log(error)
+        return(error)
+    }
+}
+
+function identical_supplier_num(data) {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM supplier WHERE `supplier_num` = ?', data, (error, results, fields) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
     });
 }
 
-function add_value_target(data) {
+function identical_supplier_name(data) {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM supplier WHERE `supplier_name` = ?', data, (error, results, fields) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+}
 
-    const id = '0';
-    const status = '1'
-    // console.log(data.productCode);
-    connection.query('INSERT INTO value_target (`id`, `category`, `target_num`, `target_name`, `target_status`, `update_time`) VALUES (?, ?, ?, ?, ?, ?)', [id, data.category, data.valueTargetCode, data.name, status, data.updateTime], (error, results, fields) => {
-        if (error) {
-            console.error('查詢錯誤：', error);
+
+async function add_value_target(data) {
+
+    try {
+        const id = '0';
+        const status = '1';
+
+        const check_valuetarget_code = await identical_valuetarget_num(data.valueTargetCode)
+        const check_valuetarget_name = await identical_valuetarget_name(data.name, data.category)
+
+        if (check_valuetarget_code.length > 0) {
+            console.log('價值標的代碼重複，請重新填寫')
+            return('價值標的代碼重複，請重新填寫')
+        } else if (check_valuetarget_name.length > 0) {
+                console.log('價值標的名稱重複，請重新填寫')
+                return('價值標的名稱重複，請重新填寫')
         } else {
-            console.log("added")
-            // let arr = obj_to_dict(results)
-            // console.log('查詢結果：', arr);
+            return new Promise((resolve, reject) => {
+                connection.query('INSERT INTO value_target (`id`, `category`, `target_num`, `target_name`, `target_status`, `update_time`) VALUES (?, ?, ?, ?, ?, ?)', [id, data.category, data.valueTargetCode, data.name, status, data.updateTime], (error, results, fields) => {
+                    if (error) {
+                        console.error('新增價值標的錯誤：', error);
+                        reject(error);
+                    } else {
+                        console.log("價值標的新增成功")
+                        resolve("價值標的新增成功")
+                    }
+                });
+            });
         }
+    }
+    catch (error) {
+        console.log(error)
+        return(error)
+    }
+}
+
+
+function identical_valuetarget_num(data) {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM value_target WHERE `target_num` = ?', data, (error, results, fields) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+}
+
+function identical_valuetarget_name(name, category) {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM value_target WHERE `target_name` = ? AND category = ?', [name, category], (error, results, fields) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
     });
 }
 
 //期初庫存新增(data由前端傳回來)
-function add_inventory(data) {
+async function add_inventory(data) {
+    console.log(data)
+    try {
+        const id = '0';
 
-    const id = '0';
-    console.log(data.productCode);
-    connection.query('INSERT INTO m_inventory_setup (`id`, `m_id`, `m_name`, `date`, `start_quantity`, `start_unit`, `start_unit_price`, `start_cost`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [id, data.productCode, data.productName, data.date, data.openingQuantity, data.openingUnit, data.openingUnitPrice, data.openingCost], (error, results, fields) => {
-        if (error) {
-            console.error('查詢錯誤：', error);
+        const check_material_code = await identical_material_num(data.productCode)
+        const check_material_name = await identical_material_name(data.productName)
+
+        if (check_material_code.length > 0) {
+            console.log('原物料代碼重複，請重新填寫')
+            return('原物料代碼重複，請重新填寫')
+        } else if (check_material_name.length > 0) {
+                console.log('原物料名稱重複，請重新填寫')
+                return('原物料名稱重複，請重新填寫')
         } else {
-            console.log("added")
-            // let arr = obj_to_dict(results)
-            // console.log('查詢結果：', arr);
+            return new Promise((resolve, reject) => {
+                connection.query('INSERT INTO m_inventory_setup (`id`, `m_id`, `m_name`, `date`, `start_quantity`, `start_unit`, `start_unit_price`, `start_cost`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [id, data.productCode, data.productName, data.date, data.openingQuantity, data.openingUnit, data.openingUnitPrice, data.openingCost], (error, results, fields) => {
+                    if (error) {
+                        console.error('新增期初原物料錯誤：', error);
+                        reject(error);
+                    } else {
+                        console.log("期初原物料新增成功")
+                        resolve("期初原物料新增成功")
+                    }
+                });
+            });
         }
+    }
+    catch (error) {
+        console.log(error)
+        return(error)
+    }
+}
+
+function identical_material_num(data) {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM m_inventory_setup WHERE `m_id` = ?', data, (error, results, fields) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
     });
 }
+
+function identical_material_name(name) {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM m_inventory_setup WHERE `m_name` = ?', name, (error, results, fields) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+}
+
+
+
 function del_inventory(condition) {
     console.log(condition)
     const deleteQuery = 'DELETE FROM `m_inventory_setup` WHERE `m_inventory_setup`.`m_id` = ?';
@@ -711,7 +822,7 @@ function sel_inventory() {
                 reject(error);
             } else {
                 let arr = obj_to_dict(results)
-                console.log('查詢結果：', arr);
+                // console.log('查詢結果：', arr);
                 resolve(arr);
             }
         });

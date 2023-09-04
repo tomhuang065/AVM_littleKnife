@@ -28,26 +28,54 @@ const RawMaterialFormModal = ({ show, onClose, onSave }) => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    rawMaterialData.openingCost = `${Number(rawMaterialData.openingQuantity)*Number(rawMaterialData.openingUnitPrice)}`
-    console.log(rawMaterialData.openingCost)
-    // onSave(rawMaterialData);
-    console.log(rawMaterialData)
-    const response = await instance.post('/add_inventory', {
-      ID:JSON.stringify(rawMaterialData)
+
+  e.preventDefault();
+  console.log(rawMaterialData.date)
+
+  if(rawMaterialData.productCode === ''){
+    alert('尚未輸入期初原物料代碼')
+  }
+  else{
+    if(rawMaterialData.productName === ''){
+      alert('尚未輸入期初原物料名稱')
     }
-  )
-  alert("已新增期初庫存資料")
-  setMat(response.data)
-  setRawMaterialData({
-    productCode: "",
-    productName: "",
-    date: "",
-    openingQuantity: "",
-    openingUnit: "",
-    openingUnitPrice: "",
-    openingCost: "",
-  })
+    else if(rawMaterialData.date === ''){
+      alert('尚未輸入期初原物料日期')
+    }
+    else if(rawMaterialData.openingQuantity === ''){
+      alert('尚未輸入期初原物料數量')
+    }
+    else if(rawMaterialData.openingUnit === ''){
+      alert('尚未輸入期初原物料單位')
+    }
+    else if(rawMaterialData.openingUnitPrice === ''){
+      alert('尚未輸入期初原物料單價')
+    }
+    else{
+      rawMaterialData.openingCost = `${Number(rawMaterialData.openingQuantity)*Number(rawMaterialData.openingUnitPrice)}`
+
+      const response = await instance.post('/add_inventory', {
+        ID:JSON.stringify(rawMaterialData)
+      })
+      console.log(response.data)
+
+      alert(response.data)
+      setRawMaterialData({
+        productCode: "",
+        productName: "",
+        date: "",
+        openingQuantity: "",
+        openingUnit: "",
+        openingUnitPrice: "",
+        openingCost: "",
+      })
+      
+      if(response.data === "期初原物料新增成功"){
+          setMat(response.data)
+          onClose();
+      }
+    }
+  };
   };
 
   return (
@@ -58,23 +86,23 @@ const RawMaterialFormModal = ({ show, onClose, onSave }) => {
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="productCode">
-            <Form.Label>產品/材料代碼</Form.Label>
+            <Form.Label>原物料代碼</Form.Label>
             <Form.Control
               type="text"
               name="productCode"
               value={rawMaterialData.productCode}
               onChange={handleChange}
-              required
+              // required
             />
           </Form.Group>
           <Form.Group controlId="productName">
-            <Form.Label>產品/材料名稱</Form.Label>
+            <Form.Label>原物料名稱</Form.Label>
             <Form.Control
               type="text"
               name="productName"
               value={rawMaterialData.productName}
               onChange={handleChange}
-              required
+              // required
             />
           </Form.Group>
           <Form.Group controlId="date">
@@ -84,7 +112,7 @@ const RawMaterialFormModal = ({ show, onClose, onSave }) => {
               name="date"
               value={rawMaterialData.date}
               onChange={handleChange}
-              required
+              // required
             />
           </Form.Group>
           <Form.Group controlId="openingQuantity">
@@ -94,7 +122,7 @@ const RawMaterialFormModal = ({ show, onClose, onSave }) => {
               name="openingQuantity"
               value={rawMaterialData.openingQuantity}
               onChange={handleChange}
-              required
+              // required
             />
           </Form.Group>
           <Form.Group controlId="openingUnit">
@@ -104,7 +132,7 @@ const RawMaterialFormModal = ({ show, onClose, onSave }) => {
               name="openingUnit"
               value={rawMaterialData.openingUnit}
               onChange={handleChange}
-              required
+              // required
             />
           </Form.Group>
           <Form.Group controlId="openingUnitPrice">
@@ -114,7 +142,7 @@ const RawMaterialFormModal = ({ show, onClose, onSave }) => {
               name="openingUnitPrice"
               value={rawMaterialData.openingUnitPrice}
               onChange={handleChange}
-              required
+              // required
             />
           </Form.Group>
           <br></br>
