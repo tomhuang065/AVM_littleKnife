@@ -1322,6 +1322,7 @@ async function register(data) {
         const account = data[1]
         const password = data[2]
         const password_check = data[3]
+        const email = data[data.length - 1]
         const permission = 1;
         const status = 1;
         data.splice(3, 1)
@@ -1339,6 +1340,8 @@ async function register(data) {
             console.log('帳號以被註冊，請重新填寫')
         } else if (password != password_check) {
             console.log('兩次密碼不相同，請再次確認')
+        } else if (!isValidEmail(email)) {
+            console.log('信箱格式錯誤，請重新輸入')
         } else {
             if (password.length < 6) {
                 console.log('密碼長度至少需6位數字，請重新填寫')
@@ -1358,6 +1361,13 @@ async function register(data) {
     catch (error) {
         console.log(error)
     }
+}
+
+
+//檢查信箱
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
 }
 
 //忘記密碼(密碼重設)[帳號,密碼,再次確認密碼]
