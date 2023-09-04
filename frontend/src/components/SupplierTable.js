@@ -5,181 +5,87 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp, faArrowDown, faArrowUp, faEdit, faEllipsisH, faExternalLinkAlt, faEye, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { Form, Nav, Card, Button, Table, Dropdown, ProgressBar,  InputGroup, Pagination, ButtonGroup } from '@themesberg/react-bootstrap';
 import { Link } from 'react-router-dom';
-import Modal from 'react-bootstrap/Modal';
+import RemoveModal from "../pages/examples/SupplierEditForm"
 import moment from "moment";
 import { useChat } from "../api/context";
-
-
-
 import { Routes } from "../routes";
-import transactions from "../data/transactions";
 
 
 export const SupplierTable = (props) => {
     const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
     const [removeModal, setRemoveModal] = useState(false);
-    const [editing, setEditing] = useState(false)
-    const [index, setIndex] = useState("選擇修改項目")
-    const [state, setState] = useState("")
-
-    const [supName, setSupName] = useState("")
-    const [supNum, setSupNum] = useState("")
-    const [updateUsr, setUpdateUsr] = useState("")
-    const [updateTime, setUpdateTime] = useState("")
-    const [orig, setOrig] = useState("")
+    const [states, setStates] = useState("")
+    const [origs, setOrigs] = useState("")
+    const [supplier, setSupplier] = useState({
+      status:"",
+      supplier_num: "",
+      supplier_name:"",
+      update_time: "",
+      update_user:"",
+    })
 
     const {sup, setSup} = useChat();
 
-    const supplier = props.supplier
+    const Acc = props.supplier
     const Search = props.searchInd
 
-    const handleRowEdit = (supNum, supName, updateUsr, updateTime) => {
-        console.log("edit row")
-        setState("editing")
+    const handleRowEditDelete = (states, supNum, supName, updateUsr, updateTime, status) => {
+        setStates(states)
         setRemoveModal(true);
-        setSupName (supName)
-        setSupNum(supNum)
-        setUpdateTime(updateTime)
-        setUpdateUsr(updateUsr)
-        setRemoveModal(true);
-        setOrig(supNum)
+        setSupplier({ supplier_num: supNum, supplier_name:supName, update_time: updateTime, update_user: updateUsr, status:status});
+        setOrigs(supNum)
     }
-    const handleRowDelete = (supNum, supName,  updateUsr, updateTime) => {
-        setState("deleting")
-        setRemoveModal(true);
-        setSupName(supName)
-        setSupNum(supNum)
-        setUpdateTime(updateTime)
-        setUpdateUsr(updateUsr)
-        setOrig(supNum)
-
-      }
-
-    const editSupplier = (content) =>{
-        setEditing(true)
-        switch(content) {
-          case "供應商代碼" :{
-            setIndex(content)
-            break;
-          }
-          case "供應商名稱" :{
-            setIndex(content)
-            break;
-          }
-          case "更新人員" :{
-            setIndex(content)
-            break;
-          }
-          case "更新時間" :{
-            setIndex(content)
-            break;
-          }
-          default:{
-            break;
-          }
-        }
-      }
-
-      const modifySupplier = (event) =>{
-        // setEditing(false);
-        console.log(event.target.value)
-        if(event !== ""){
-          switch(index) {
-            case "供應商代碼" :{
-                setSupNum(event.target.value)
-                // setPlaceHolder("")
-              break;
-            }
-            case "供應商名稱" :{
-                setSupName(event.target.value)
-                // setPlaceHolder("")
-              break;
-            }
-            case "更新人員" :{
-                setUpdateUsr(event.target.value)
-                // setPlaceHolder("")
-              break;
-            }
-            case "更新時間" :{
-                setUpdateTime(event.target.value)
-                // setPlaceHolder("")
-              break;
-            }
-            default:{
-              break;
-            }
-        }
-        
-        }
     
-      }
+    const handleEditSupplier = async(sup)=>{
+      console.log("sup", sup)
+      const jsonData = {
+        orig: `${origs}`,
+        status:`${sup}`,
+        update_user: `${supplier.update_user}`,
+        update_time: `${supplier.update_time}`,
+        supplier_num: `${supplier.supplier_num}`,
+        supplier_name: `${supplier.supplier_name}`,
+        task:"change_state"
 
-      const handleClick = (response) =>{
-        alert("已變更供應商狀態");
-        // window.location.reload(false)
-        
-      }
-      const handleDeleteSupplier= async()=>{
-        // console.log(fourth)
-        const jsonData = {
-          content: `${supNum}`
-        };
-        const response = await instance.post('/del_supplier', {
-          ID:JSON.stringify(jsonData)
-        }
-      )
-        console.log(response.data)
-        setRemoveModal(false)
-        handleClick(response.data);
-        setSup(null)
-    
-      }
-    
-      const handleEditSupplier = async(sup)=>{
-        console.log("sup", sup)
-        const jsonData = {
-          orig: `${orig}`,
-          status:`${sup}`
+      };
+      const response = await instance.post('/update_supplier', {
+        ID:JSON.stringify(jsonData)
+      })
+      console.log(response.data)
+      alert("已成功修改供應商顯示狀態")
+      setRemoveModal(false)
 
-        };
-        const response = await instance.post('/update_supplier', {
-          ID:JSON.stringify(jsonData)
-        }
-      )
-        console.log(response.data)
-        // console.log(orig, " ", third ," ", thirdCn, " ", thirdEng, " ", fourth, " ", fourthCn, " ", fourthEng)
-        setRemoveModal(false)
-        setEditing(false);
-        setIndex("選擇修改項目")
-        handleClick(response.data);
-    
-    
-      }
+  
+    }
 
-      const handleChangeState = (supNum, supName, updateUsr, updateTime, status) =>{
-        setOrig(supNum)
-        setSupName(supName)
-        setSupNum(supNum)
-        setUpdateTime(updateTime)
-        setUpdateUsr(updateUsr)
-        if(status === 1){
-          setSup(false)
-        }
-        else{
-          setSup(true)
-        }
+    const handleChangeState = (supNum, supName, updateUsr, updateTime, status) =>{
+      setOrigs(supNum)
+      setSupplier({
+        supplier_num: supNum,
+        supplier_name:supName,
+        update_time: updateTime,
+        update_user:updateUsr,
+      })
+      console.log(status)
+      if(status === 1){
+        setSup(false)
       }
+      else{
+        setSup(true)
+      }
+    }
 
-      useEffect(()=>{
-        console.log(sup)
-        if(orig !== ''){
-          handleEditSupplier(sup)
-        }
-        setOrig("")    
-      },[sup])
+  useEffect(()=>{
+    console.log(sup)
+    if(origs !== ''){
+      setSupplier({status :sup})
+      handleEditSupplier(sup)
+    }
+    setOrigs("")    
+  },[sup])
   
     const TableRow = (props) => {
-      const { supplier_num, supplier_name, id, update_user,  update_time, status } = props;
+      const { supplier_num, supplier_name, update_user,  update_time, status } = props;
       return (
         <tr >
           <td >
@@ -210,65 +116,17 @@ export const SupplierTable = (props) => {
             {update_time === null?"---":moment(update_time).format('YYYY-MM-DD HH:mm:ss')}
             </span>
           </td>
+          <td>
+            <Button variant = "link"onClick={() => {handleRowEditDelete("editing", supplier_num, supplier_name, update_user,  update_time, status)}}>
+              <FontAwesomeIcon icon={faEdit} className="me-0.5" /> 
+            </Button>
+            <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete("deleting",  supplier_num, supplier_name, update_user,  update_time, status)}}>
+              <FontAwesomeIcon icon={faTrashAlt} className="me-0.5" /> 
+            </Button>
+          </td>
         </tr>
       );
     };
-  
-    const RemoveModal = ({ onHide, show, state }) =>{
-        const rmtype = ["供應商代碼","供應商名稱","更新人員","更新時間" ]
-        return(
-        <Modal
-            size="lg"
-            aria-labelledby="contained-modal-title-vcenter"
-            centered
-            {...{ onHide, show }}
-        >
-          <Modal.Header closeButton>
-            <Modal.Title id="contained-modal-title-vcenter">
-              {state === "deleting" ? "確定要刪除此供應商？" : "你正在編輯供應商資訊"}
-            </Modal.Title>
-          </Modal.Header>
-          {state === "deleting"?
-            <Modal.Body>
-              供應商名稱 : {supName} / 供應商代碼 : {supNum} <br></br> 更新人員 : {updateUsr} / 更新時間 : {updateTime} 
-            </Modal.Body>
-            :
-            <Modal.Body>
-              <Dropdown className = "btn-group dropleft"id = "dropdown-button-drop-start" as={ButtonGroup}>
-                <Dropdown.Toggle as={Button} split variant="link"  className="text-dark m-0 p-0" style ={{color :"red"}}>
-                  {/* <span className="icon icon-sm">
-                    <FontAwesomeIcon icon={faEllipsisH} className="icon-dark" />
-                      "選擇修改項目"
-                  </span> */}
-                  <Button variant="outline-primary" >{index}</Button>
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  {rmtype.map((rm)=> (
-                    <Dropdown.Item onClick={() => {editSupplier(rm)}}>
-                      <FontAwesomeIcon icon={faEdit} className="me-2" /> {rm}
-                    </Dropdown.Item>
-                  ))}
-                </Dropdown.Menu>
-              </Dropdown>
-              {editing? 
-              <Form >
-                <InputGroup >
-                  <InputGroup.Text>
-                    <FontAwesomeIcon  />
-                  </InputGroup.Text>
-                  <Form.Control type="text" onClick ={e => modifySupplier(e)} onChange={e => console.log(e.target.value)} />
-                  {/* <FontAwesomeIcon icon={faEdit} className="me-2" />  */}
-                </InputGroup>
-              </Form>:null}
-            </Modal.Body>
-          }
-          <Modal.Footer>
-            {state === "deleting"?<Button variant="outline-secondary" onClick={handleDeleteSupplier}>確認</Button> :<Button variant="outline-secondary" onClick={handleEditSupplier}>修改</Button>  }
-            <Button variant="outline-primary" onClick={() => {setRemoveModal(false)}}>取消</Button>
-          </Modal.Footer>
-        </Modal>
-        )
-      };
 
     return (
       <Card border="light" className="table-wrapper table-responsive shadow-sm" style ={{width:"120%"}}>
@@ -282,10 +140,11 @@ export const SupplierTable = (props) => {
                 <th className="border-bottom">變更供應商狀態</th>
                 <th className="border-bottom">更新人員</th>
                 <th className="border-bottom">更新時間</th>
+                <th className="border-bottom">  選項</th>
               </tr>
             </thead>
             <tbody>
-              {typeof(supplier) === "undefined" ? null : supplier.filter((sup) =>  
+              {typeof(Acc) === "undefined" ? null : Acc.filter((sup) =>  
                                    sup.supplier_num.includes(Search) ||
                                    sup.supplier_name.includes(Search))
                                 .map(t => <TableRow key={`transaction-${t.id}`} {...t} />)}
@@ -296,28 +155,12 @@ export const SupplierTable = (props) => {
           <RemoveModal /** 編輯視窗 */
             show={removeModal}
             onHide={() => setRemoveModal(false)}
-            state={state}
+            states ={states}
+            supplier ={supplier}
+            origs={origs}
+
         />:<div></div>}
       </Card>
     );
   };
   
-  {/* <Dropdown as={ButtonGroup}>
-              <Dropdown.Toggle as={Button} split variant="link" className="text-dark m-0 p-0">
-                <span className="icon icon-sm">
-                  <FontAwesomeIcon icon={faEllipsisH} className="icon-dark" />
-                </span>
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <Dropdown.Item onClick={() => {handleChangeState(supplier_num, supplier_name, update_user, update_time, status)}}>
-                  <FontAwesomeIcon icon={faEdit} className="me-2" /> Change
-                </Dropdown.Item>
-                <Dropdown.Item onClick={() => {handleRowEdit(supplier_num, supplier_name, update_user, update_time)}}>
-                  <FontAwesomeIcon icon={faEdit} className="me-2" /> Edit
-                </Dropdown.Item>
-
-                <Dropdown.Item className="text-danger"onClick={() => {handleRowDelete(supplier_num, supplier_name, update_user, update_time)}} >
-                  <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> Remove
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown> */}

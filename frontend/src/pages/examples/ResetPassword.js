@@ -38,7 +38,7 @@ export default () => {
       }
     )
     if(response.data === '修改成功，請重新登入'){
-      alert('修改成功')
+      alert(response.data)
       history.push("/examples/Signin")
     }
     else{

@@ -188,14 +188,14 @@ router.get('/sel_supplier', async (req, res) => {
     }
 });
 router.post('/del_supplier', async (req, res) => {
-    await del_supplier(JSON.parse(req.body.ID).content)
+    await del_supplier(JSON.parse(req.body.ID).supplier_num)
     res.send('已成功刪除供應商');
 })
 
 router.post('/update_supplier', async(req, res) => {
     console.log(JSON.parse(req.body.ID))
     await update_supplier(JSON.parse(req.body.ID))
-    res.send('已成功修改期初庫存資料');
+    res.send('已成功修改供應商資料');
 
 });
 router.post('/add_supplier', async (req, res) => {
@@ -322,7 +322,7 @@ async function resetUserInfo(data) {
                     reject(error);
                 } else {
                     // console.log(results)
-                    resolve("修改成功");
+                    resolve("修改成功，請重新登入");
                 }
             });
         });
@@ -359,7 +359,7 @@ function find_old_password(data) {
 
 
 function del_supplier(condition) {
-    console.log(condition)
+    console.log("consition", condition)
     const deleteQuery = "DELETE FROM `supplier` WHERE `supplier`.`supplier_num` = ?";
     
     connection.query(deleteQuery,condition,(error, results, fields) => {
@@ -719,11 +719,36 @@ function update_supplier(updatedata) {
     if(updatedata.status ==='false'){
         stat = '0';
     }
-    connection.query(updateQuery, [stat, condition], (error, results, fields) => {
+    if(updatedata.task === "change_state"){
+        connection.query(updateQuery, [stat, condition], (error, results, fields) => {
+            if (error) {
+                console.error('修改資料庫錯誤：', error);
+                return('修改資料庫錯誤：', error)
+            } else {
+                console.log('已成功修改期初庫存資料');
+                return('已成功修改期初庫存資料')
+            }
+        });
+    }
+    
+    updateQuery = 'UPDATE `supplier` SET supplier_num = ? WHERE `supplier`.`supplier_num` = ?';
+    connection.query(updateQuery, [updatedata.supplier_num, condition], (error, results, fields) => {
         if (error) {
             console.error('修改資料庫錯誤：', error);
+            return('修改資料庫錯誤：', error)
         } else {
-            console.log('已成功修改資料');
+            console.log('已成功修改期初庫存資料');
+            return('已成功修改期初庫存資料')
+        }
+    });
+    updateQuery = 'UPDATE `supplier` SET supplier_name = ? WHERE `supplier`.`supplier_num` = ?';
+    connection.query(updateQuery, [updatedata.supplier_name, condition], (error, results, fields) => {
+        if (error) {
+            console.error('修改資料庫錯誤：', error);
+            return('修改資料庫錯誤：', error)
+        } else {
+            console.log('已成功修改期初庫存資料');
+            return('已成功修改期初庫存資料')
         }
     });
 }
