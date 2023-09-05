@@ -10,21 +10,36 @@ import moment from "moment";
 import { useChat } from "../api/context";
 
 
-import { Routes } from "../routes";
-import transactions from "../data/transactions";
-
-
-
 export const ValuetargetsTable = (props) => {
     const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
     const [orig, setOrig] = useState("")
     const {val, setVal, valType, setValType} = useChat()
+    const [states, setStates] = useState("");
+    const [removeModal, setRemoveModal] = useState(false)
+    const [origs, setOrigs] = useState("")
+    const [valueTarget, setValueTarget] = useState({
+      target_status:"",
+      target_num: "",
+      target_name:"",
+      category:"",
+  
+    })
+    
+    
     const value = props.valueTarget.data
     const type = props.type
     const Search = props.search
 
-    const handleChangeState = (orig, status) =>{
+    const handleRowEditDelete = (states, target_num, target_name, target_status, category) => {
+      setStates(states)
+      setRemoveModal(true);
+      setValueTarget({ target_num: target_num, target_name:target_name, target_status:target_status, category:category});
+      setOrig(target_num)
+    }
+
+    const handleChangeState = (orig, status,  target_name, category) =>{
       setValType(type)
+      setValueTarget({ target_num: orig, target_name:target_name, target_status:status, category:category});
       setOrig(orig)
       if(status === 1){
         setVal(false)
@@ -43,16 +58,19 @@ export const ValuetargetsTable = (props) => {
     },[val])
 
     const handleEditValueTarget = async(stat)=>{
+      console.log(valueTarget)
       const jsonData = {
         orig: `${orig}`,
         status:`${stat}`,
+        target_num: `${valueTarget.target_num}`,
+        target_name: `${valueTarget.target_name}`,
+        target_status: `${valueTarget.target_status}`,
       };
       const response = await instance.post('/mod_value_target', {
         ID:JSON.stringify(jsonData)
       }
       )
       alert(response.data);
-      setVal(null)
     }
     const handleDeleteValueTarget = async(targetNum)=>{
       // console.log(fourth)
@@ -72,15 +90,10 @@ export const ValuetargetsTable = (props) => {
     }
 
     const TableRow = (props) => {
-      const { id, target_num, target_name, target_status, update_time } = props;
+      const { id, target_num, target_name, target_status, update_time, category } = props;
   
       return (
         <tr>
-          {/* <td>
-            <Card.Link as={Link} to={Routes.Invoice.path} className="fw-normal">
-              {id}
-            </Card.Link>
-          </td> */}
           <td>
             <span className="fw-normal">
               {target_num}
@@ -98,12 +111,20 @@ export const ValuetargetsTable = (props) => {
             </span>
           </td>
           <td>
-            <Button variant="outline-primary" onClick={() => {handleChangeState(target_num, target_status)}}>變更</Button>
+            <Button variant="outline-primary" onClick={() => {handleChangeState(target_num, target_status, target_name, category)}}>變更</Button>
           </td>
           <td>
             <span className="fw-normal">
               {update_time === null?"---":moment(update_time).format('YYYY-MM-DD HH:mm:ss')}
             </span>
+          </td>
+          <td>
+            <Button variant = "link"onClick={() => {handleRowEditDelete("editing", target_num, target_name, target_status, category)}}>
+              <FontAwesomeIcon icon={faEdit} className="me-0.5" /> 
+            </Button>
+            <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete("deleting", target_num, target_name, target_status, category)}}>
+              <FontAwesomeIcon icon={faTrashAlt} className="me-0.5" /> 
+            </Button>
           </td>
         </tr>
       );
@@ -121,6 +142,7 @@ export const ValuetargetsTable = (props) => {
                 <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}狀態</th>
                 <th className="border-bottom">變更{type === "原料"?"原料":type === "產品"?"產品":"顧客"}狀態</th>
                 <th className="border-bottom">更新時間</th>
+                <th className="border-bottom">  選項</th>
               </tr>
             </thead>
             <tbody>
@@ -131,6 +153,15 @@ export const ValuetargetsTable = (props) => {
             </tbody>
           </Table>
         </Card.Body>
+        {removeModal?
+          <RemoveModal /** 編輯視窗 */
+            show={removeModal}
+            onHide={() => setRemoveModal(false)}
+            onSave={(num, name) => setValueTarget({target_num : num, target_name:name})}
+            states ={states}
+            valueTarget ={valueTarget}
+            orig={orig}
+        />:<div></div>}
       </Card>
     );
   };

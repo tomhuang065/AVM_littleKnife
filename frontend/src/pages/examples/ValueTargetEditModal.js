@@ -7,86 +7,53 @@ import { faAngleDown, faAngleUp, faArrowDown, faArrowUp, faEdit, faEllipsisH, fa
 import { Modal, Form, Nav, Card, Button, Table, Dropdown, ProgressBar,  InputGroup, Pagination, ButtonGroup } from '@themesberg/react-bootstrap';
 
 
-const RemoveModal = ({ onHide, show, states, inventory, origs }) =>{
+const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
 
     const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
     const [placeHolder, setPlaceHolder] = useState("")
     const [editing, setEditing] = useState(false)
     const [index, setIndex] = useState("選擇修改項目")
+    const {val, setVal, valType, setValType} = useChat()
     const [forChange, setForChange] = useState("")
-    const {mat, setMat} = useChat();
-    const [newInventory, setNewInventory] = useState({
-        id: inventory.id,
-        mid: inventory.mid,
-        mname:inventory.mname,
-        date: inventory.date,
-        startC: inventory.startC,
-        startU: inventory.startU,
-        startP: inventory.startP,
-        startQ: inventory.startQ,
+    const [newValueTarget, setNewValueTarget] = useState({
+        target_status: valueTarget.target_status,
+        target_name: valueTarget.target_name,
+        target_num:valueTarget.target_num,
+        category : valueTarget.category,
+        
       });
 
-    const handleInventoryChange =(e) =>{
+    const handleValueTargetChange =(e) =>{
         const { name, value } = e.target;
         // console.log(name, value)
-        setNewInventory({
-            ...newInventory,
+        setNewValueTarget({
+            ...newValueTarget,
             [name]: value,
         });
     }
 
-    const editMaterialInventory = (content) =>{
+    const editValueTarget = (content) =>{
         console.log(forChange, placeHolder)
         // setForChange("")
         // setPlaceHolder("")
         setEditing(true)
         switch(content) {
-          case "編號" :{
+          case "價值標的狀態" :{
             setIndex(content)
-            setPlaceHolder(newInventory.id)
-            setForChange('id')
+            setPlaceHolder(newValueTarget.target_status)
+            setForChange('target_status')
             break;
           }
-          case "材料代碼" :{
-            setPlaceHolder(newInventory.mid)
+          case "價值標的代碼" :{
+            setPlaceHolder(newValueTarget.target_num)
             setIndex(content)
-            setForChange("mid")
+            setForChange("target_num")
             break;
           }
-          case "材料名稱" :{
+          case "價值標的名稱" :{
             setIndex(content)
-            setPlaceHolder(newInventory.mname)
-            setForChange("mname")
-            break;
-          }
-          case "日期" :{
-            setIndex(content)
-            setPlaceHolder(newInventory.date)
-            setForChange("date")
-            break;
-          }
-          case "期初數量" :{
-            setPlaceHolder(newInventory.startQ)
-            setForChange("startQ")
-            setIndex(content)
-            break;
-          }
-          case "期初單位" :{
-            setPlaceHolder(newInventory.startU)
-            setForChange("startU")
-            setIndex(content)
-            break;
-          }
-          case "期初單價" :{
-            setPlaceHolder(newInventory.startP)
-            setForChange("startP")
-            setIndex(content)
-            break;
-          }
-          case "期初成本" :{
-            setPlaceHolder(newInventory.startC)
-            setForChange("startC")
-            setIndex(content)
+            setPlaceHolder(newValueTarget.target_name)
+            setForChange("target_name")
             break;
           }
           default:{
@@ -95,46 +62,46 @@ const RemoveModal = ({ onHide, show, states, inventory, origs }) =>{
         }
       }
 
-      const handleDeleteInventory = async()=>{
+      const handleDeleteValueTarget = async()=>{
         const jsonData = {
-          mid: `${newInventory.mid}`
+          target_num: `${newValueTarget.target_num}`
         };
-        setMat(null)
-        const response = await instance.post('/del_inventory', {
+        setValType(null)
+        const response = await instance.post('/del_value_target', {
           ID:JSON.stringify(jsonData)
         }
       )
         alert(response.data);
         onHide()
         setEditing(false); //not to show the input bar
-        setMat("del")
+        setValType(newValueTarget.category)
       }
     
-      const handleEditInventory = async()=>{
+      const handleEditValueTarget = async()=>{
         const jsonData = {
-          orig: `${origs}`,
-          id: `${newInventory.id}`,
-          mid: `${newInventory.mid}`,
-          mname: `${newInventory.mname}`,
-          startC: `${newInventory.startC}`,
-          startP: `${newInventory.startP}`,
-          startQ: `${newInventory.startQ}`,
-          startU: `${newInventory.startU}`,
+          orig: `${orig}`,
+          target_num: `${newValueTarget.target_num}`,
+          target_name: `${newValueTarget.target_name}`,
+          target_status: `${newValueTarget.target_status}`,
         };
-        const response = await instance.post('/update_inventory', {
+        setValType(null)
+
+        const response = await instance.post('/mod_value_target', {
           ID:JSON.stringify(jsonData)
         }
       )
+        onSave(newValueTarget.target_num, newValueTarget.target_name)
+        setValType(newValueTarget.category)
         setEditing(false); //not to show the input bar
         setPlaceHolder("") //placeholder in the modal input bar
         setForChange("")
         setIndex("選擇修改項目") //the index button in the 
         alert(response.data);
-        setMat("edit")
+        // setMat("edit")
         onHide()
       }
 
-    const inventoryArray = ['材料代碼','材料名稱', '期初數量', '期初單位','期初單價']
+    const valueTargetArray = ['價值標的代碼','價值標的名稱']
 
     return(
     <Modal
@@ -145,13 +112,13 @@ const RemoveModal = ({ onHide, show, states, inventory, origs }) =>{
     >
       <Modal.Header closeButton>
         <Modal.Title id="contained-modal-title-vcenter">
-          {states === "deleting" ? "刪除期初原物料？" : "編輯期初原物料"}
+          {states === "deleting" ? "刪除價值標的" : "編輯價值標的"}
         </Modal.Title>
       </Modal.Header>
       {states === "deleting"?
         <Modal.Body>
           {/* 三階代碼 : {third} / 三階科目中文名稱 : {thirdCn} / 三階科目英文名稱 : {thirdEng} /<br></br> 四階代碼 : {fourth} / 四階科目中文名稱 : {fourthCn} / 四階科目英文名稱 :{fourthEng} */}
-          編號：{newInventory.id} / 材料代碼 : {newInventory.mid} / 材料名稱 : {newInventory.mname} <br></br> 期初數量 : {newInventory.startQ} / 期初單位 : {newInventory.startU} <br></br> 期初單價 : {newInventory.startP} / 期初成本 : {newInventory.startC}
+          價值標的代碼：{newValueTarget.num} <br></br> 價值標的名稱 : {newValueTarget.target_name}  
         </Modal.Body>
         :
         <Modal.Body className="d-flex flex-wrap flex-md-nowrap align-items-center  py-4">
@@ -160,8 +127,8 @@ const RemoveModal = ({ onHide, show, states, inventory, origs }) =>{
               <Button variant="outline-primary" >{index}</Button>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-                {inventoryArray.map((inv) =>  (
-                    <Dropdown.Item onClick={() => {editMaterialInventory(inv)}}>
+                {valueTargetArray.map((inv) =>  (
+                    <Dropdown.Item onClick={() => {editValueTarget(inv)}}>
                         <FontAwesomeIcon  className="me-2" /> {inv}
                     </Dropdown.Item> 
                   ))}
@@ -176,13 +143,13 @@ const RemoveModal = ({ onHide, show, states, inventory, origs }) =>{
               <InputGroup.Text>
                 <FontAwesomeIcon  />
               </InputGroup.Text>
-              <Form.Control type="text" style ={{width : 500}} placeholder = {placeHolder} name={forChange}  onChange={handleInventoryChange} />
+              <Form.Control type="text" style ={{width : 500}} placeholder = {placeHolder} name={forChange}  onChange={handleValueTargetChange} />
             </InputGroup>
           </Form>:null}
         </Modal.Body>
       }
       <Modal.Footer>
-        {states === "deleting"?<Button variant="outline-secondary" onClick={handleDeleteInventory}>確認</Button> :<Button variant="outline-secondary" onClick={handleEditInventory}>修改</Button>  }
+        {states === "deleting"?<Button variant="outline-secondary" onClick={handleDeleteValueTarget}>確認</Button> :<Button variant="outline-secondary" onClick={handleEditValueTarget}>修改</Button>  }
         <Button variant="outline-primary">取消</Button>
       </Modal.Footer>
     </Modal>

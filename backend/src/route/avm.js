@@ -762,13 +762,29 @@ function update_supplier(updatedata) {
 
 function update_value_target(updatedata) {
     const condition = updatedata.orig
-    console.log(condition, " ", updatedata.status)
+    console.log(updatedata)
     let updateQuery = 'UPDATE `value_target` SET target_status = ? WHERE `value_target`.`target_num` = ?';
     var stat = "1";
     if(updatedata.status ==='false'){
         stat = '0';
     }
     connection.query(updateQuery, [stat, condition], (error, results, fields) => {
+        if (error) {
+            console.error('修改資料庫錯誤：', error);
+        } else {
+            console.log('已成功修改資料');
+        }
+    });
+    updateQuery = 'UPDATE `value_target` SET target_num = ? WHERE `value_target`.`target_num` = ?';
+    connection.query(updateQuery, [updatedata.target_num, condition], (error, results, fields) => {
+        if (error) {
+            console.error('修改資料庫錯誤：', error);
+        } else {
+            console.log('已成功修改資料');
+        }
+    });
+    updateQuery = 'UPDATE `value_target` SET target_name = ? WHERE `value_target`.`target_num` = ?';
+    connection.query(updateQuery, [updatedata.target_name, condition], (error, results, fields) => {
         if (error) {
             console.error('修改資料庫錯誤：', error);
         } else {

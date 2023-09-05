@@ -79,7 +79,7 @@ export default () => {
   };
   const onHandleAccountDownload = async () => {
     const workbook = new ExcelJs.Workbook(); // 創建試算表檔案
-    const sheet = workbook.addWorksheet('會計科目'); //在檔案中新增工作表 參數放自訂名稱
+    const sheet = workbook.addWorksheet('財會系統'); //在檔案中新增工作表 參數放自訂名稱
 
 		sheet.addTable({ // 在工作表裡面指定位置、格式並用columsn與rows屬性填寫內容
 	    name: 'table名稱',  // 表格內看不到的，讓你之後想要針對這個table去做額外設定的時候，可以指定到這個table
@@ -101,7 +101,7 @@ export default () => {
 	    const blobData = new Blob([content], {
 	      type: "application/vnd.ms-excel;charset=utf-8;"
 	    });
-	    link.download = '會計科目.xlsx';
+	    link.download = '財會系統.xlsx';
 	    link.href = URL.createObjectURL(blobData);
 	    link.click();
 	  });
@@ -207,6 +207,9 @@ export default () => {
               </Nav.Item>
               <Nav.Item>
                 <Nav.Link eventKey="add" >單筆新增</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="browse" >瀏覽</Nav.Link>
               </Nav.Item>
             </Nav>
 
@@ -357,6 +360,12 @@ export default () => {
                 </Button>
                 </Col>
                 </div>
+              </Tab.Pane>
+              <Tab.Pane eventKey="browse" >
+                <div className="d-flex flex-wrap flex-md-nowrap align-items-center py-3">
+瀏覽
+                </div>
+               
               </Tab.Pane>
               
             </Tab.Content >
