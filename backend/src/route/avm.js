@@ -422,7 +422,10 @@ async function register(data) {
         } else if (password.length < 6) {
                 // console.log('密碼長度至少需6位數字，請重新填寫')
                 return('密碼長度至少需6位數字，請重新填寫')
-        } else {
+        } else if(!isValidEmail(email)) {
+            return('信箱格式錯誤，請重新填寫')
+        }
+        else {
             return new Promise((resolve, reject) => {
                 connection.query(query, [username, account, password, email, permission, status], (error, results, fields) => {
                     if (error) {
@@ -438,6 +441,10 @@ async function register(data) {
     catch (error) {
         return(error)
     }
+}
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
 }
 
 //註冊檢查重複使用者名稱
