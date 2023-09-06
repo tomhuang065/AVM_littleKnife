@@ -5,7 +5,7 @@ import { Col, Row, Button, Form , Tab ,Nav } from '@themesberg/react-bootstrap';
 import { BomTable , TransactionsTable2} from "../../components/Tables";
 // import api from "../../api/api";
 import ExcelJs from "exceljs";
-import SupplierFormModal from './BomModal';
+import AddBOMModal from './BomModal';
 import { useChat } from "../../api/context";
 import axios from 'axios';
 import ProductTable from "../../components/pl";
@@ -212,9 +212,9 @@ export default () => {
       </Tab.Container>
 
       {/* Supplier Form Modal */}
-      <SupplierFormModal
+      <AddBOMModal
         show={showSupplierModal}
-        onClose={handleCloseSupplierModal}
+        onHide={handleCloseSupplierModal}
         onSave={handleSaveSupplier}
       />
     </>

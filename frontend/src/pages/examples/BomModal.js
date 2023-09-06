@@ -1,108 +1,130 @@
-import React, { useState } from "react";
-import { Modal, Button, Form } from '@themesberg/react-bootstrap';
+import React, { useState } from 'react';
+import { Button, Modal, Form } from 'react-bootstrap';
+import axios from 'axios';
+import moment from 'moment';
 
-const ValueFormModal = ({ show, onClose, onSave }) => {
-  const [productData, setProductData] = useState({
-    product_id: "",
-    product_name: "",
-    product_sec_id: "",
-    use_quantity: "",
-    update_user: "",
-    update_time: "",
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setProductData({
-      ...productData,
-      [name]: value,
+function AddBOMModal({ show, onHide }) {
+    const instance = axios.create({ baseURL: 'http://localhost:5000/api/avm' });
+    const [formData, setFormData] = useState({
+        product_id: '',
+        product_name: '',
+        product_sec_id: '',
+        use_quantity: '',
+        update_user: '',
+        update_time: '',
     });
-  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSave(productData);
-  };
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value,
+        });
+    };
 
-  return (
-    <Modal show={show} onHide={onClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>新增BOM</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form onSubmit={handleSubmit}>
-          <Form.Group controlId="productId">
-            <Form.Label>產品代碼</Form.Label>
-            <Form.Control
-              type="text"
-              name="product_id"
-              value={productData.product_id}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-          <Form.Group controlId="productName">
-            <Form.Label>產品名稱</Form.Label>
-            <Form.Control
-              type="text"
-              name="product_name"
-              value={productData.product_name}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-          <Form.Group controlId="productSecId">
-            <Form.Label>二階產品代碼</Form.Label>
-            <Form.Control
-              type="text"
-              name="product_sec_id"
-              value={productData.product_sec_id}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-          <Form.Group controlId="useQuantity">
-            <Form.Label>使用量</Form.Label>
-            <Form.Control
-              type="text"
-              name="use_quantity"
-              value={productData.use_quantity}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-          <Form.Group controlId="updateUser">
-            <Form.Label>更新人員</Form.Label>
-            <Form.Control
-              type="text"
-              name="update_user"
-              value={productData.update_user}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-          <Form.Group controlId="updateTime">
-            <Form.Label>更新時間</Form.Label>
-            <Form.Control
-              type="text"
-              name="update_time"
-              value={productData.update_time}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={onClose}>
-              取消
-            </Button>
-            <Button type="submit" variant="primary">
-              儲存
-            </Button>
-          </Modal.Footer>
-        </Form>
-      </Modal.Body>
-    </Modal>
-  );
-};
+    const handleAddBOM = async (e) => {
+        e.preventDefault();
+        // 檢查是否有欄位未填寫
+        if (formData.product_id === '') {
+            alert('尚未輸入產品代碼');
+            return;
+        }
+        if (formData.product_name === '') {
+            alert('尚未輸入產品名稱');
+            return;
+        }
+        if (formData.product_sec_id === '') {
+            alert('尚未輸入二階產品代碼');
+            return;
+        }
+        if (formData.use_quantity === '') {
 
-export default ValueFormModal;
+            alert('尚未輸入使用數量');
+            return;
+        }
+        // 設定更新人員
+
+
+        // 設定更新時間
+        formData.update_time = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+        // 將 formData 中的值發送到後端
+        console.log('新增 BOM 第一階', formData);
+        instance.post('/add_bom_first', {ID:JSON.stringify(formData)})
+            .then((response) => {
+                console.log('新增成功', response.data);
+                alert('新增成功');
+                onHide(); // 關閉 modal
+            })
+            .catch((error) => {
+                alert('新增失敗，請稍後再試');
+                console.error('新增失敗', error);
+            });
+    };
+
+    return (
+        <Modal show={show} onHide={onHide}>
+            <Modal.Header closeButton>
+                <Modal.Title>新增 BOM 第一階</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form>
+                    <Form.Group controlId="product_id">
+                        <Form.Label>產品代碼</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="product_id"
+                            value={formData.product_id}
+                            onChange={handleInputChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="product_name">
+                        <Form.Label>產品名稱</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="product_name"
+                            value={formData.product_name}
+                            onChange={handleInputChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="product_sec_id">
+                        <Form.Label>二階產品代碼</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="product_sec_id"
+                            value={formData.product_sec_id}
+                            onChange={handleInputChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="use_quantity">
+                        <Form.Label>使用數量</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="use_quantity"
+                            value={formData.use_quantity}
+                            onChange={handleInputChange}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId="update_user">
+                        <Form.Label>更新人員</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="update_user"
+                            value={formData.update_user}
+                            onChange={handleInputChange}
+                        />
+                    </Form.Group>
+                </Form>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={onHide}>
+                    取消
+                </Button>
+                <Button variant="primary" onClick={handleAddBOM}>
+                    新增
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    );
+}
+
+export default AddBOMModal;

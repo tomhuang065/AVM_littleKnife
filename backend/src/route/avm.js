@@ -89,6 +89,19 @@ router.post('/add_user', async (req, res) => {
     }
 });
 
+router.post('/add_bom_first', async (req, res) => {
+    try {
+        const result = await add_bom_first(JSON.parse(req.body.ID));
+        console.log(result)
+        res.json(result);
+    } catch (error) {
+        console.error('發生錯誤：', error);
+        res.status(500).send('伺服器發生錯誤');
+
+    }
+});
+
+
 router.post('/check_user', async (req, res) => {
     try {
         const task = await login(JSON.parse(req.body.ID));
@@ -322,7 +335,53 @@ router.post('/del_inventory', async (req, res) => {
 });
 
 
+
 export default router
+
+//BOM第一階新增(對應到bom_first table)
+async function add_bom_first(data) {
+    try {
+        console.log('data', data)
+        const id = data.product_id;
+
+        const check = await bom_id_check(id)
+        if (check.length != 0) {
+            console.log('已有此產品代碼存在，請重新輸入新的產品代碼')
+        } else {
+            const query = 'INSERT INTO `bom_first`(`product_id`, `product_name`, `product_sec_id`, `use_quantity`, `update_user`, `update_time`) VALUES ?'
+            // const now = new Date();
+            // const sqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
+            // data.push(sqlDatetime)
+            // data = [data]
+            connection.query(query, data.product_id, data.product_name, data.product_sec_id, data.use_quantity, data.update_user, data.update_time, (error, results, fields) => {
+                if (error) {
+                    console.error('新增錯誤', error);
+                } else {
+                    // let arr = obj_to_dict(results)
+                    console.log('新增成功');
+                }
+            });
+        }
+    } catch (error) {
+        console.log(error)
+    }
+
+}
+
+//BOM一階代碼防呆
+function bom_id_check(id) {
+    const query = 'SELECT * FROM `bom_first` WHERE `product_id` = ?'
+    return new Promise((resolve, reject) => {
+        connection.query(query, id, (error, results, fields) => {
+            if (error) {
+                reject(error)
+            }
+            else {
+                resolve(results)
+            }
+        })
+    })
+}
 
 function add_product_purchase(data) {
     console.log(data)    
