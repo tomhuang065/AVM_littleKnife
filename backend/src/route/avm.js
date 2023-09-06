@@ -5,16 +5,22 @@ import bodyParser from "body-parser";
 import multer from 'multer';
 //import { checkPrime } from 'crypto';
 // import { genNumber, getNumber } from '../core/getNumber'
+import XLSX from 'xlsx';
+import fs from 'fs';
+
+if (!fs.existsSync('uploads')) {
+    fs.mkdirSync('uploads');
+}
 
 // 配置文件上传
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, 'uploads/'); // 存储上传的文件的目录
+        cb(null, 'uploads/'); // 保存的路径，备注：需要自己创建
     },
     filename: function (req, file, cb) {
-      cb(null, file.originalname); // 使用原始文件名作为存储文件名
+        cb(null, file.originalname); // 将保存文件名设置为 字段名 + 时间戳，比如 logo-1478521468943
     }
-  });
+});
   
 const upload = multer({ storage });
 
@@ -172,10 +178,32 @@ router.post('/add_value_target', async (req, res) => {
 });
 
 router.post('/del_value_target', async (req, res) => {
-    await del_value_target(JSON.parse(req.body.ID).content)
+    await del_value_target(JSON.parse(req.body.ID).content);
     res.send('已成功刪除價值標的');
-})
+});
 
+
+
+router.post('/upload_bom', upload.single('excelFile'), (req, res) => {
+    try {
+        // 確保上傳的檔案存在並處理檔案
+        if (!req.file) {
+            return res.status(400).json({ error: '未選擇檔案' });
+        }
+        console.log(req.file.filename);
+        const result = upload_bom(req.file.filename);
+        //console.log(result);
+        
+
+
+        // 此處可以進一步處理上傳的Excel檔案，例如解析數據等
+
+        res.status(200).json({ message: '上傳成功' });
+    } catch (error) {
+        console.error('上傳失敗', error);
+        res.status(500).json({ error: '上傳失敗' });
+    }
+});
 
 router.get('/sel_supplier', async (req, res) => {
     try {
@@ -1047,6 +1075,113 @@ function upload_account_subject(name) {
 
     const query = 'INSERT INTO account_subjects (third, third_subjects_cn, third_subjects_eng, fourth, fourth_subjects_cn, fourth_subjects_eng, status, update_user) VALUES ?';
     connection.query(query, [insertValues], (error, results, fields) => {
+        if (error) {
+            console.error('寫入資料庫錯誤：', error);
+            return;//這邊看你們要return什麼給前端
+        }
+        console.log('已成功將資料寫入資料庫');
+    });
+
+}
+
+function read_excel(name) {
+    const parseExcel = (filename) => {
+        console.log(`Reading file: ${filename}`);
+
+        const excelData = XLSX.readFile(filename, { encoding: "big-5" });
+
+        return Object.keys(excelData.Sheets).map(name => ({
+            name,
+            data: XLSX.utils.sheet_to_json(excelData.Sheets[name]),
+        }));
+    };
+
+    let tmp = []
+    parseExcel(`./uploads/${name}`).forEach(element => {
+        element.data.forEach(item => {
+            tmp.push(item);
+        });
+    });
+
+    let arr = obj_to_dict(tmp)
+    // console.log(arr)
+    // console.log(arr[0]['third'])
+    return (arr)
+};
+
+
+function upload_bom(name) {
+    let arr = read_excel(name)
+
+    //將column name改成英文
+    const updatedArr = arr.map((item) => {
+        const updatedItem = {};
+
+        Object.keys(item).forEach((key) => {
+            if (key === '一階產品代碼') {
+                updatedItem['product_id'] = item[key];
+            } else if (key === '一階產品名稱') {
+                updatedItem['product_name'] = item[key];
+            } else if (key === '二階產品代碼') {
+                updatedItem['product_sec_id'] = item[key];
+            } else if (key === '二階產品名稱') {
+                updatedItem['product_sec_name'] = item[key];
+            } else if (key === '二階產品使用量(每一單位一階產品)') {
+                updatedItem['sec_use_quantity'] = item[key];
+            } else if (key === '三階產品代碼') {
+                updatedItem['product_thr_id'] = item[key];
+            } else if (key === '三階產品使用量(每一單位二階產品)') {
+                updatedItem['thr_use_quantity'] = item[key];
+            } else {
+                updatedItem[key] = item[key];
+            }
+        });
+        return updatedItem;
+    })
+
+    // console.log(updatedArr)
+
+    const myDate = new Date();
+    const sqlDate = myDate.toISOString().substring(0, 10);
+    const user = "測試人員"
+
+    const insert_first = updatedArr.map(element => [
+        element.product_id,
+        element.product_name,
+        element.product_sec_id,
+        element.sec_use_quantity,
+        sqlDate,
+        user
+    ]);
+
+    console.log(insert_first)
+    const unique_first = Array.from(new Set(insert_first.map(JSON.stringify)), JSON.parse);
+
+    console.log(unique_first);
+
+    const insert_second = updatedArr.map(element => [
+        element.product_id,
+        element.product_sec_id,
+        element.product_sec_name,
+        element.product_thr_id,
+        element.thr_use_quantity,
+        sqlDate,
+        user
+    ]);
+
+    const first_query = 'INSERT INTO bom_first (`product_id`, `product_name`, `product_sec_id`, `use_quantity`, `update_user`, `update_time`) VALUES ?';
+    const second_query = 'INSERT INTO bom_second ( `product_id`, `product_sec_id`, `product_sec_name`, `material_id`, `use_quantity`, `update_user`, `update_time`) VALUES ?';
+
+
+    connection.query(first_query, [unique_first], (error, results, fields) => {
+        if (error) {
+            console.error('寫入資料庫錯誤：', error);
+            return;//這邊看你們要return什麼給前端
+        }
+        console.log('已成功將資料寫入資料庫');
+    });
+
+    connection.query(second_query, [insert_second], (error, results, fields) => {
         if (error) {
             console.error('寫入資料庫錯誤：', error);
             return;//這邊看你們要return什麼給前端

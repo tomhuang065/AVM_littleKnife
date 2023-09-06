@@ -36,33 +36,74 @@ export default () => {
   };
 
   const handleExceldownload = async () => {
-    const workbook = new ExcelJs.Workbook(); // 創建試算表檔案
-    const sheet = workbook.addWorksheet('供應商'); //在檔案中新增工作表 參數放自訂名稱
-
-		sheet.addTable({ // 在工作表裡面指定位置、格式並用columsn與rows屬性填寫內容
-	    name: 'table名稱',  // 表格內看不到的，讓你之後想要針對這個table去做額外設定的時候，可以指定到這個table
-	    ref: 'A1', // 從A1開始
-	    columns: [{ name: '供應商代碼' }, { name: '供應商名稱' }],
+    const bom = new ExcelJs.Workbook();
+    const sheet = bom.addWorksheet('BOM表設定');
+    sheet.addTable({
+        ref: 'A1',
+        columns: [
+            { name: '一階產品代碼' },
+            { name: '一階產品名稱' },
+            { name: '二階產品代碼' },
+            { name: '二階產品名稱' },
+            { name: '二階產品使用量(每一單位一階產品)' },
+            { name: '三階產品代碼' },
+            { name: '三階產品名稱' },
+            { name: '三階產品使用量(每一單位二階產品)' },
+        ],
         rows: [
-            ['0001', '小刀測試1'],
-            ['0002', '小刀測試2']
+            ["P001", "小刀產品1", "P001 - 1", "小刀產品1- 1", "5", "M001", "2"],
+            ["P001", "小刀產品1", "P001 - 1", "小刀產品1- 1", "5", "M002", "3"],
+            ["P001", "小刀產品1", "P001 - 2", "小刀產品1- 2", "6", "M001", "2"],
+            ["P001", "小刀產品1", "P001 - 2", "小刀產品1- 2", "6", "M002", "3"],
+            ["P001", "小刀產品1", "P001 - 2", "小刀產品1- 2", "6", "M003", "1"],
         ]
-		});
-
+    })
     // 表格裡面的資料都填寫完成之後，訂出下載的callback function
 		// 異步的等待他處理完之後，創建url與連結，觸發下載
-	  workbook.xlsx.writeBuffer().then((content) => {
+	  bom.xlsx.writeBuffer().then((content) => {
 		const link = document.createElement("a");
 	    const blobData = new Blob([content], {
 	      type: "application/vnd.ms-excel;charset=utf-8;"
 	    });
-	    link.download = '供應商.xlsx';
+	    link.download = 'BOM.xlsx';
 	    link.href = URL.createObjectURL(blobData);
 	    link.click();
 	  });
       
   }
 
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const handleFileChange = (e) => {
+      setSelectedFile(e.target.files[0]);
+  };
+
+  const handleUpload = () => {
+      if (!selectedFile) {
+          alert('請選擇一個Excel檔案');
+          return;
+      }
+
+      const formData = new FormData();
+      formData.append('excelFile', selectedFile);
+
+      
+      instance.post('/upload_bom', formData, {
+          headers: {
+              'Content-Type': 'multipart/form-data'
+          }
+      })
+      .then(function (response) {
+          // 處理成功的回應
+          alert('上傳成功');
+          console.log('上傳成功', response.data);
+      })
+      .catch(function (error) {
+          // 處理錯誤
+          alert('上傳失敗，請重新上傳');
+          console.error('上傳失敗', error);
+      });
+  };
 
   const handleSingleAdd = () => {
     setShowSupplierModal(true);
@@ -131,7 +172,7 @@ export default () => {
                   <Col xs={12} xl={5}>
                     <Form.Group>
                       <Form.Label>上傳excel</Form.Label>
-                      <Form.Control type="file" accept=".xlsx,.xls" onChange={handleExcelUpload} />
+                      <Form.Control type="file" accept=".xlsx,.xls" onChange={handleFileChange} />
                     </Form.Group>
                   </Col>
 
@@ -142,7 +183,7 @@ export default () => {
                   <FontAwesomeIcon icon={faDownload} className="me-2" />
                   下載範例
                 </Button>
-                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleExcelUploadSubmit}>
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleUpload}>
                     <FontAwesomeIcon icon={faUpload} className="me-2" />
                     上傳
                 </Button>
