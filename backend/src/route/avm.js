@@ -295,7 +295,7 @@ router.post('/add_inventory', async (req, res) => {
 router.get('/get_bom', async (req, res) => {
     try {
         const result = await calculateProductCost();
-        console.log('res',result)
+        //console.log('res',result)
         res.json(result);
     } catch (error) {
         console.error('發生錯誤：', error);
