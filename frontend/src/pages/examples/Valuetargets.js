@@ -113,6 +113,7 @@ export default () => {
         setValResult(await instance.get('/sel_value_target_department'));
         setType("部門")
         setSearchPH("搜尋部門")
+        console.log(valResult)
         break;
       }
       default:{

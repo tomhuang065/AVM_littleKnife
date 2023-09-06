@@ -16,7 +16,6 @@ export const ValuetargetsTable = (props) => {
     const {val, setVal, valType, setValType} = useChat()
     const [states, setStates] = useState("");
     const [removeModal, setRemoveModal] = useState(false)
-    const [origs, setOrigs] = useState("")
     const [valueTarget, setValueTarget] = useState({
       target_status:"",
       target_num: "",
@@ -24,7 +23,6 @@ export const ValuetargetsTable = (props) => {
       category:"",
   
     })
-    
     
     const value = props.valueTarget.data
     const type = props.type
@@ -68,27 +66,10 @@ export const ValuetargetsTable = (props) => {
       };
       const response = await instance.post('/mod_value_target', {
         ID:JSON.stringify(jsonData)
-      }
-      )
+      })
       alert(response.data);
     }
-    const handleDeleteValueTarget = async(targetNum)=>{
-      // console.log(fourth)
-      const jsonData = {
-        content: `${targetNum}`
-      };
-      const response = await instance.post('/del_value_target', {
-        ID:JSON.stringify(jsonData)
-      }
-    )
-      console.log("get repsonse dta",response.data)
-      // setRemoveModal(false)
-      alert("已刪除價值標的")
-      // handleClick(response.data);
-      setValType(type)
   
-    }
-
     const TableRow = (props) => {
       const { id, target_num, target_name, target_status, update_time, category } = props;
   
@@ -137,10 +118,10 @@ export const ValuetargetsTable = (props) => {
             <thead>
               <tr>
                 {/* <th className="border-bottom">編號</th> */}
-                <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}代碼</th>
-                <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}名稱</th>
-                <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":"顧客"}狀態</th>
-                <th className="border-bottom">變更{type === "原料"?"原料":type === "產品"?"產品":"顧客"}狀態</th>
+                <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":type === "顧客"?"顧客":"部門"}代碼</th>
+                <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":type === "顧客"?"顧客":"部門"}名稱</th>
+                <th className="border-bottom">{type === "原料"?"原料":type === "產品"?"產品":type === "顧客"?"顧客":"部門"}狀態</th>
+                <th className="border-bottom">變更{type === "原料"?"原料":type === "產品"?"產品":type === "顧客"?"顧客":"部門"}狀態</th>
                 <th className="border-bottom">更新時間</th>
                 <th className="border-bottom">  選項</th>
               </tr>
