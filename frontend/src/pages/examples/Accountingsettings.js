@@ -64,29 +64,36 @@ export default () => {
     }
   }
 
-  const handleExcelUpload = (event) => {
-    setSelectedFile(event.target.files[0]);
-
+  const handleFileChange = (e) => {
+      setSelectedFile(e.target.files[0]);
   };
 
-  const handleExcelUploadSubmit = async () => {
-    if (selectedFile) {
-      const fileReader = new FileReader();
-      fileReader.readAsBinaryString(selectedFile);
-      fileReader.onload = async (event) => {
-        try {
-          const { result } = event.target;
-          const workbook = xlsx.read(result, { type: "binary" });
-          const rows = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-          console.log(rows);
-          await instance.post('/upload',rows)
-          alert('上傳成功')
-        } catch (e) {
-          console.log("error", e);
-        }
-      };
+  const handleUpload = () => {
+    if (!selectedFile) {
+        alert('請選擇一個Excel檔案');
+        return;
     }
-  }
+
+    const formData = new FormData();
+    formData.append('excelFile', selectedFile);
+
+    
+    instance.post('/upload_account', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+    .then(function (response) {
+        // 處理成功的回應
+        alert('上傳成功');
+        console.log('上傳成功', response.data);
+    })
+    .catch(function (error) {
+        // 處理錯誤
+        alert('上傳失敗，請重新上傳');
+        console.error('上傳失敗', error);
+    });
+};
 
   const handleSearchIndChange = (e) => {
     setSearchInd(e.target.value)
@@ -169,7 +176,7 @@ export default () => {
                   <Col xs={12} xl={5}>
                     <Form.Group>
                       <Form.Label>上傳excel</Form.Label>
-                      <Form.Control type="file" accept=".xlsx,.xls" onChange={handleExcelUpload} />
+                      <Form.Control type="file" accept=".xlsx,.xls" onChange={handleFileChange} />
                     </Form.Group>
                   </Col>
                 </div>
@@ -179,7 +186,7 @@ export default () => {
                   <FontAwesomeIcon icon={faDownload} className="me-2" />
                   下載範例
                 </Button>
-                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleExcelUploadSubmit}>
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleUpload}>
                     <FontAwesomeIcon icon={faUpload} className="me-2" />
                     上傳
                 </Button>

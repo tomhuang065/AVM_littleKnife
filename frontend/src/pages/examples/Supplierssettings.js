@@ -12,7 +12,7 @@ import { useChat } from "../../api/context";
 
 
 export default () => {
-  const [excelFile, setExcelFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const {sup, setSup} = useChat();
   const [showSupplierModal, setShowSupplierModal] = useState(false);
   const [result, setResult] = useState("")
@@ -25,10 +25,36 @@ export default () => {
     setSearchInd(e.target.value)
   };
 
-  const handleExcelUpload = (event) => {
-    const file = event.target.files[0];
-    setExcelFile(file);
-  };
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+};
+
+const handleUpload = () => {
+  if (!selectedFile) {
+      alert('請選擇一個Excel檔案');
+      return;
+  }
+
+  const formData = new FormData();
+  formData.append('excelFile', selectedFile);
+
+  
+  instance.post('/upload_account', formData, {
+      headers: {
+          'Content-Type': 'multipart/form-data'
+      }
+  })
+  .then(function (response) {
+      // 處理成功的回應
+      alert('上傳成功');
+      console.log('上傳成功', response.data);
+  })
+  .catch(function (error) {
+      // 處理錯誤
+      alert('上傳失敗，請重新上傳');
+      console.error('上傳失敗', error);
+  });
+};
 
   const handleExcelUploadSubmit = async () => {
     const formData = new FormData();
@@ -116,7 +142,7 @@ export default () => {
                   <Col xs={12} xl={5}>
                     <Form.Group>
                       <Form.Label>上傳excel</Form.Label>
-                      <Form.Control type="file" accept=".xlsx,.xls" onChange={handleExcelUpload} />
+                      <Form.Control type="file" accept=".xlsx,.xls" onChange={handleFileChange} />
                     </Form.Group>
                   </Col>
 
@@ -127,7 +153,7 @@ export default () => {
                   <FontAwesomeIcon icon={faDownload} className="me-2" />
                   下載範例
                 </Button>
-                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleExcelUploadSubmit}>
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleUpload}>
                     <FontAwesomeIcon icon={faUpload} className="me-2" />
                     上傳
                 </Button>

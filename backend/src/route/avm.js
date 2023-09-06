@@ -24,8 +24,6 @@ const storage = multer.diskStorage({
   
 const upload = multer({ storage });
 
-
-
 const router = express.Router();
 // router.use(bodyParser.json());
 
@@ -196,7 +194,6 @@ router.post('/del_value_target', async (req, res) => {
 });
 
 
-
 router.post('/upload_bom', upload.single('excelFile'), (req, res) => {
     try {
         // 確保上傳的檔案存在並處理檔案
@@ -217,6 +214,39 @@ router.post('/upload_bom', upload.single('excelFile'), (req, res) => {
         res.status(500).json({ error: '上傳失敗' });
     }
 });
+
+router.post('/upload_account', upload.single('excelFile'), (req, res) => {
+    try {
+        // 確保上傳的檔案存在並處理檔案
+        if (!req.file) {
+            return res.status(400).json({ error: '未選擇檔案' });
+        }
+        console.log(req.file.filename);
+        const result = upload_account_subject(req.file.filename);
+        
+        res.status(200).json({ message: '上傳成功' });
+    } catch (error) {
+        console.error('上傳失敗', error);
+        res.status(500).json({ error: '上傳失敗' });
+    }
+});
+
+router.post('/upload_target', upload.single('excelFile'), (req, res) => {
+    try {
+        // 確保上傳的檔案存在並處理檔案
+        if (!req.file) {
+            return res.status(400).json({ error: '未選擇檔案' });
+        }
+        console.log(req.file.filename);
+        const result = upload_target(req.file.filename);
+
+        res.status(200).json({ message: '上傳成功' });
+    } catch (error) {
+        console.error('上傳失敗', error);
+        res.status(500).json({ error: '上傳失敗' });
+    }
+});
+
 
 router.get('/sel_supplier', async (req, res) => {
     try {
@@ -1211,6 +1241,52 @@ function upload_bom(name) {
         if (error) {
             console.error('寫入資料庫錯誤：', error);
             return;//這邊看你們要return什麼給前端
+        }
+        console.log('已成功將資料寫入資料庫');
+    });
+
+}
+
+function upload_target(name) {
+    let arr = read_excel(name)
+
+    //將column name改成英文
+    const updatedArr = arr.map((item) => {
+        const updatedItem = {};
+
+        Object.keys(item).forEach((key) => {
+            if (key === '標的種類(只可填"顧客"、"原料"或"產品")') {
+                updatedItem['category'] = item[key];
+            } else if (key === '標的代碼') {
+                updatedItem['target_num'] = item[key];
+            } else if (key === '標的名稱') {
+                updatedItem['target_name'] = item[key];
+            }
+            else {
+                updatedItem[key] = item[key];
+            }
+        });
+        return updatedItem;
+    })
+    // console.log(updatedArr)
+
+    const stat = 1;
+
+    const now = new Date();
+    const sqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
+
+    const insertValues = updatedArr.map(element => [
+        element.category,
+        element.target_num,
+        element.target_name,
+        stat,
+        sqlDatetime]);
+
+    const query = 'INSERT INTO value_target (category, target_num, target_name, target_status, update_time) VALUES ?';
+    connection.query(query, [insertValues], (error, results, fields) => {
+        if (error) {
+            console.error('寫入資料庫錯誤：', error);
+            return; //這邊看你們要return什麼給前端
         }
         console.log('已成功將資料寫入資料庫');
     });

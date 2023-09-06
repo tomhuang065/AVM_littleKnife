@@ -12,7 +12,6 @@ import ValueTargetFormModal from './ValueTargetAddModal';
 
 
 export default () => {
-  const [excelFile, setExcelFile] = useState(null);
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const {val, task, setTask, valType, setValType} = useChat();
   const [showValueTargetModal, setShowValueTargetModal] = useState(false);
@@ -20,13 +19,8 @@ export default () => {
   const [valResult, setValResult] = useState([]);
   const [type, setType] = useState("") //for add form
   const [searchPH, setSearchPH] = useState("")
+  const [selectedFile, setSelectedFile] = useState(null);
   
-  
-  const handleExcelUpload = (event) => {
-    const file = event.target.files[0];
-    setExcelFile(file);
-  };
-
   
   const handleSearchIndChange = (e) => {
     setSearchInd(e.target.value)
@@ -88,6 +82,37 @@ export default () => {
 	  });
       
   }
+
+const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+};
+
+const handleUpload = () => {
+  if (!selectedFile) {
+      alert('請選擇一個Excel檔案');
+      return;
+  }
+
+  const formData = new FormData();
+  formData.append('excelFile', selectedFile);
+
+  
+  instance.post('/upload_target', formData, {
+      headers: {
+          'Content-Type': 'multipart/form-data'
+      }
+  })
+  .then(function (response) {
+      // 處理成功的回應
+      alert('上傳成功');
+      console.log('上傳成功', response.data);
+  })
+  .catch(function (error) {
+      // 處理錯誤
+      alert('上傳失敗，請重新上傳');
+      console.error('上傳失敗', error);
+  });
+};
   const handleViewValueTarget= async (task) => {
     console.log("task", task)
     switch(task){
@@ -153,7 +178,7 @@ export default () => {
                   <Col xs={12} xl={5}>
                     <Form.Group>
                       <Form.Label>上傳excel</Form.Label>
-                      <Form.Control type="file" accept=".xlsx,.xls" onChange={handleExcelUpload} />
+                      <Form.Control type="file" accept=".xlsx,.xls" onChange={handleFileChange} />
                     </Form.Group>
                   </Col>
                 </div>
@@ -163,7 +188,7 @@ export default () => {
                   <FontAwesomeIcon icon={faDownload} className="me-2" />
                   下載範例
                 </Button>
-                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleExcelUploadSubmit}>
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleUpload}>
                     <FontAwesomeIcon icon={faUpload} className="me-2" />
                     上傳
                 </Button>
