@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2023-08-24 20:22:35
+-- 產生時間： 2023-09-06 17:13:52
 -- 伺服器版本： 10.4.27-MariaDB
 -- PHP 版本： 8.2.0
 
@@ -266,9 +266,9 @@ CREATE TABLE `m_inventory_setup` (
 --
 
 INSERT INTO `m_inventory_setup` (`id`, `m_id`, `m_name`, `date`, `start_quantity`, `start_unit`, `start_unit_price`, `start_cost`) VALUES
-(1, 'M001', '材料1', '2023-07-25', 300, '瓶', 100, 3000),
-(2, 'M002', '材料2', '2023-07-25', 40, '包', 50, 2000),
-(3, 'M003', '材料3', '2023-07-25', 50, '罐', 25, 1250);
+(1, 'M001', '材料1', '2023-08-30', 300, '瓶', 100, 30000),
+(2, 'M002', '材料2', '2023-08-30', 100, '包', 50, 5000),
+(3, 'M003', '材料3', '2023-08-30', 50, '罐', 25, 1250);
 
 -- --------------------------------------------------------
 
@@ -285,6 +285,7 @@ CREATE TABLE `m_purchase` (
   `purchase_quantity` int(11) NOT NULL COMMENT '採購數量',
   `purchase_unit` varchar(25) NOT NULL COMMENT '採購單位	',
   `purchase_price` int(11) NOT NULL COMMENT '採購成本',
+  `supplier_num` varchar(50) NOT NULL COMMENT '供應商代碼',
   `remark` varchar(100) DEFAULT NULL COMMENT '備註',
   `create_user` varchar(25) NOT NULL COMMENT '建立者'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -293,12 +294,12 @@ CREATE TABLE `m_purchase` (
 -- 傾印資料表的資料 `m_purchase`
 --
 
-INSERT INTO `m_purchase` (`id`, `date`, `account_subjects_num`, `purchase_id`, `purchase_name`, `purchase_quantity`, `purchase_unit`, `purchase_price`, `remark`, `create_user`) VALUES
-(1, '2023-08-09', 4111, 'M001', '小刀材料1', 100, '包', 10000, NULL, 'test'),
-(2, '2023-08-09', 4111, 'M002', '小刀材料2', 50, '瓶', 8000, NULL, 'test'),
-(3, '2023-08-09', 4111, 'M003', '小刀材料3', 75, '罐', 9000, NULL, 'test'),
-(4, '2023-08-09', 4111, 'M004', '小刀材料4', 90, '箱', 3600, NULL, 'test'),
-(5, '2023-08-09', 4111, 'M005', '小刀材料5', 100, '箱', 12000, NULL, 'test');
+INSERT INTO `m_purchase` (`id`, `date`, `account_subjects_num`, `purchase_id`, `purchase_name`, `purchase_quantity`, `purchase_unit`, `purchase_price`, `supplier_num`, `remark`, `create_user`) VALUES
+(1, '2023-08-09', 4111, 'M001', '小刀材料1', 100, '包', 10000, '0001', NULL, 'test'),
+(2, '2023-08-09', 4111, 'M002', '小刀材料2', 50, '瓶', 8000, '0002', NULL, 'test'),
+(3, '2023-08-09', 4111, 'M003', '小刀材料3', 75, '罐', 9000, '0003', NULL, 'test'),
+(4, '2023-08-09', 4111, 'M004', '小刀材料4', 90, '箱', 3600, '0004', NULL, 'test'),
+(5, '2023-08-09', 4111, 'M005', '小刀材料5', 100, '箱', 12000, '0005', NULL, 'test');
 
 -- --------------------------------------------------------
 
@@ -317,6 +318,24 @@ CREATE TABLE `m_useage` (
   `remark` varchar(100) DEFAULT NULL COMMENT '備註',
   `create_user` varchar(25) NOT NULL COMMENT '建立者'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- 傾印資料表的資料 `m_useage`
+--
+
+INSERT INTO `m_useage` (`id`, `date`, `usage_id`, `usage_name`, `usage_quantity`, `usage_unit`, `usage_price`, `remark`, `create_user`) VALUES
+(7, '2023-08-30', 'M001', '材料1', 44, '瓶', 4400, 'remark', 'test'),
+(8, '2023-08-30', 'M002', '材料2', 66, '包', 3300, 'remark', 'test'),
+(9, '2023-08-30', 'M003', '材料3', 12, '罐', 300, 'remark', 'test'),
+(10, '2023-08-30', 'M001', '材料1', 44, '瓶', 4400, 'remark', 'test'),
+(11, '2023-08-30', 'M002', '材料2', 66, '包', 3300, 'remark', 'test'),
+(12, '2023-08-30', 'M003', '材料3', 12, '罐', 300, 'remark', 'test'),
+(13, '2023-08-30', 'M001', '材料1', 44, '瓶', 4400, 'remark', 'test'),
+(14, '2023-08-30', 'M002', '材料2', 66, '包', 3300, 'remark', 'test'),
+(15, '2023-08-30', 'M003', '材料3', 12, '罐', 300, 'remark', 'test'),
+(16, '2023-08-30', 'M001', '材料1', 44, '瓶', 4400, 'remark', 'test'),
+(17, '2023-08-30', 'M002', '材料2', 66, '包', 3300, 'remark', 'test'),
+(18, '2023-08-30', 'M003', '材料3', 12, '罐', 300, 'remark', 'test');
 
 -- --------------------------------------------------------
 
@@ -347,12 +366,20 @@ CREATE TABLE `p_purchase` (
   `account_subjects_num` int(11) NOT NULL COMMENT '會科代碼',
   `purchase_id` varchar(25) NOT NULL COMMENT '採購(生產)產品代碼',
   `purchase_name` varchar(25) NOT NULL COMMENT '採購(生產)產品名稱',
-  `purchase_qunatity` int(11) NOT NULL COMMENT '採購(生產)數量',
+  `purchase_quantity` int(11) NOT NULL COMMENT '採購(生產)數量',
   `purchase_unit` varchar(25) NOT NULL COMMENT '採購(生產)單位',
   `purchase_price` int(11) NOT NULL COMMENT '採購(生產)成本',
   `remark` varchar(100) DEFAULT NULL COMMENT '備註',
   `create_user` varchar(25) NOT NULL COMMENT '建立者'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- 傾印資料表的資料 `p_purchase`
+--
+
+INSERT INTO `p_purchase` (`id`, `date`, `account_subjects_num`, `purchase_id`, `purchase_name`, `purchase_quantity`, `purchase_unit`, `purchase_price`, `remark`, `create_user`) VALUES
+(1, '2023-08-30', 4112, 'P001', '小刀產品1', 2, '個', 1000, 'remark', 'test'),
+(2, '2023-08-30', 4112, 'P001', '小刀產品1', 2, '個', 8000, 'remark', 'test');
 
 -- --------------------------------------------------------
 
@@ -435,7 +462,8 @@ INSERT INTO `user` (`id`, `username`, `account`, `password`, `email`, `permissio
 (1, 'tester', 'testing', '123456', 'abc@gmail.com', 1, 1),
 (2, 'tester2', 'test123', '111111', 'qax@gmail.com', 1, 1),
 (3, 'tester3', 'test000', '000000', 'aaa@gmail.com', 1, 1),
-(4, 'sean', 'tester', '777777', 'sean@gmail.com', 1, 1);
+(4, 'sean', 'tester', '777777', 'sean@gmail.com', 1, 1),
+(5, '信箱測試', 'email_test', 'emailemail', 'email@email.com', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -459,7 +487,8 @@ CREATE TABLE `value_target` (
 INSERT INTO `value_target` (`id`, `category`, `target_num`, `target_name`, `target_status`, `update_time`) VALUES
 (1, '顧客', 'C001', '小刀測試1', 1, '2023-07-25 09:38:01'),
 (2, '原料', 'M001', '小刀測試2', 1, '2023-08-02 09:38:01'),
-(3, '產品', 'P001', '小刀測試3', 1, '2023-08-10 09:38:01');
+(3, '產品', 'P001', '小刀測試3', 1, '2023-08-10 09:38:01'),
+(4, '部門', 'D001', '小刀測試4', 1, '2023-09-03 09:24:07');
 
 --
 -- 已傾印資料表的索引
@@ -587,7 +616,7 @@ ALTER TABLE `m_purchase`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `m_useage`
 --
 ALTER TABLE `m_useage`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號';
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號', AUTO_INCREMENT=19;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `p_inventory_setup`
@@ -599,7 +628,7 @@ ALTER TABLE `p_inventory_setup`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `p_purchase`
 --
 ALTER TABLE `p_purchase`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號';
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號', AUTO_INCREMENT=3;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `p_useage`
@@ -617,13 +646,13 @@ ALTER TABLE `supplier`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `value_target`
 --
 ALTER TABLE `value_target`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -455,14 +455,15 @@ function material_excel() {
             { name: '採購數量' },
             { name: '採購單位' },
             { name: '採購成本' },
+            { name: '供應商代碼' },
             { name: '備註' }
         ],
         rows: [
-            ['2023-0809', '4111', 'M001', '小刀材料1', '100', '包', '10000', ''],
-            ['2023-0809', '4111', 'M002', '小刀材料2', '50', '瓶', '8000', ''],
-            ['2023-0809', '4111', 'M003', '小刀材料3', '75', '罐', '9000', ''],
-            ['2023-0809', '4111', 'M004', '小刀材料4', '90', '箱', '3600', ''],
-            ['2023-0809', '4111', 'M005', '小刀材料5', '100', '箱', '12000', '']
+            ['2023-0809', '4111', 'M001', '小刀材料1', '100', '包', '0001', '10000', ''],
+            ['2023-0809', '4111', 'M002', '小刀材料2', '50', '瓶', '0002', '8000', ''],
+            ['2023-0809', '4111', 'M003', '小刀材料3', '75', '罐', '0003', '9000', ''],
+            ['2023-0809', '4111', 'M004', '小刀材料4', '90', '箱', '0004', '3600', ''],
+            ['2023-0809', '4111', 'M005', '小刀材料5', '100', '箱', '0005', '12000', '']
         ]
     })
     //等前端處理
@@ -806,6 +807,8 @@ function upload_material(name) {
                 updatedItem['purchase_unit'] = item[key];
             } else if (key === '採購成本') {
                 updatedItem['purchase_price'] = item[key];
+            } else if (key === '供應商代碼') {
+                updatedItem['supplier_num'] = item[key]
             } else if (key === '備註') {
                 updatedItem['remark'] = item[key];
             } else {
@@ -825,11 +828,12 @@ function upload_material(name) {
         element.purchase_quantity,
         element.purchase_unit,
         element.purchase_price,
+        element.supplier_num,
         element.remark,
         user
     ]);
 
-    const query = 'INSERT INTO m_purchase (date, account_subjects_num, purchase_id, purchase_name, purchase_quantity, purchase_unit, purchase_price, remark, create_user) VALUES ?';
+    const query = 'INSERT INTO m_purchase (date, account_subjects_num, purchase_id, purchase_name, purchase_quantity, purchase_unit, purchase_price, supplier_num, remark, create_user) VALUES ?';
     connection.query(query, [insertValues], (error, results, fields) => {
         if (error) {
             console.error('寫入資料庫錯誤：', error);
@@ -1453,7 +1457,7 @@ function add_m_purchase(data) {
     const sqlDate = myDate.toISOString().substring(0, 10);
     data.splice(0, 0, sqlDate);
     data = [data]
-    const query = 'INSERT INTO `m_purchase`(`date`, `account_subjects_num`,purchase_id`, `purchase_name`, `purchase_quantity`, `purchase_unit`, `purchase_price`,`remark`,`create_user`) VALUES ?'
+    const query = 'INSERT INTO `m_purchase`(`date`, `account_subjects_num`,purchase_id`, `purchase_name`, `purchase_quantity`, `purchase_unit`, `purchase_price`,`supplier_num`,`remark`,`create_user`) VALUES ?'
 
     connection.query(query, [data], (error, results, fields) => {
         if (error) {
