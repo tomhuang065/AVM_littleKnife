@@ -198,7 +198,7 @@ export default () => {
                 {/* 單筆新增按鈕 */}
                 <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
                   <FontAwesomeIcon icon={faPlus} className="me-2" />
-                  單筆新增
+                  新增一階產品
                 </Button>
               </div>
               {/* <TransactionsTable /> */}

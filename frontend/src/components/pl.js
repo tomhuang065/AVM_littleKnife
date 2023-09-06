@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import {Table , Card} from '@themesberg/react-bootstrap';
+import {Table , Card ,Button} from '@themesberg/react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus , faFileAlt , faEdit , faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+
 
 function ProductTable({ data }) {
   const [expandedRows, setExpandedRows] = useState([]);
@@ -12,6 +15,27 @@ function ProductTable({ data }) {
     }
   };
 
+  const handleSingleAdd = (rowKey) => {
+    console.log(rowKey)
+  }
+
+  const handleRowEdit = (rowKey) => {
+    console.log(rowKey)
+  }
+
+  const handleRowEditDelete = (rowKey) => {
+    console.log(rowKey)
+  }
+
+  const handleRowEdit2 = (rowKey) => {
+    console.log(rowKey)
+  }
+  const handleRowEditDelete2 = (rowKey) => {
+    console.log(rowKey)
+  }
+
+  
+
   const renderNestedTable = (subData , prevLevelName) => {
     return (
       <Card border="light" className="shadow-sm mb-3">
@@ -22,6 +46,7 @@ function ProductTable({ data }) {
             <th className="border-bottom">用量</th>
             <th className="border-bottom">單價</th>
             <th className="border-bottom">總價</th>
+            <th className="border-bottom">選項</th>
           </tr>
         </thead>
         <tbody>
@@ -33,7 +58,16 @@ function ProductTable({ data }) {
                 <td>{subData[subKey].useage}</td>
                 <td>{subData[subKey].unit_price}</td>
                 <td>{subData[subKey].total_price}</td>
+                <td>
+                  <Button variant = "link"onClick={() => {handleRowEdit2()}}>
+                    <FontAwesomeIcon icon={faEdit} className="me-0.5" /> 
+                  </Button>
+                  <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete2()}}>
+                    <FontAwesomeIcon icon={faTrashAlt} className="me-0.5" /> 
+                  </Button>
+              </td>
               </tr>
+              
             )}
               {expandedRows.includes(subKey) && (
                 <tr>
@@ -51,7 +85,7 @@ function ProductTable({ data }) {
   const renderNestedTable2 = (subData , prevLevelName) => {
     return (
       <Card border="light" className="shadow-sm mb-3">
-      <Table hover className="user-table align-items-center table-striped">
+      <Table className="user-table align-items-center table-striped">
         <thead>
           <tr>
             <th className="border-bottom">三階產品名稱</th>
@@ -86,6 +120,7 @@ function ProductTable({ data }) {
         <tr>
           <th className="border-bottom">產品名稱</th>
           <th className="border-bottom">Product Cost</th>
+          <th className="border-bottom">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -94,10 +129,28 @@ function ProductTable({ data }) {
             <tr onClick={() => handleRowClick(key)}>
               <td>{data.productCosts[key].product_name}</td>
               <td>{data.productCosts[key].product_cost}</td>
+              <td>
+                  <Button variant = "link"onClick={() => {handleRowEdit()}}>
+                    <FontAwesomeIcon icon={faEdit} className="me-0.5" /> 
+                  </Button>
+                  <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete()}}>
+                    <FontAwesomeIcon icon={faTrashAlt} className="me-0.5" /> 
+                  </Button>
+              </td>
             </tr>
             {expandedRows.includes(key) && (
+                
               <tr>
+                {/* <Button variant="primary" onClick={handleRowClick(key)}>新增二階產品</Button>    
+                         */}
+                <td>
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
+                  <FontAwesomeIcon icon={faPlus} className="me-2" />
+                  新增二階產品
+                </Button>
+                </td>
                 <td colSpan="2">{renderNestedTable(data.productCosts_sec , key)}</td>
+
               </tr>
             )}
           </React.Fragment>
