@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Table from 'react-bootstrap/Table';
+import {Table , Card} from '@themesberg/react-bootstrap';
 
 function ProductTable({ data }) {
   const [expandedRows, setExpandedRows] = useState([]);
@@ -14,13 +14,14 @@ function ProductTable({ data }) {
 
   const renderNestedTable = (subData , prevLevelName) => {
     return (
-      <Table bordered>
+      <Card border="light" className="shadow-sm mb-3">
+      <Table  className="user-table align-items-center table-striped">
         <thead>
           <tr>
-            <th>二階產品名稱</th>
-            <th>使用量</th>
-            <th>Unit Price</th>
-            <th>Total Price</th>
+            <th className="border-bottom">二階產品名</th>
+            <th className="border-bottom">用量</th>
+            <th className="border-bottom">單價</th>
+            <th className="border-bottom">總價</th>
           </tr>
         </thead>
         <tbody>
@@ -43,18 +44,20 @@ function ProductTable({ data }) {
           ))}
         </tbody>
       </Table>
+    </Card>
     );
   };
 
   const renderNestedTable2 = (subData , prevLevelName) => {
     return (
-      <Table bordered>
+      <Card border="light" className="shadow-sm mb-3">
+      <Table hover className="user-table align-items-center table-striped">
         <thead>
           <tr>
-            <th>三階原料名稱</th>
-            <th>使用量</th>
-            <th>Unit Price</th>
-            <th>Total Price</th>
+            <th className="border-bottom">三階產品名稱</th>
+            <th className="border-bottom">使用量</th>
+            <th className="border-bottom">Unit Price</th>
+            <th className="border-bottom">Total Price</th>
           </tr>
         </thead>  
         <tbody>
@@ -72,15 +75,17 @@ function ProductTable({ data }) {
           ))}
         </tbody>
       </Table>
+    </Card>
     );
   };
 
   return (
-    <Table bordered>
+    <Card border="light" className="table-wrapper table-responsive shadow-sm">
+    <Table className="user-table align-items-center table-striped">
       <thead>
         <tr>
-          <th>產品名稱</th>
-          <th>Product Cost</th>
+          <th className="border-bottom">產品名稱</th>
+          <th className="border-bottom">Product Cost</th>
         </tr>
       </thead>
       <tbody>
@@ -99,6 +104,7 @@ function ProductTable({ data }) {
         ))}
       </tbody>
     </Table>
+  </Card>
   );
 }
 
