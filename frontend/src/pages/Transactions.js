@@ -79,7 +79,7 @@ export default () => {
   };
   const onHandleAccountDownload = async () => {
     const workbook = new ExcelJs.Workbook(); // 創建試算表檔案
-    const sheet = workbook.addWorksheet('會計科目'); //在檔案中新增工作表 參數放自訂名稱
+    const sheet = workbook.addWorksheet('財會系統'); //在檔案中新增工作表 參數放自訂名稱
 
 		sheet.addTable({ // 在工作表裡面指定位置、格式並用columsn與rows屬性填寫內容
 	    name: 'table名稱',  // 表格內看不到的，讓你之後想要針對這個table去做額外設定的時候，可以指定到這個table
@@ -101,7 +101,7 @@ export default () => {
 	    const blobData = new Blob([content], {
 	      type: "application/vnd.ms-excel;charset=utf-8;"
 	    });
-	    link.download = '會計科目.xlsx';
+	    link.download = '財會系統.xlsx';
 	    link.href = URL.createObjectURL(blobData);
 	    link.click();
 	  });
@@ -167,12 +167,12 @@ export default () => {
       }
       else{
         if(Number(salesData.price) < 0 || Number(salesData.quantity) < 0){
-          alert("數量或單價不可為零")
+          alert("數量或單價不可小於零")
         }
         else{
           salesData.fourthAccountCode = accountFourth.fourth;
           salesData.valueTarget = valueTarget.valNum;
-          alert("已新增銷售資料 : ")
+          alert("已新增銷售資料 ")
           console.log(salesData)
           setSalesData({
             fourthAccountCode: "",
@@ -182,6 +182,9 @@ export default () => {
             comment: "",
             valueTarget:"",
           });
+          setAccountThird({third :"", thirdCn : "選擇三階會計科目代碼"})
+          setAccountFourth({fourth: "", fourthCn :"選擇四階會計科目代碼"})
+          setValueTarget({tarNum:"", tarName:"選擇價值標的"})
         }
       }
     }
@@ -205,16 +208,13 @@ export default () => {
               <Nav.Item>
                 <Nav.Link eventKey="add" >單筆新增</Nav.Link>
               </Nav.Item>
-              {/* <Nav.Item>
+              <Nav.Item>
                 <Nav.Link eventKey="browse" >瀏覽</Nav.Link>
-              </Nav.Item> */}
+              </Nav.Item>
             </Nav>
 
             {/* Tab Content */}
             <Tab.Content >
-              {/* <Tab.Pane eventKey="browse" > 
-                  <AccountTable accounts={result.data}/>
-              </Tab.Pane> */}
               <Tab.Pane eventKey="add" > 
                 <Form >
                     <Form.Group controlId="date">
@@ -280,11 +280,11 @@ export default () => {
                         required
                       />
                     </Form.Group>
-                    
-                    <Form.Group controlId="openingQuantity">
-                      {((Number(salesData.price)>0)&&(Number(salesData.quantity)>0))?<div>總價: {Number(salesData.price)*Number(salesData.quantity)}</div>:<div>總價:</div  >}
-                    </Form.Group>
                     <br></br>
+                    <Form.Group controlId="openingQuantity">
+                      {((Number(salesData.price)>0)&&(Number(salesData.quantity)>0))?<p style={{fontSize: 18}}><b>總價: {Number(salesData.price)*Number(salesData.quantity)}</b></p>:<p style={{fontSize: 17}}>總價:</p>}
+                    </Form.Group>
+                    {/* <br></br> */}
                     <Form.Group controlId="valueTargetCode">
                       <Form.Label>價值標的</Form.Label>
                       <br></br>
@@ -360,6 +360,12 @@ export default () => {
                 </Button>
                 </Col>
                 </div>
+              </Tab.Pane>
+              <Tab.Pane eventKey="browse" >
+                <div className="d-flex flex-wrap flex-md-nowrap align-items-center py-3">
+瀏覽
+                </div>
+               
               </Tab.Pane>
               
             </Tab.Content >

@@ -7,14 +7,14 @@ import Presentation from "./examples/Signin";
 // import Upgrade from "./Upgrade";
 import DashboardOverview from "./dashboard/DashboardOverview";
 import Transactions from "./Transactions";
-import Posystem from "./Posystem";
+import Purchase from "./Purchase";
 import Settings from "./Settings";
 import BootstrapTables from "./tables/BootstrapTables";
 import Signin from "./examples/Signin";
 import Signup from "./examples/Signup";
-import ForgotPassword from "./examples/ForgotPassword";
+// import ForgotPassword from "./examples/ForgotPassword";
 import ResetPassword from "./examples/ResetPassword";
-import Lock from "./examples/Lock";
+// import Lock from "./examples/Lock";
 import NotFoundPage from "./examples/NotFound";
 import ServerError from "./examples/ServerError";
 import Valuetargets from "./examples/Valuetargets";
@@ -100,28 +100,21 @@ export default () => (
     <RouteWithLoader exact path={Routes.Presentation.path} component={Presentation} />
     <RouteWithLoader exact path={Routes.Signin.path} component={Signin} />
     <RouteWithLoader exact path={Routes.Signup.path} component={Signup} />
-    <RouteWithLoader exact path={Routes.ForgotPassword.path} component={ForgotPassword} />
     <RouteWithLoader exact path={Routes.ResetPassword.path} component={ResetPassword} />
-    <RouteWithLoader exact path={Routes.Lock.path} component={Lock} />
     <RouteWithLoader exact path={Routes.NotFound.path} component={NotFoundPage} />
     <RouteWithLoader exact path={Routes.ServerError.path} component={ServerError} />
 
     {/* pages */}
     <RouteWithSidebar exact path={Routes.DashboardOverview.path} component={DashboardOverview} />
-    {/* <RouteWithSidebar exact path={Routes.Upgrade.path} component={Upgrade} /> */}
-    <RouteWithSidebar exact path={Routes.Posystem.path} component={Posystem} />
+    <RouteWithSidebar exact path={Routes.Purchase.path} component={Purchase} />
     <RouteWithSidebar exact path={Routes.Transactions.path} component={Transactions} />
     <RouteWithSidebar exact path={Routes.Settings.path} component={Settings} />
     <RouteWithSidebar exact path={Routes.BootstrapTables.path} component={BootstrapTables} />
-    <RouteWithSidebar exact path={Routes.Valuetargets.path} component={Valuetargets} render={() => <Redirect to={Routes.Presentation.path}  />} />
+    <RouteWithSidebar exact path={Routes.Valuetargets.path} component={Valuetargets} />
     <RouteWithSidebar exact path={Routes.Accountingsettings.path} component={Accountingsettings} />
     <RouteWithSidebar exact path={Routes.Supplierssettings.path} component={Supplierssettings} />
     <RouteWithSidebar exact path={Routes.BeginningInventorysettings.path} component={BeginningInventorysettings} />
     <RouteWithSidebar exact path={Routes.Bomsettings.path} component={Bomsettings} />
-
-
-    {/* documentation */}
-
 
     <Redirect to={Routes.NotFound.path} />
   </Switch>

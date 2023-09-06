@@ -6,16 +6,20 @@ import { useChat } from "../../api/context";
 
 
 
-const SupplierFormModal = ({ show, onClose, onSave }) => {
+const SupplierFormModal = ({ show, onClose }) => {
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
-  const {sup, setSup} = useChat();
+  const {userData, setSup} = useChat();
   const [supplierData, setSupplierData] = useState({
-    name: "",
-    supplierCode: "", // Updated field name to "供應商代碼"
+    supplier_name: "",
+    supplier_num: "",
+    update_time : "",
+    update_user :userData.Username,
+     // Updated field name to "供應商代碼"
     // Add other fields as needed
   });
 
   const handleChange = (e) => {
+    console.log(e.target)
     const { name, value } = e.target;
     setSupplierData({
       ...supplierData,
@@ -25,19 +29,35 @@ const SupplierFormModal = ({ show, onClose, onSave }) => {
 
   const handleSubmit = async(e) => {
     e.preventDefault();
-    const curDate = new Date();
-    supplierData.updateTime =  moment(curDate).format('YYYY-MM-DD HH:mm:ss');
-    
-    onSave(supplierData);
-    console.log(supplierData)
-    const response = await instance.post('/add_supplier', {
-      ID:JSON.stringify(supplierData)
+    if(supplierData.supplier_name === ''){
+      alert('尚未輸入供應商名稱')
     }
-  )
-  alert("已新增供應商")
-  setSup("add_sup")
-  // window.location.reload(false)
-  };
+    else{
+      if(supplierData.supplier_num === ''){
+        alert('尚未輸入供應商代碼')
+      }
+      else{
+        supplierData.update_time = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+        supplierData.update_user = userData.Username;
+
+        const response = await instance.post('/add_supplier', {
+          ID:JSON.stringify(supplierData)
+        })
+
+        alert(response.data)
+        setSupplierData({
+          supplier_name: "",
+          supplier_num: "",
+          update_time:"",
+          update_user: "",
+        })
+        if(response.data === "供應商新增成功"){
+            setSup("add_sup")
+            onClose();
+        }
+      }
+    };
+  }
 
   return (
     <Modal show={show} onHide={onClose}>
@@ -50,20 +70,20 @@ const SupplierFormModal = ({ show, onClose, onSave }) => {
             <Form.Label>供應商名稱</Form.Label>
             <Form.Control
               type="text"
-              name="name"
-              value={supplierData.name}
+              name="supplier_name"
+              value={supplierData.supplier_name}
               onChange={handleChange}
-              required
+              // required
             />
           </Form.Group>
           <Form.Group controlId="supplierCode">
             <Form.Label>供應商代碼</Form.Label>
             <Form.Control
               type="text"
-              name="supplierCode"
-              value={supplierData.supplierCode}
+              name="supplier_num"
+              value={supplierData.supplier_num}
               onChange={handleChange}
-              required
+              // required
             />
           </Form.Group>
           {/* Add other input fields for supplier details */}

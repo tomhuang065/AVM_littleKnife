@@ -6,7 +6,7 @@ import { Col, Row, Button, Form , Tab ,Nav } from '@themesberg/react-bootstrap';
 import { SupplierTable } from "../../components/SupplierTable";
 // import api from "../../api/api";
 import ExcelJs from "exceljs";
-import SupplierFormModal from './SupplierFormModal';
+import SupplierFormModal from './SupplierAddFormModal';
 import { useChat } from "../../api/context";
 
 
@@ -17,6 +17,13 @@ export default () => {
   const [showSupplierModal, setShowSupplierModal] = useState(false);
   const [result, setResult] = useState("")
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
+  const [searchInd, setSearchInd] = useState("")
+
+
+
+  const handleSearchIndChange = (e) => {
+    setSearchInd(e.target.value)
+  };
 
   const handleExcelUpload = (event) => {
     const file = event.target.files[0];
@@ -25,13 +32,6 @@ export default () => {
 
   const handleExcelUploadSubmit = async () => {
     const formData = new FormData();
-    // formData.append("file", excelFile);
-    // const res = await api.post("/api/excel", formData, {
-    //   headers: {
-    //     "Content-Type": "multipart/form-data",
-    //   },
-    // });
-    // console.log(res);
   };
 
   const handleExceldownload = async () => {
@@ -71,11 +71,10 @@ export default () => {
     setShowSupplierModal(false);
   };
 
-  const handleSaveSupplier = (supplierData) => {
-    // Handle the logic to save the supplier data
-    console.log("Supplier Data:", supplierData);
-    setShowSupplierModal(false);
-  };
+  // const handleSaveSupplier = (supplierData) => {
+  //   console.log("Supplier Data:", supplierData);
+  //   setShowSupplierModal(false);
+  // };
   const handleViewSupplier= async () => {
 
     setResult(await instance.get('/sel_supplier'));
@@ -83,7 +82,7 @@ export default () => {
   }
 
   useEffect(()=>{
-      handleViewSupplier(sup)
+      handleViewSupplier()
       setSup(null)
   },[sup])
 
@@ -139,19 +138,25 @@ export default () => {
               <Tab.Pane eventKey="browse">
               {/* Browse content here */}
               {/* You can display a table or a list of files here */}
-              <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-                {/* 單筆新增按鈕 */}
+              <div className="d-flex flex-wrap flex-md-nowrap align-items-center py-3">
+                <Form className="d-flex me-2" style ={{position: "Absolute", top: 170, right: 7, width:300 }} >
+                  <Form.Control
+                    type="search"
+                    placeholder="搜尋供應商"
+                    className="me-2"
+                    aria-label="Search"
+                    onChange={handleSearchIndChange}
+                    value={searchInd}
+                  />
+                </Form>
                 <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
-                  <FontAwesomeIcon icon={faPlus} className="me-2" />
-                  單筆新增
+                  <FontAwesomeIcon icon={faPlus} className="me-2" />單筆新增
                 </Button>
+                <br></br>
               </div>
-              {/* <TransactionsTable /> */}
-              <SupplierTable supplier = {result.data} />
-              {/* {suppliers} */}
+              <SupplierTable supplier = {result.data} searchInd={searchInd} />
             </Tab.Pane>
             </Tab.Content>
-
           </Col>
 
         </Row>
@@ -161,7 +166,7 @@ export default () => {
       <SupplierFormModal
         show={showSupplierModal}
         onClose={handleCloseSupplierModal}
-        onSave={handleSaveSupplier}
+        // onSave={handleSaveSupplier}
       />
     </>
   );

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDownload, faFileAlt, faMagic, faPlus, faRocket, faStore, faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faFileAlt, faMagic, faPlus, faRocket, faSearch, faStore, faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Button, Dropdown, Form, Tab ,Nav } from '@themesberg/react-bootstrap';
-import { RawMaterialInventoryTable } from "../../components/Tables";
+import { RawMaterialInventoryTable } from "../../components/InventoryTable";
 // import api from "../../api/api";
-import RawMaterialFormModal from "./InventoryForm";
+import RawMaterialFormModal from "./BeginningInventoryAddForm";
 import ExcelJs from "exceljs";
 import axios from "axios";
 import { useChat } from "../../api/context";
@@ -16,6 +16,8 @@ export default () => {
   const [showInventoryModal, setShowInventoryModal] = useState(false);
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [result, setResult] = useState([]);
+  const [filteredResult, setFilteredResult] = useState([]);
+  const [searchInd, setSearchInd] = useState("")
   const {mat, setMat} = useChat();
 
 
@@ -77,46 +79,19 @@ export default () => {
     setShowModal(false);
   };
 
-  // Function to handle saving the form data from the modal
-  const handleSaveModalData = (rawMaterialData) => {
-    // Perform saving logic here, e.g., call API or update state
-    console.log("Raw material data:", rawMaterialData);
-
-    // Close the modal after saving
-    handleCloseModal();
-  };
-
-  const rawMaterials = [
-    {
-      productCode: "P001",
-      productName: "Product A",
-      date: "2023-07-27",
-      openingQuantity: 100,
-      openingUnit: "kg",
-      openingUnitPrice: 10.5,
-      openingCost: 1050,
-    },
-    {
-      productCode: "P003",
-      productName: "Product A",
-      date: "2023-07-27",
-      openingQuantity: 100,
-      openingUnit: "kg",
-      openingUnitPrice: 10.5,
-      openingCost: 1050,
-    },
-    // Add more raw material data as needed
-  ];
-
   const handleViewInventory = async () => {
     setResult(await instance.get('/sel_inventory'));
-    console.log(result);
+    setFilteredResult(result.data)
+    console.log(result.data);
   }
+
+  const handleSearchIndChange = (e) => {
+    setSearchInd(e.target.value)
+  };
 
   useEffect(()=>{
     handleViewInventory()
   },[mat])
-
 
   return (
     <>
@@ -165,16 +140,25 @@ export default () => {
                 </div>
               </Tab.Pane>
               <Tab.Pane eventKey="browse">
-              {/* Browse content here */}
-              {/* You can display a table or a list of files here */}
-              <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-                {/* 單筆新增按鈕 */}
+              <div className="d-flex  flex-wrap flex-md-nowrap align-items-center  py-4">
                 <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleOpenModal}>
                   <FontAwesomeIcon icon={faPlus} className="me-2" />
                   單筆新增
                 </Button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <Form className="d-flex"  style ={{position: "Absolute", top: 180, right: 15, width:300 }}>
+                  <Form.Control
+                    type="search"
+                    placeholder="搜尋原物料"
+                    className="me-2"
+                    aria-label="Search"
+                    onChange={handleSearchIndChange}
+                    value={searchInd}
+                  />
+                </Form>
               </div>
-              <RawMaterialInventoryTable rawMaterials={result.data} />
+              
+              <RawMaterialInventoryTable rawMaterials={result} searchInd={searchInd} />
             </Tab.Pane>
             </Tab.Content>
 
@@ -183,11 +167,11 @@ export default () => {
         </Row>
       </Tab.Container>
 
-      {/* Supplier Form Modal */}
       <RawMaterialFormModal
         show={showModal}
         onClose={handleCloseModal}
-        onSave={handleSaveModalData}
+        onSave={handleCloseModal}
+
       />
     </>
   );
