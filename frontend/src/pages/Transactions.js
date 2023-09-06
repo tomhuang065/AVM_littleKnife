@@ -14,26 +14,30 @@ var xlsx = require("xlsx")
 
 
 export default () => {
-  const {val, setVal, sendValue, signIn, suppliers} = useChat();
+  const {val, setVal, sendValue, signIn, userData} = useChat();
 
   const [valueResult, setValueResult] = useState([]);
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
-  const [type, setType] = useState("選擇價值標種類")
+  const [type, setType] = useState("選擇價值標的種類")
   const [formType, setFormType] = useState("text")
   const [selectedFile, setSelectedFile] = useState(null);
   const [accountResult, setAccountResult] = useState([]);
   const [thirdAccountResult, setThirdAccountResult] = useState([]);
   const [accountThird, setAccountThird] = useState({third :"", thirdCn : "選擇三階會計科目代碼"})
-  const [accountFourth, setAccountFourth] = useState({fourth: "", fourthCn :"選擇四階會計科目代碼"})
-  const [valueTarget, setValueTarget] = useState({tarNum:"", tarName:"選擇價值標的"})
+  // const [accountFourth, setAccountFourth] = useState({fourth: "", fourthCn :"選擇四階會計科目代碼"})
+  // const [valueTarget, setValueTarget] = useState({tarNum:"", tarName:"選擇價值標的"})
 
   const [salesData, setSalesData] = useState({
     fourthAccountCode: "",
+    fourth:"選擇四階會計科目",
     date: moment(new Date()).format('MM/DD/YYYY'),
     quantity: "",
     price: "",
+    unit:"",
     comment: "",
-    valueTarget:"",
+    target_num:"",
+    target_name:"選擇價值標的",
+    // user: userData.Username,
     // Add other fields as needed
   });
 
@@ -46,31 +50,48 @@ export default () => {
       [name]: value,
     });
   };
+
+  const handleClickType= (type) =>{
+    setType(type)
+    setSalesData({...salesData, target_num:"", target_name:"選擇價值標的"})
+  }
+
   const handleCurrentDate = (e) => {
     setFormType("date");
   };
 
   const handleViewValueTarget= async () => {
-    setValueResult([])
-    switch(type){
-      case "原料":{
-        const resM = await instance.get('/sel_value_target_material')
-        setValueResult(resM.data)
-        break;
-      }
-      case "顧客":{
-        const resC = await instance.get('/sel_value_target_customer')
-        setValueResult(resC.data)
-        break;
-      }
-      case "產品":{
-        const resP = await instance.get('/sel_value_target_product')
-        setValueResult(resP.data)
-        break;
-      }
-      default:
-        break;
+    if(type === "選擇價值標的種類"){
+      alert("尚未選擇價值標的種類")
     }
+    else{
+      switch(type){
+        case "原料":{
+          const resM = await instance.get('/sel_value_target_material')
+          setValueResult(resM.data)
+          break;
+        }
+        case "顧客":{
+          const resC = await instance.get('/sel_value_target_customer')
+          setValueResult(resC.data)
+          break;
+        }
+        case "產品":{
+          const resP = await instance.get('/sel_value_target_product')
+          setValueResult(resP.data)
+          break;
+        }
+        case "部門":{
+          const resD = await instance.get('/sel_value_target_department')
+          setValueResult(resD.data)
+          break;
+        }
+        default:
+          break;
+        }
+
+    }
+    
   }
 
   const handleExcelUpload = (event) => {
@@ -121,6 +142,7 @@ export default () => {
       }
     }
     setAccountResult(dat.data)
+    console.log(accountResult)
   }
 
   const handleExcelUploadSubmit = async () => {
@@ -142,6 +164,12 @@ export default () => {
     }
   }
 
+  const checkGetThird =()=>{
+    if(accountThird.third === ""){
+      alert("請先選擇三階會計科目")
+    }
+  }
+
   const ThirdAccountRow = (props) => {
     // console.log(props)
     return (
@@ -154,37 +182,71 @@ export default () => {
     );
   }
 
-  const valTar = ["原料", "產品", "顧客"]
+  const valTar = ["原料", "產品", "顧客", "部門"]
 
-  const handleSalesSubmit = ()=>{
+  const handleSalesSubmit = async()=>{
     // console.log(typeof(salesData.price))
-    if(accountFourth.fourth ===""){
-        alert("會計科目尚未填寫")
+    if(salesData.fourth ==="" || salesData.fourthAccountCode === ""){
+        alert("尚未選擇會計科目")
     }
     else{
-      if(valueTarget.valNum ===""){
-        alert("會計科目尚未填寫")
+      if(salesData.target_num ===""){
+        alert("尚未選擇價值標的")
       }
       else{
-        if(Number(salesData.price) < 0 || Number(salesData.quantity) < 0){
-          alert("數量或單價不可小於零")
+        if(salesData.price === ""){
+          alert("尚未填寫單價")
+        }
+        else if(Number(salesData.price) < 0){
+          alert("單價不可小於零")
+        }
+        else if(salesData.unit === ""){
+          alert("尚未填寫單位")
+        }
+        else if(salesData.quantity === ""){
+          alert("尚未填寫數量")
+        }
+        else if( Number(salesData.quantity) < 0){
+          alert("數量不可小於零")
         }
         else{
-          salesData.fourthAccountCode = accountFourth.fourth;
-          salesData.valueTarget = valueTarget.valNum;
-          alert("已新增銷售資料 ")
+          // salesData.fourthAccountCode = accountFourth.fourth;
+
+          salesData.price = String(Number(salesData.price)*Number(salesData.quantity))
+          // salesData.user = moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+          console.log(userData.Username)
           console.log(salesData)
+          const jsonData = {
+            date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            account_subjects_num: `${salesData.fourthAccountCode}`,
+            purchase_id: `${salesData.target_num}`,
+            purchase_name: `${salesData.target_name}`,
+            purchase_quantity: `${salesData.quantity}`,
+            purchase_unit: `${salesData.unit}`,
+            purchase_price: `${salesData.price}`,
+            remark:`${salesData.remark}`,
+            create_user:userData.Username,
+          };
+          const response = await instance.post('/add_purchase', {
+            ID:JSON.stringify(jsonData)
+          })
+          console.log(response)
+          alert("已新增銷售資料 ")
           setSalesData({
+            ...salesData,
             fourthAccountCode: "",
-            date: moment(new Date()).format('MM/DD/YYYY'),
             quantity: "",
             price: "",
+            unit:'',
             comment: "",
-            valueTarget:"",
+            target_num:"",
+            target_name:"選擇價值標的",
+            fourth:"選擇四階會計科目代碼",
+
           });
+          setType("選擇價值標的種類")
           setAccountThird({third :"", thirdCn : "選擇三階會計科目代碼"})
-          setAccountFourth({fourth: "", fourthCn :"選擇四階會計科目代碼"})
-          setValueTarget({tarNum:"", tarName:"選擇價值標的"})
+          // setValueTarget({tarNum:"", tarName:"選擇價值標的"})
         }
       }
     }
@@ -208,9 +270,9 @@ export default () => {
               <Nav.Item>
                 <Nav.Link eventKey="add" >單筆新增</Nav.Link>
               </Nav.Item>
-              <Nav.Item>
+              {/* <Nav.Item>
                 <Nav.Link eventKey="browse" >瀏覽</Nav.Link>
-              </Nav.Item>
+              </Nav.Item> */}
             </Nav>
 
             {/* Tab Content */}
@@ -244,11 +306,11 @@ export default () => {
                         &nbsp;&nbsp;&nbsp;&nbsp;
                         <Dropdown className = "btn-group dropleft"id = "dropdown-button-drop-start" as={ButtonGroup}>
                           <Dropdown.Toggle as={Button} split variant="link"  className="text-dark m-0 p-0" style ={{color :"red"}}>
-                            <Button variant="outline-primary">{accountFourth.fourth} {accountFourth.fourthCn} </Button>
+                            <Button variant="outline-primary" onClick={checkGetThird}>{salesData.fourthAccountCode} {salesData.fourth} </Button>
                           </Dropdown.Toggle>
                           <Dropdown.Menu>
                           {accountResult === []? null : accountResult.filter(account => account.third===accountThird.third).map(account=> (
-                            <Dropdown.Item onClick={()=> setAccountFourth({fourth: account.fourth, fourthCn:account.fourth_subjects_cn})}>
+                            <Dropdown.Item onClick={()=> setSalesData({...salesData, fourth: account.fourth_subjects_cn, fourthAccountCode : account.fourth})}>
                                 <div className = "me-2">{account.fourth} {account.fourth_subjects_cn}</div>
                             </Dropdown.Item>
                           ))}
@@ -280,6 +342,17 @@ export default () => {
                         required
                       />
                     </Form.Group>
+                    <Form.Group controlId="openingQuantity">
+                      <Form.Label>單位</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="unit"
+                        value={salesData.unit}
+                        placeholder={salesData.unit}
+                        onChange={handleSalesChange}
+                        required
+                      />
+                    </Form.Group>
                     <br></br>
                     <Form.Group controlId="openingQuantity">
                       {((Number(salesData.price)>0)&&(Number(salesData.quantity)>0))?<p style={{fontSize: 18}}><b>總價: {Number(salesData.price)*Number(salesData.quantity)}</b></p>:<p style={{fontSize: 17}}>總價:</p>}
@@ -295,7 +368,7 @@ export default () => {
                         <Dropdown.Menu>
                             {valTar.map(v => {
                                 return (
-                                  <Dropdown.Item onClick={()=> setType(v)} >
+                                  <Dropdown.Item onClick={()=> handleClickType(v)} >
                                   <div className = "me-2">{v} </div>
                                 </Dropdown.Item>
                                 )
@@ -305,11 +378,11 @@ export default () => {
                       &nbsp;&nbsp;&nbsp;&nbsp;
                       <Dropdown className = "btn-group dropleft"id = "dropdown-button-drop-start" as={ButtonGroup}>
                         <Dropdown.Toggle as={Button} split variant="link"  className="text-dark m-0 p-0" style ={{color :"red"}}>
-                          <Button variant="outline-primary" onClick={handleViewValueTarget} >{valueTarget.tarNum} {valueTarget.tarName}</Button>
+                          <Button variant="outline-primary" onClick={handleViewValueTarget} >{salesData.target_num} {salesData.target_name}</Button>
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                           {typeof(valueResult) ==="undefined"? null : valueResult.filter(value => value.category===type).map(value=> (
-                            <Dropdown.Item onClick={()=> setValueTarget({tarNum: value.target_num, tarName:value.target_name})}>
+                            <Dropdown.Item onClick={()=> setSalesData({...salesData, target_num: value.target_num, target_name:value.target_name})}>
                                 <div className = "me-2">{value.target_num} {value.target_name}</div>
                             </Dropdown.Item>
                           ))}
@@ -361,12 +434,12 @@ export default () => {
                 </Col>
                 </div>
               </Tab.Pane>
-              <Tab.Pane eventKey="browse" >
+              {/* <Tab.Pane eventKey="browse" >
                 <div className="d-flex flex-wrap flex-md-nowrap align-items-center py-3">
 瀏覽
                 </div>
                
-              </Tab.Pane>
+              </Tab.Pane> */}
               
             </Tab.Content >
           </Col>

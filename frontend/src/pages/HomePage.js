@@ -22,6 +22,7 @@ import Accountingsettings from "./examples/Accountingsettings";
 import Supplierssettings from "./examples/Supplierssettings";
 import BeginningInventorysettings from "./examples/BeginningInventorysettings";
 import Bomsettings from "./examples/Bomsettings";
+import ChangeProfile from "./changeprofile";
 
 // components
 import Sidebar from "../components/Sidebar";
@@ -106,6 +107,7 @@ export default () => (
 
     {/* pages */}
     <RouteWithSidebar exact path={Routes.DashboardOverview.path} component={DashboardOverview} />
+    <RouteWithSidebar exact path={Routes.ChangeProfile.path} component={ChangeProfile} />
     <RouteWithSidebar exact path={Routes.Purchase.path} component={Purchase} />
     <RouteWithSidebar exact path={Routes.Transactions.path} component={Transactions} />
     <RouteWithSidebar exact path={Routes.Settings.path} component={Settings} />
