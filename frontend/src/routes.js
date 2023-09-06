@@ -12,7 +12,7 @@ export const Routes = {
     // ForgotPassword: { path: "/examples/forgot-password" },
     ResetPassword: { path: "/examples/reset-password" },
     Invoice: { path: "/examples/invoice" },
-    // Lock: { path: "/examples/lock" },
+    ChangeProfile: { path: "/change-profile" },
     NotFound: { path: "/examples/404" },
     ServerError: { path: "/examples/500" },
     Valuetargets: { path: "/valuetargets" },//價值標的

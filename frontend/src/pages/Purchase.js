@@ -7,12 +7,14 @@ import axios from "axios";
 import moment from "moment";
 import accRows from "./data/accountData"
 import { useChat } from "../api/context";
+// import response from 'express' 
 import ExcelJs from "exceljs";
+// import { json } from "express";
 var xlsx = require("xlsx")
 
 
 export default () => {
-  const {val, setVal, sendValue, signIn, suppliers} = useChat();
+  const {val, setVal, sendValue, signIn, suppliers, userData} = useChat();
   const [formType, setFormType] = useState("text")
   const [selectedFile, setSelectedFile] = useState(null);
 
@@ -20,15 +22,18 @@ export default () => {
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [supplierResult, setSupplierResult] = useState([]);
   const [supplier, setSupplier] = useState({supNum:"", supName:"選擇供應商"})
-  const [material, setMaterial] = useState("選擇原料")
+  const [material, setMaterial] = useState([])
 
   const [inventoryData, setInventoryData] = useState({
-    supplier: "",
+    supplier: "選擇供應商",
     date: moment(new Date()).format('MM/DD/YYYY'),
+    material_id:"",
+    material_name:"選擇原料",
     quantity: "",
     price: "",
     comment: "",
-    material:"",
+    // material:"",
+    unit:"",
     // Add other fields as needed
   });
   const handleCurrentDate = (e) => {
@@ -81,6 +86,16 @@ export default () => {
       };
     }
   }
+
+  const handleGetMaterial = async() =>{
+    console.log("called")
+    const resM = await instance.get('/sel_value_target_material')
+    console.log(resM.data)
+    console.log(resM.data.length)
+
+
+    setMaterial(resM.data)
+  }
   const onHandleAccountDownload = async () => {
     const workbook = new ExcelJs.Workbook(); // 創建試算表檔案
     const sheet = workbook.addWorksheet('進貨'); //在檔案中新增工作表 參數放自訂名稱
@@ -115,16 +130,16 @@ export default () => {
 
   const materialResult = ["小刀測試一","小刀測試二","小刀測試三","小刀測試四","小刀測試五" ]
 
-  const handleInventorySubmit = ()=>{
-    inventoryData.supplier = supplier
-    inventoryData.material = material
+  const handleInventorySubmit = async()=>{
+    inventoryData.supplier = supplier.supNum
+    // inventoryData.material = material
 
     // console.log(typeof(salesData.price))
     if(inventoryData.supplier ===""){
         alert("尚未選擇供應商")
     }
     else{
-      if(inventoryData.material ===""){
+      if(inventoryData.material_name ==="" || inventoryData.material_id === ""){
         alert("尚未選擇原料")
       }
       else{
@@ -137,6 +152,22 @@ export default () => {
             alert("數量或單價不可有小數點")
           }
           else{
+            const jsonData = {
+              date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+              account_subjects_num: "4111",
+              material_id: `${inventoryData.material_id}`,
+              material_name: `${inventoryData.material_name}`,
+              purchase_quantity: `${inventoryData.quantity}`,
+              purchase_unit: `${inventoryData.unit}`,
+              purchase_price: `${inventoryData.price}`,
+              remark:`${inventoryData.comment}`,
+              create_user:userData.Username,
+              supplier_num:`${inventoryData.supplier}`,
+            };
+            console.log(jsonData)
+            // const response = await instance.post('/add_material', {
+            //   ID:JSON.stringify(jsonData)
+            // })
             alert("已新增存貨資料")
             console.log(inventoryData)
             setInventoryData({
@@ -147,7 +178,7 @@ export default () => {
               comment: "",
               material:"",
             });
-            setMaterial("選擇原料")
+            setMaterial([])
             setSupplier("選擇供應商")
 
           }
@@ -175,14 +206,15 @@ export default () => {
               <Nav.Item>
                 <Nav.Link eventKey="add" >單筆新增</Nav.Link>
               </Nav.Item>
-              <Nav.Item>
+              {/* <Nav.Item>
                 <Nav.Link eventKey="browse" >瀏覽</Nav.Link>
-              </Nav.Item>
+              </Nav.Item> */}
             </Nav>
 
             <Tab.Content >
               <Tab.Pane eventKey="add" > 
                 <Form >
+                  <br></br>
                   <Form.Group controlId="date">
                     <Form.Label>進貨日期</Form.Label>
                     <Form.Control
@@ -213,26 +245,15 @@ export default () => {
                     <br></br>
                     <Dropdown className = "btn-group dropleft"id = "dropdown-button-drop-start" as={ButtonGroup}>
                       <Dropdown.Toggle as={Button} split variant="link"  className="text-dark m-0 p-0" style ={{color :"red"}}>
-                        <Button variant="outline-primary" >{material}</Button>
+                        <Button variant="outline-primary"onClick ={handleGetMaterial} >{inventoryData.material_id} {inventoryData.material_name}</Button>
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
-                      {/* {materialResult === []? null:materialResult.map(t => <MaterialRow  {...t} />)}
-                        */}\
-                        <Dropdown.Item onClick={()=> setMaterial("小刀測試一")}>
-                              <div className = "me-2">小刀測試一</div>
-                          </Dropdown.Item>
-                          <Dropdown.Item onClick={()=> setMaterial("小刀測試二")}>
-                              <div className = "me-2">小刀測試二</div>
-                          </Dropdown.Item>
-                          <Dropdown.Item onClick={()=> setMaterial("小刀測試三")}>
-                              <div className = "me-2">小刀測試三</div>
-                          </Dropdown.Item>
-                          <Dropdown.Item onClick={()=> setMaterial("小刀測試四")}>
-                              <div className = "me-2">小刀測試四</div>
-                          </Dropdown.Item>
-                          <Dropdown.Item onClick={()=> setMaterial("小刀測試五")}>
-                              <div className = "me-2">小刀測試五</div>
-                          </Dropdown.Item>
+                      {material.length === 0?null:material.map(t =>  
+                          <Dropdown.Item onClick={()=> setInventoryData({...inventoryData, material_id : t.target_num, material_name :t.target_name })}>
+                              <div className = "me-2">{t.target_num} {t.target_name}</div>
+                          </Dropdown.Item>)}
+                       
+                    
                       </Dropdown.Menu>
                     
                     </Dropdown>
@@ -257,6 +278,17 @@ export default () => {
                       name="price"
                       value={inventoryData.price}
                       placeholder={inventoryData.price}
+                      onChange={handleInventoryChange}
+                      required
+                    />
+                  </Form.Group>
+                  <Form.Group controlId="openingQuantity">
+                    <Form.Label>單位</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="unit"
+                      value={inventoryData.unit}
+                      placeholder={inventoryData.unit}
                       onChange={handleInventoryChange}
                       required
                     />
@@ -308,11 +340,11 @@ export default () => {
                 </Col>
                 </div>
               </Tab.Pane>
-              <Tab.Pane eventKey="browse" >
+              {/* <Tab.Pane eventKey="browse" >
                 <div className="d-flex flex-wrap flex-md-nowrap align-items-center py-3">
                   瀏覽
                 </div>
-              </Tab.Pane>
+              </Tab.Pane> */}
             </Tab.Content >
           </Col>
         </Row>

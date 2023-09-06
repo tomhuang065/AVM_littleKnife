@@ -60,6 +60,19 @@ router.post('/upload', (req, res) => {
     });
 });
 
+router.post('/add_purchase', async (req, res) => {
+    try {
+        console.log("got")
+        const result = await add_product_purchase(JSON.parse(req.body.ID));
+        console.log(result)
+        res.json(result);
+    } catch (error) {
+        console.error('發生錯誤：', error);
+        res.status(500).send('伺服器發生錯誤');
+
+    }
+})
+
 router.post('/add_user', async (req, res) => {
     try {
         const result = await register(JSON.parse(req.body.ID));
@@ -253,6 +266,19 @@ router.post('/del_inventory', async (req, res) => {
 
 export default router
 
+function add_product_purchase(data) {
+    console.log(data)    
+    const query = 'INSERT INTO `p_purchase`(`date`, `account_subjects_num`,`purchase_id`, `purchase_name`, `purchase_qunatity`, `purchase_unit`, `purchase_price`,`remark`,`create_user`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+
+    connection.query(query, [data.date, data.account_subjects_num, data.purchase_id, data.purchase_name, data.purchase_quantity, data.purchase_unit, data.purchase_price, data.comment, data.create_user], (error, results, fields) => {
+        if (error) {
+            console.error(error);
+        } else {
+            // let arr = obj_to_dict(results)
+            console.log('新增成功');
+        }
+    });
+}
 
 async function login(data) {
     try {
