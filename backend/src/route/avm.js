@@ -76,6 +76,18 @@ router.post('/add_purchase', async (req, res) => {
 
     }
 })
+router.post('/add_material', async (req, res) => {
+    try {
+        console.log("got")
+        const result = await add_material(JSON.parse(req.body.ID));
+        console.log(result)
+        res.json(result);
+    } catch (error) {
+        console.error('發生錯誤：', error);
+        res.status(500).send('伺服器發生錯誤');
+
+    }
+})
 
 router.post('/add_user', async (req, res) => {
     try {
