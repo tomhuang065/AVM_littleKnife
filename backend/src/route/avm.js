@@ -66,7 +66,6 @@ router.post('/upload', (req, res) => {
 
 router.post('/add_purchase', async (req, res) => {
     try {
-        console.log("got")
         const result = await add_product_purchase(JSON.parse(req.body.ID));
         console.log(result)
         res.json(result);
@@ -76,10 +75,9 @@ router.post('/add_purchase', async (req, res) => {
 
     }
 })
-router.post('/add_material', async (req, res) => {
+router.post('/add_material', async(req, res) => {
     try {
-        console.log("got")
-        const result = await add_material(JSON.parse(req.body.ID));
+        const result = await add_material_purchase(JSON.parse(req.body.ID));
         console.log(result)
         res.json(result);
     } catch (error) {
@@ -405,6 +403,22 @@ function add_product_purchase(data) {
         } else {
             // let arr = obj_to_dict(results)
             console.log('新增成功');
+        }
+    });
+}
+function add_material_purchase(data) {
+    console.log(data)    
+    const query = 'INSERT INTO `m_purchase`(`date`, `account_subjects_num`,`purchase_id`, `purchase_name`, `purchase_quantity`, `purchase_unit`, `purchase_price`, `supplier_num`, `remark`,`create_user`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+
+    connection.query(query, [data.date, data.account_subjects_num, data.material_id, data.material_name, data.purchase_quantity, data.purchase_unit, data.purchase_price, data.supplier_num, data.remark, data.create_user], (error, results, fields) => {
+        if (error) {
+            console.error(error);
+            return(error);
+        } else {
+            // let arr = obj_to_dict(results)
+            console.log('新增存貨成功');
+            return('新增存貨成功');
+
         }
     });
 }

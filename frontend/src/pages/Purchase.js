@@ -165,21 +165,25 @@ export default () => {
               supplier_num:`${inventoryData.supplier}`,
             };
             console.log(jsonData)
-            // const response = await instance.post('/add_material', {
-            //   ID:JSON.stringify(jsonData)
-            // })
+            const response = await instance.post('/add_material', {
+              ID:JSON.stringify(jsonData)
+            })
+            console.log(response)
             alert("已新增存貨資料")
-            console.log(inventoryData)
+            // console.log(inventoryData)
             setInventoryData({
-              supplier: "",
               date: moment(new Date()).format('MM/DD/YYYY'),
               quantity: "",
               price: "",
               comment: "",
-              material:"",
+              unit:"",
+              material_num:"",
+              supplier: "",
+              material_name:"選擇原料",
+          
             });
             setMaterial([])
-            setSupplier("選擇供應商")
+            setSupplier({supNum:"", supName:"選擇供應商"})
 
           }
           
