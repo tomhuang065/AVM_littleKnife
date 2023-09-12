@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2023-09-06 17:13:52
+-- 產生時間： 2023-09-12 09:31:01
 -- 伺服器版本： 10.4.27-MariaDB
 -- PHP 版本： 8.2.0
 
@@ -185,6 +185,7 @@ CREATE TABLE `bom_first` (
   `product_name` varchar(25) NOT NULL COMMENT '產品名稱',
   `product_sec_id` varchar(25) NOT NULL COMMENT '二階產品代碼',
   `use_quantity` int(11) NOT NULL COMMENT '使用量',
+  `status` int(11) NOT NULL COMMENT '狀態(1:True,0:False)',
   `update_user` varchar(25) DEFAULT NULL COMMENT '更新人員',
   `update_time` datetime DEFAULT NULL COMMENT '更新時間'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -193,9 +194,11 @@ CREATE TABLE `bom_first` (
 -- 傾印資料表的資料 `bom_first`
 --
 
-INSERT INTO `bom_first` (`id`, `product_id`, `product_name`, `product_sec_id`, `use_quantity`, `update_user`, `update_time`) VALUES
-(1, 'P001', '小刀產品1', 'P001-1', 5, '測試人員', '2023-08-08 00:00:00'),
-(2, 'P001', '小刀產品1', 'P001-2', 6, '測試人員', '2023-08-08 00:00:00');
+INSERT INTO `bom_first` (`id`, `product_id`, `product_name`, `product_sec_id`, `use_quantity`, `status`, `update_user`, `update_time`) VALUES
+(1, 'P001', '小刀產品1', 'P001-1', 5, 1, '測試人員', '2023-09-12 00:00:00'),
+(2, 'P001', '小刀產品1', 'P001-2', 6, 1, '測試人員', '2023-09-12 00:00:00'),
+(3, 'P002', '小刀產品2', 'M001', 1, 1, '測試人員', '2023-09-12 00:00:00'),
+(4, 'P002', '小刀產品2', 'M002', 2, 1, '測試人員', '2023-09-12 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -219,11 +222,11 @@ CREATE TABLE `bom_second` (
 --
 
 INSERT INTO `bom_second` (`id`, `product_id`, `product_sec_id`, `product_sec_name`, `material_id`, `use_quantity`, `update_user`, `update_time`) VALUES
-(1, 'P001', 'P001-1', '小刀產品1-1', 'M001', 2, '測試人員', '2023-08-08 00:00:00'),
-(2, 'P001', 'P001-1', '小刀產品1-1', 'M002', 3, '測試人員', '2023-08-08 00:00:00'),
-(3, 'P001', 'P001-2', '小刀產品1-2', 'M001', 2, '測試人員', '2023-08-08 00:00:00'),
-(4, 'P001', 'P001-2', '小刀產品1-2', 'M002', 3, '測試人員', '2023-08-08 00:00:00'),
-(5, 'P001', 'P001-2', '小刀產品1-2', 'M003', 1, '測試人員', '2023-08-08 00:00:00');
+(1, 'P001', 'P001-1', '小刀產品1-1', 'M001', 2, '測試人員', '2023-09-12 00:00:00'),
+(2, 'P001', 'P001-1', '小刀產品1-1', 'M002', 3, '測試人員', '2023-09-12 00:00:00'),
+(3, 'P001', 'P001-2', '小刀產品1-2', 'M001', 2, '測試人員', '2023-09-12 00:00:00'),
+(4, 'P001', 'P001-2', '小刀產品1-2', 'M002', 3, '測試人員', '2023-09-12 00:00:00'),
+(5, 'P001', 'P001-2', '小刀產品1-2', 'M003', 1, '測試人員', '2023-09-12 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -348,6 +351,7 @@ CREATE TABLE `p_inventory_setup` (
   `p_id` varchar(25) NOT NULL COMMENT '產品代碼	',
   `p_name` varchar(25) NOT NULL COMMENT '產品名稱	',
   `date` date NOT NULL COMMENT '日期',
+  `supplier_num` varchar(50) NOT NULL COMMENT '供應商代碼',
   `start_quantity` int(11) NOT NULL COMMENT '期初數量',
   `start_unit` varchar(25) NOT NULL COMMENT '期初單位	',
   `start_unit_price` int(11) NOT NULL COMMENT '期初單價	',
@@ -586,7 +590,7 @@ ALTER TABLE `account_subjects`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `bom_first`
 --
 ALTER TABLE `bom_first`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號', AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號', AUTO_INCREMENT=5;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `bom_second`

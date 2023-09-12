@@ -737,14 +737,16 @@ function upload_bom(name) {
     const myDate = new Date();
     const sqlDate = myDate.toISOString().substring(0, 10);
     const user = "測試人員"
+    const status = 1
 
     const insert_first = updatedArr.map(element => [
         element.product_id,
         element.product_name,
         element.product_sec_id,
         element.sec_use_quantity,
-        sqlDate,
-        user
+        status,
+        user,
+        sqlDate
     ]);
 
     console.log(insert_first)
@@ -752,17 +754,19 @@ function upload_bom(name) {
 
     console.log(unique_first);
 
-    const insert_second = updatedArr.map(element => [
-        element.product_id,
-        element.product_sec_id,
-        element.product_sec_name,
-        element.product_thr_id,
-        element.thr_use_quantity,
-        sqlDate,
-        user
-    ]);
+    const insert_second = updatedArr
+        .filter(element => element.product_thr_id && element.thr_use_quantity) // 過濾掉 product_thr_id 和 thr_use_quantity 不存在的項目
+        .map(element => [
+            element.product_id,
+            element.product_sec_id,
+            element.product_sec_name,
+            element.product_thr_id,
+            element.thr_use_quantity,
+            user,
+            sqlDate
+        ]);
 
-    const first_query = 'INSERT INTO bom_first (`product_id`, `product_name`, `product_sec_id`, `use_quantity`, `update_user`, `update_time`) VALUES ?';
+    const first_query = 'INSERT INTO bom_first (`product_id`, `product_name`, `product_sec_id`, `use_quantity`,`status`, `update_user`, `update_time`) VALUES ?';
     const second_query = 'INSERT INTO bom_second ( `product_id`, `product_sec_id`, `product_sec_name`, `material_id`, `use_quantity`, `update_user`, `update_time`) VALUES ?';
 
 
@@ -774,14 +778,15 @@ function upload_bom(name) {
         console.log('已成功將資料寫入資料庫');
     });
 
-    connection.query(second_query, [insert_second], (error, results, fields) => {
-        if (error) {
-            console.error('寫入資料庫錯誤：', error);
-            return;//這邊看你們要return什麼給前端
-        }
-        console.log('已成功將資料寫入資料庫');
-    });
-
+    if(insert_second.length != 0){
+        connection.query(second_query, [insert_second], (error, results, fields) => {
+            if (error) {
+                console.error('寫入資料庫錯誤：', error);
+                return;//這邊看你們要return什麼給前端
+            }
+            console.log('已成功將資料寫入資料庫');
+        });
+    }
 }
 
 //材料採購匯入
@@ -935,37 +940,59 @@ async function calculateProductCost() {
             }
 
             const bomSecondRows = bomSecondData.filter((bomSecondRow) => bomSecondRow.product_sec_id === product_sec_id);
-            bomSecondRows.forEach((bomSecondRow) => {
-                const { product_sec_id, product_sec_name, material_id, use_quantity: bomSecondUseQuantity } = bomSecondRow;
-                const productKey_sec = `${productKey}:${product_sec_id}-${product_sec_name}`;
-                if (!productCosts_sec[productKey_sec]) {
-                    productCosts_sec[productKey_sec] = {
-                        product_sec_name: product_sec_name,
-                        useage: 0,
-                        unit_price: 0,
-                        total_price: 0,
-                    };
-                }
 
+            //假設有二階與三階
+            if (bomSecondRows.length != 0) {
+                bomSecondRows.forEach((bomSecondRow) => {
+                    const { product_sec_id, product_sec_name, material_id, use_quantity: bomSecondUseQuantity } = bomSecondRow;
+                    const productKey_sec = `${productKey}:${product_sec_id}-${product_sec_name}`;
+                    if (!productCosts_sec[productKey_sec]) {
+                        productCosts_sec[productKey_sec] = {
+                            product_sec_name: product_sec_name,
+                            useage: 0,
+                            unit_price: 0,
+                            total_price: 0,
+                        };
+                    }
+
+                    const mInventorySetupRow = mInventorySetupData.find((mInventoryRow) => mInventoryRow.m_id === material_id);
+                    if (mInventorySetupRow) {
+                        const { m_name, start_unit_price } = mInventorySetupRow;
+                        productCosts_sec[productKey_sec].useage += bomSecondUseQuantity;
+                        productCosts_sec[productKey_sec].unit_price += bomSecondUseQuantity * start_unit_price;
+                        productCosts_sec[productKey_sec].total_price += bomSecondUseQuantity * start_unit_price * use_quantity;
+                        productCosts[productKey].product_cost += bomSecondUseQuantity * start_unit_price * use_quantity;
+
+                        const productKey_third = `${productKey_sec}-${material_id}`;
+                        if (!productCosts_third[productKey_third]) {
+                            productCosts_third[productKey_third] = {
+                                material_name: m_name,
+                                useage: bomSecondUseQuantity,
+                                unit_price: start_unit_price,
+                                total_price: bomSecondUseQuantity * start_unit_price,
+                            };
+                        }
+                    }
+                });
+            } else { //若沒有二階(直接對到原料)
+                let material_id = product_sec_id
                 const mInventorySetupRow = mInventorySetupData.find((mInventoryRow) => mInventoryRow.m_id === material_id);
                 if (mInventorySetupRow) {
                     const { m_name, start_unit_price } = mInventorySetupRow;
-                    productCosts_sec[productKey_sec].useage += bomSecondUseQuantity;
-                    productCosts_sec[productKey_sec].unit_price = bomSecondUseQuantity * start_unit_price;
-                    productCosts_sec[productKey_sec].total_price += bomSecondUseQuantity * start_unit_price * use_quantity;
-                    productCosts[productKey].product_cost += bomSecondUseQuantity * start_unit_price * use_quantity;
-
-                    const productKey_third = `${productKey_sec}-${material_id}`;
-                    if (!productCosts_third[productKey_third]) {
-                        productCosts_third[productKey_third] = {
-                            material_name: m_name,
-                            useage: bomSecondUseQuantity,
+                    //直接計算bom一階成本
+                    productCosts[productKey].product_cost += start_unit_price * use_quantity;
+                    const productKey_sec = `${productKey}:${product_sec_id}-${m_name}`;
+                    if (!productCosts_sec[productKey_sec]) {
+                        productCosts_sec[productKey_sec] = {
+                            product_sec_name: m_name,
+                            useage: use_quantity,
                             unit_price: start_unit_price,
-                            total_price: bomSecondUseQuantity * start_unit_price,
+                            total_price: use_quantity * start_unit_price,
                         };
                     }
                 }
-            });
+            }
+
         });
 
         // 最終呈現結果
@@ -977,6 +1004,7 @@ async function calculateProductCost() {
         console.error(error);
     }
 }
+
 
 //供應商新增(data由前端拋來)
 function add_supplier(data) {
