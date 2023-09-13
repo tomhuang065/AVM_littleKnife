@@ -26,7 +26,7 @@ export default () => {
   const [accountThird, setAccountThird] = useState({third :"", thirdCn : "選擇三階會計科目代碼"})
   // const [accountFourth, setAccountFourth] = useState({fourth: "", fourthCn :"選擇四階會計科目代碼"})
   // const [valueTarget, setValueTarget] = useState({tarNum:"", tarName:"選擇價值標的"})
-
+  const [supplierResult, setSupplierResult] = useState([]);
   const [salesData, setSalesData] = useState({
     fourthAccountCode: "",
     fourth:"選擇四階會計科目",
@@ -37,6 +37,8 @@ export default () => {
     comment: "",
     target_num:"",
     target_name:"選擇價值標的",
+    supplier_num:"",
+    supplier_name:"選擇供應商",
     // user: userData.Username,
     // Add other fields as needed
   });
@@ -50,6 +52,12 @@ export default () => {
       [name]: value,
     });
   };
+
+  const handleViewSupplier= async () => {
+    const sup = await instance.get('/sel_supplier')
+    setSupplierResult(sup.data);
+    console.log(supplierResult);
+  }
 
   const handleClickType= (type) =>{
     setType(type)
@@ -177,6 +185,16 @@ export default () => {
           <Dropdown.Item onClick={() => setAccountThird({third : props.third, thirdCn : props.third_subjects_cn})}>
               <div className = "me-2">{props.third} {props.third_subjects_cn}</div>
           </Dropdown.Item>
+          {/* <Form className="d-flex me-2"  >
+            <Form.Control
+              type="search"
+              placeholder="搜尋供應商"
+              className="me-2"
+              aria-label="Search"
+              // onChange={handleSearchIndChange}
+              // value={searchInd}
+            />
+          </Form> */}
       </>
       
     );
@@ -197,14 +215,14 @@ export default () => {
         if(salesData.price === ""){
           alert("尚未填寫單價")
         }
-        else if(Number(salesData.price) < 0){
-          alert("單價不可小於零")
-        }
         else if(salesData.unit === ""){
           alert("尚未填寫單位")
         }
         else if(salesData.quantity === ""){
           alert("尚未填寫數量")
+        }
+        else if(!Number.isInteger(Number(salesData.quantity)) ||!Number.isInteger(Number(salesData.price)) ){
+          alert("數量與單價欄位皆須為數字")
         }
         else if( Number(salesData.quantity) < 0){
           alert("數量不可小於零")
@@ -214,8 +232,8 @@ export default () => {
 
           salesData.price = String(Number(salesData.price)*Number(salesData.quantity))
           // salesData.user = moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-          console.log(userData.Username)
-          console.log(salesData)
+          // console.log(userData.Username)
+          // console.log(salesData)
           const jsonData = {
             date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             account_subjects_num: `${salesData.fourthAccountCode}`,
@@ -224,9 +242,12 @@ export default () => {
             purchase_quantity: `${salesData.quantity}`,
             purchase_unit: `${salesData.unit}`,
             purchase_price: `${salesData.price}`,
-            remark:`${salesData.remark}`,
+            supplier_num: `${salesData.supplier_num}`,
+            supplier_name: `${salesData.supplier_name}`,
+            remark:`${salesData.comment}`,
             create_user:userData.Username,
           };
+          console.log(jsonData)
           const response = await instance.post('/add_purchase', {
             ID:JSON.stringify(jsonData)
           })
@@ -242,6 +263,8 @@ export default () => {
             target_num:"",
             target_name:"選擇價值標的",
             fourth:"選擇四階會計科目代碼",
+            supplier_num:"",
+            supplier_name:"選擇供應商",
 
           });
           setType("選擇價值標的種類")
@@ -299,8 +322,31 @@ export default () => {
                           <Dropdown.Toggle as={Button} split variant="link"  className="text-dark m-0 p-0" style ={{color :"red"}}>
                             <Button variant="outline-primary" onClick={handleViewAccount}>{accountThird.third} {accountThird.thirdCn}</Button>
                           </Dropdown.Toggle>  
+                          {/* <Form className="d-flex me-2"  >
+                            <Form.Control
+                              type="search"
+                              placeholder="搜尋供應商"
+                              className="me-2"
+                              aria-label="Search"
+                              // onChange={handleSearchIndChange}
+                              // value={searchInd}
+                            />
+                          </Form> */}
                           <Dropdown.Menu>
-                            {thirdAccountResult === []? null:thirdAccountResult.map(t => <ThirdAccountRow  {...t} />)}
+                            {thirdAccountResult === []? null:
+                            <>
+                            <Form className="d-flex me-2"  >
+                            <Form.Control
+                              type="search"
+                              placeholder="搜尋三階會科代碼"
+                              className="me-2"
+                              aria-label="Search"
+                              // onChange={handleSearchIndChange}
+                              // value={searchInd}
+                            />
+                          </Form>
+                            {thirdAccountResult.map(t => <ThirdAccountRow  {...t} />)}
+                            </>}
                           </Dropdown.Menu>
                         </Dropdown>
                         &nbsp;&nbsp;&nbsp;&nbsp;
@@ -342,17 +388,7 @@ export default () => {
                         required
                       />
                     </Form.Group>
-                    <Form.Group controlId="openingQuantity">
-                      <Form.Label>單位</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="unit"
-                        value={salesData.unit}
-                        placeholder={salesData.unit}
-                        onChange={handleSalesChange}
-                        required
-                      />
-                    </Form.Group>
+                 
                     <br></br>
                     <Form.Group controlId="openingQuantity">
                       {((Number(salesData.price)>0)&&(Number(salesData.quantity)>0))?<p style={{fontSize: 18}}><b>總價: {Number(salesData.price)*Number(salesData.quantity)}</b></p>:<p style={{fontSize: 17}}>總價:</p>}
@@ -392,6 +428,41 @@ export default () => {
 
                     </Form.Group>
                     <br></br>
+                    {type === "原料"? 
+                    <>
+                      <Form.Group controlId="openingQuantity">
+                        <Form.Label>單位</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="unit"
+                          value={salesData.unit}
+                          placeholder={salesData.unit}
+                          onChange={handleSalesChange}
+                          required
+                        />
+                      </Form.Group>
+                      <br></br>
+                      <Form.Group controlId="valueTargetName">
+                        <Form.Label>供應商</Form.Label> 
+                        <br></br>
+                        <Dropdown className = "btn-group dropleft"id = "dropdown-button-drop-start" as={ButtonGroup}>
+                          <Dropdown.Toggle as={Button} split variant="link"  className="text-dark m-0 p-0" style ={{color :"red"}}>
+                            <Button variant="outline-primary" onClick={handleViewSupplier}>{salesData.supplier_num} {salesData.supplier_name}</Button>
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu>
+                          {supplierResult === []? null:supplierResult.map(t => 
+                            <Dropdown.Item onClick={() => setSalesData({...salesData, supplier_num : t.supplier_num, supplier_name : t.supplier_name})}>
+                                <div className = "me-2">{t.supplier_num} {t.supplier_name}</div>
+                            </Dropdown.Item>)}
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </Form.Group>
+                    </>
+                      :
+                      null}
+                   
+                    <br></br>
+
                     <Form.Group controlId="comment">
                       <Form.Label>備註</Form.Label>
                       <Form.Control

@@ -212,7 +212,7 @@ router.post('/add_value_target', async (req, res) => {
 });
 
 router.post('/del_value_target', async (req, res) => {
-    await del_value_target(JSON.parse(req.body.ID).content);
+    await del_value_target(JSON.parse(req.body.ID).target_num);
     res.send('已成功刪除價值標的');
 });
 
@@ -541,7 +541,7 @@ function del_supplier(condition) {
 }
 
 function del_value_target(condition) {
-    console.log(condition)
+    console.log("cond", condition)
     const deleteQuery = "DELETE FROM `value_target` WHERE `value_target`.`target_num` = ?";
     
     connection.query(deleteQuery,condition,(error, results, fields) => {
@@ -892,7 +892,7 @@ function update_supplier(updatedata) {
     
     let updateQuery = 'UPDATE `supplier` SET status = ? WHERE `supplier`.`supplier_num` = ?';
     var stat = "1";
-    if(updatedata.status ==='false'){
+    if(updatedata.status ==='1'){
         stat = '0';
     }
     if(updatedata.task === "change_state"){

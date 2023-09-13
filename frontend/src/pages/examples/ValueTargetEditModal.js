@@ -66,6 +66,7 @@ const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
         const jsonData = {
           target_num: `${newValueTarget.target_num}`
         };
+        console.log(jsonData)
         setValType(null)
         const response = await instance.post('/del_value_target', {
           ID:JSON.stringify(jsonData)
@@ -96,7 +97,7 @@ const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
         setPlaceHolder("") //placeholder in the modal input bar
         setForChange("")
         setIndex("選擇修改項目") //the index button in the 
-        alert(response.data);
+        alert("已變更價值標的");
         // setMat("edit")
         onHide()
       }
@@ -118,7 +119,7 @@ const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
       {states === "deleting"?
         <Modal.Body>
           {/* 三階代碼 : {third} / 三階科目中文名稱 : {thirdCn} / 三階科目英文名稱 : {thirdEng} /<br></br> 四階代碼 : {fourth} / 四階科目中文名稱 : {fourthCn} / 四階科目英文名稱 :{fourthEng} */}
-          價值標的代碼：{newValueTarget.num} <br></br> 價值標的名稱 : {newValueTarget.target_name}  
+          價值標的代碼：{newValueTarget.target_num} <br></br> 價值標的名稱 : {newValueTarget.target_name}  
         </Modal.Body>
         :
         <Modal.Body className="d-flex flex-wrap flex-md-nowrap align-items-center  py-4">

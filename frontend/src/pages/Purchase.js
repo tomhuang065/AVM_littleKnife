@@ -286,6 +286,8 @@ export default () => {
                       required
                     />
                   </Form.Group>
+                  <br></br>
+
                   <Form.Group controlId="openingQuantity">
                     <Form.Label>單位</Form.Label>
                     <Form.Control
@@ -297,8 +299,10 @@ export default () => {
                       required
                     />
                   </Form.Group>
+                  <br></br>
+
                   <Form.Group controlId="openingQuantity">
-                    {((Number(inventoryData.price)>0)&&(Number(inventoryData.quantity)>0))?<div>總價: {Number(inventoryData.price)*Number(inventoryData.quantity)}</div>:<div>總價:</div  >}
+                    {((Number(inventoryData.price)>0)&&(Number(inventoryData.quantity)>0))?<p style={{fontSize: 18}}><b>總價: {Number(inventoryData.price)*Number(inventoryData.quantity)}</b></p>:<p style={{fontSize: 17}}>總價:</p  >}
                   </Form.Group>
                   <br></br>
                   <Form.Group controlId="comment">
