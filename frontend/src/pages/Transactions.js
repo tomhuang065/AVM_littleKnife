@@ -26,6 +26,11 @@ export default () => {
   const [accountThird, setAccountThird] = useState({third :"", thirdCn : "選擇三階會計科目代碼"})
   // const [accountFourth, setAccountFourth] = useState({fourth: "", fourthCn :"選擇四階會計科目代碼"})
   // const [valueTarget, setValueTarget] = useState({tarNum:"", tarName:"選擇價值標的"})
+  const [searchInd3, setSearchInd3] = useState("")
+  const [searchInd4, setSearchInd4] = useState("")
+  const [searchIndV, setSearchIndV] = useState("")
+  const [searchIndS, setSearchIndS] = useState("")
+
   const [supplierResult, setSupplierResult] = useState([]);
   const [salesData, setSalesData] = useState({
     fourthAccountCode: "",
@@ -42,6 +47,21 @@ export default () => {
     // user: userData.Username,
     // Add other fields as needed
   });
+
+
+
+  const handleSearchInd3Change = (e) => {
+    setSearchInd3(e.target.value)
+  };
+  const handleSearchInd4Change = (e) => {
+    setSearchInd4(e.target.value)
+  };
+  const handleSearchIndVChange = (e) => {
+    setSearchIndV(e.target.value)
+  };
+  const handleSearchIndSChange = (e) => {
+    setSearchIndS(e.target.value)
+  };
 
   // const filteredData = data.filter(item => item.age > 25);
 
@@ -215,8 +235,11 @@ export default () => {
         if(salesData.price === ""){
           alert("尚未填寫單價")
         }
-        else if(salesData.unit === ""){
+        else if(salesData.unit === "" && type === "原料"){
           alert("尚未填寫單位")
+        }
+        else if(salesData.supplier_num === "" && type === "原料"){
+          alert("尚未選擇供應商")
         }
         else if(salesData.quantity === ""){
           alert("尚未填寫數量")
@@ -243,7 +266,7 @@ export default () => {
             purchase_unit: `${salesData.unit}`,
             purchase_price: `${salesData.price}`,
             supplier_num: `${salesData.supplier_num}`,
-            supplier_name: `${salesData.supplier_name}`,
+            // supplier_name: `${salesData.supplier_name}`,
             remark:`${salesData.comment}`,
             create_user:userData.Username,
           };
@@ -269,6 +292,10 @@ export default () => {
           });
           setType("選擇價值標的種類")
           setAccountThird({third :"", thirdCn : "選擇三階會計科目代碼"})
+          setSearchInd3("")
+          setSearchInd4("")
+          setSearchIndV("")
+          setSearchIndS("")
           // setValueTarget({tarNum:"", tarName:"選擇價值標的"})
         }
       }
@@ -322,46 +349,58 @@ export default () => {
                           <Dropdown.Toggle as={Button} split variant="link"  className="text-dark m-0 p-0" style ={{color :"red"}}>
                             <Button variant="outline-primary" onClick={handleViewAccount}>{accountThird.third} {accountThird.thirdCn}</Button>
                           </Dropdown.Toggle>  
-                          {/* <Form className="d-flex me-2"  >
-                            <Form.Control
-                              type="search"
-                              placeholder="搜尋供應商"
-                              className="me-2"
-                              aria-label="Search"
-                              // onChange={handleSearchIndChange}
-                              // value={searchInd}
-                            />
-                          </Form> */}
                           <Dropdown.Menu>
                             {thirdAccountResult === []? null:
                             <>
-                            <Form className="d-flex me-2"  >
-                            <Form.Control
-                              type="search"
-                              placeholder="搜尋三階會科代碼"
-                              className="me-2"
-                              aria-label="Search"
-                              // onChange={handleSearchIndChange}
-                              // value={searchInd}
-                            />
-                          </Form>
-                            {thirdAccountResult.map(t => <ThirdAccountRow  {...t} />)}
-                            </>}
+                              <Form className="mx-3 my-2 w-auto"  >
+                                <Form.Control
+                                  type="search"
+                                  placeholder="搜尋三階會科代碼"
+                                  className="me-2"
+                                  aria-label="Search"
+                                  onChange={handleSearchInd3Change}
+                                  value={searchInd3}
+                                  onClick = {()=> console.log(thirdAccountResult[0].third)}
+                                />
+                              </Form>
+                              {thirdAccountResult.filter((acc) => 
+                                    String(acc.third).includes(searchInd3) ||
+                                    String(acc.third_subjects_cn).includes(searchInd3)).map(t => <ThirdAccountRow  {...t} />)
+                              }
+                            </>
+                            }
                           </Dropdown.Menu>
                         </Dropdown>
                         &nbsp;&nbsp;&nbsp;&nbsp;
+                        {accountThird.third === ""?null:
                         <Dropdown className = "btn-group dropleft"id = "dropdown-button-drop-start" as={ButtonGroup}>
                           <Dropdown.Toggle as={Button} split variant="link"  className="text-dark m-0 p-0" style ={{color :"red"}}>
                             <Button variant="outline-primary" onClick={checkGetThird}>{salesData.fourthAccountCode} {salesData.fourth} </Button>
                           </Dropdown.Toggle>
                           <Dropdown.Menu>
-                          {accountResult === []? null : accountResult.filter(account => account.third===accountThird.third).map(account=> (
-                            <Dropdown.Item onClick={()=> setSalesData({...salesData, fourth: account.fourth_subjects_cn, fourthAccountCode : account.fourth})}>
-                                <div className = "me-2">{account.fourth} {account.fourth_subjects_cn}</div>
-                            </Dropdown.Item>
-                          ))}
+                          {accountResult === []? null : 
+                          <>
+                            <Form className="mx-3 my-2 w-auto"  >
+                              <Form.Control
+                                type="search"
+                                placeholder="搜尋四階會科代碼"
+                                className="me-2"
+                                aria-label="Search"
+                                onChange={handleSearchInd4Change}
+                                value={searchInd4}
+                                onClick = {()=> console.log(thirdAccountResult[0].third)}
+                              />
+                            </Form>
+                            {accountResult.filter(account => (account.third===accountThird.third)&&((String(account.fourth).includes(searchInd4))||((String(account.fourth_subjects_cn).includes(searchInd4))))).map(account=> (
+                              <Dropdown.Item onClick={()=> setSalesData({...salesData, fourth: account.fourth_subjects_cn, fourthAccountCode : account.fourth})}>
+                                  <div className = "me-2">{account.fourth} {account.fourth_subjects_cn}</div>
+                              </Dropdown.Item>
+                            ))}
+                          </>
+                          }
                           </Dropdown.Menu>
                         </Dropdown>
+                        }
                       </div>
                     </Form.Group>
                     <br></br>
@@ -412,20 +451,37 @@ export default () => {
                         </Dropdown.Menu>
                       </Dropdown>
                       &nbsp;&nbsp;&nbsp;&nbsp;
-                      <Dropdown className = "btn-group dropleft"id = "dropdown-button-drop-start" as={ButtonGroup}>
-                        <Dropdown.Toggle as={Button} split variant="link"  className="text-dark m-0 p-0" style ={{color :"red"}}>
-                          <Button variant="outline-primary" onClick={handleViewValueTarget} >{salesData.target_num} {salesData.target_name}</Button>
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                          {typeof(valueResult) ==="undefined"? null : valueResult.filter(value => value.category===type).map(value=> (
-                            <Dropdown.Item onClick={()=> setSalesData({...salesData, target_num: value.target_num, target_name:value.target_name})}>
-                                <div className = "me-2">{value.target_num} {value.target_name}</div>
-                            </Dropdown.Item>
-                          ))}
-                          {/* {valueResult} */}
-                        </Dropdown.Menu>
-                      </Dropdown>
-
+                      {type ==="選擇價值標的種類"?
+                        null
+                        :
+                        <Dropdown className = "btn-group dropleft"id = "dropdown-button-drop-start" as={ButtonGroup}>
+                          <Dropdown.Toggle as={Button} split variant="link"  className="text-dark m-0 p-0" style ={{color :"red"}}>
+                            <Button variant="outline-primary" onClick={handleViewValueTarget} >{salesData.target_num} {salesData.target_name}</Button>
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu>
+                            {typeof(valueResult) ==="undefined"? null : 
+                            <>
+                              <Form className="mx-3 my-2 w-auto"  >
+                                <Form.Control
+                                  type="search"
+                                  placeholder="搜尋價值標的"
+                                  className="me-2"
+                                  aria-label="Search"
+                                  onChange={handleSearchIndVChange}
+                                  value={searchIndV}
+                                  // onClick = {()=> console.log(thirdAccountResult[0].third)}
+                                />
+                              </Form>
+                              {valueResult.filter(value => (value.category===type)&&((String(value.target_num).includes(searchIndV))||(String(value.target_name).includes(searchIndV)))).map(value=> (
+                                <Dropdown.Item onClick={()=> setSalesData({...salesData, target_num: value.target_num, target_name:value.target_name})}>
+                                    <div className = "me-2">{value.target_num} {value.target_name}</div>
+                                </Dropdown.Item>
+                              ))}
+                            </>
+                            }
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      }
                     </Form.Group>
                     <br></br>
                     {type === "原料"? 
@@ -450,10 +506,25 @@ export default () => {
                             <Button variant="outline-primary" onClick={handleViewSupplier}>{salesData.supplier_num} {salesData.supplier_name}</Button>
                           </Dropdown.Toggle>
                           <Dropdown.Menu>
-                          {supplierResult === []? null:supplierResult.map(t => 
-                            <Dropdown.Item onClick={() => setSalesData({...salesData, supplier_num : t.supplier_num, supplier_name : t.supplier_name})}>
-                                <div className = "me-2">{t.supplier_num} {t.supplier_name}</div>
-                            </Dropdown.Item>)}
+                          {supplierResult === []? null:
+                          <>
+                           <Form className="mx-3 my-2 w-auto"  >
+                              <Form.Control
+                                type="search"
+                                placeholder="搜尋供應商"
+                                className="me-2"
+                                aria-label="Search"
+                                onChange={handleSearchIndSChange}
+                                value={searchIndS}
+                                // onClick = {()=> console.log(thirdAccountResult[0].third)}
+                              />
+                            </Form>
+                            {supplierResult.filter(sup => String(sup.supplier_num).includes(searchIndS)||String(sup.supplier_name).includes(searchIndS)).map(t => 
+                              <Dropdown.Item onClick={() => setSalesData({...salesData, supplier_num : t.supplier_num, supplier_name : t.supplier_name})}>
+                                  <div className = "me-2">{t.supplier_num} {t.supplier_name}</div>
+                              </Dropdown.Item>)}
+                          </>
+                          }
                           </Dropdown.Menu>
                         </Dropdown>
                       </Form.Group>

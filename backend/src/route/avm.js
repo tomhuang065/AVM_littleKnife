@@ -395,9 +395,9 @@ function bom_id_check(id) {
 
 function add_product_purchase(data) {
     console.log(data)    
-    const query = 'INSERT INTO `p_purchase`(`date`, `account_subjects_num`,`purchase_id`, `purchase_name`, `purchase_qunatity`, `purchase_unit`, `purchase_price`,`remark`,`create_user`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    const query = 'INSERT INTO `p_purchase`(`date`, `account_subjects_num`,`purchase_id`, `purchase_name`,`purchase_quantity`, `purchase_unit`, `purchase_price`, `supplier_num`,`remark`,`create_user`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
 
-    connection.query(query, [data.date, data.account_subjects_num, data.purchase_id, data.purchase_name, data.purchase_quantity, data.purchase_unit, data.purchase_price, data.comment, data.create_user], (error, results, fields) => {
+    connection.query(query, [data.date, data.account_subjects_num, data.purchase_id, data.purchase_name,  data.purchase_quantity, data.purchase_unit, data.purchase_price, data.supplier_num, data.comment, data.create_user], (error, results, fields) => {
         if (error) {
             console.error(error);
         } else {

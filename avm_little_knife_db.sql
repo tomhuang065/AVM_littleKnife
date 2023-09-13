@@ -371,8 +371,9 @@ CREATE TABLE `p_purchase` (
   `purchase_id` varchar(25) NOT NULL COMMENT '採購(生產)產品代碼',
   `purchase_name` varchar(25) NOT NULL COMMENT '採購(生產)產品名稱',
   `purchase_quantity` int(11) NOT NULL COMMENT '採購(生產)數量',
-  `purchase_unit` varchar(25) NOT NULL COMMENT '採購(生產)單位',
+  `purchase_unit` varchar(25) DEFAULT NULL COMMENT '採購(生產)單位',
   `purchase_price` int(11) NOT NULL COMMENT '採購(生產)成本',
+  `supplier_num`  varchar(25) DEFAULT NULL COMMENT '供應商代碼',
   `remark` varchar(100) DEFAULT NULL COMMENT '備註',
   `create_user` varchar(25) NOT NULL COMMENT '建立者'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
