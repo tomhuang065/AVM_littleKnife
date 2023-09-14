@@ -66,8 +66,18 @@ router.post('/upload', (req, res) => {
 
 router.post('/add_purchase', async (req, res) => {
     try {
-        console.log("got")
         const result = await add_product_purchase(JSON.parse(req.body.ID));
+        console.log(result)
+        res.json(result);
+    } catch (error) {
+        console.error('發生錯誤：', error);
+        res.status(500).send('伺服器發生錯誤');
+
+    }
+})
+router.post('/add_material', async(req, res) => {
+    try {
+        const result = await add_material_purchase(JSON.parse(req.body.ID));
         console.log(result)
         res.json(result);
     } catch (error) {
@@ -202,7 +212,7 @@ router.post('/add_value_target', async (req, res) => {
 });
 
 router.post('/del_value_target', async (req, res) => {
-    await del_value_target(JSON.parse(req.body.ID).content);
+    await del_value_target(JSON.parse(req.body.ID).target_num);
     res.send('已成功刪除價值標的');
 });
 
@@ -444,14 +454,30 @@ function bom_id_check(id) {
 
 function add_product_purchase(data) {
     console.log(data)    
-    const query = 'INSERT INTO `p_purchase`(`date`, `account_subjects_num`,`purchase_id`, `purchase_name`, `purchase_qunatity`, `purchase_unit`, `purchase_price`,`remark`,`create_user`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    const query = 'INSERT INTO `p_purchase`(`date`, `account_subjects_num`,`purchase_id`, `purchase_name`,`purchase_quantity`, `purchase_unit`, `purchase_price`, `supplier_num`,`remark`,`create_user`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
 
-    connection.query(query, [data.date, data.account_subjects_num, data.purchase_id, data.purchase_name, data.purchase_quantity, data.purchase_unit, data.purchase_price, data.comment, data.create_user], (error, results, fields) => {
+    connection.query(query, [data.date, data.account_subjects_num, data.purchase_id, data.purchase_name,  data.purchase_quantity, data.purchase_unit, data.purchase_price, data.supplier_num, data.comment, data.create_user], (error, results, fields) => {
         if (error) {
             console.error(error);
         } else {
             // let arr = obj_to_dict(results)
             console.log('新增成功');
+        }
+    });
+}
+function add_material_purchase(data) {
+    console.log(data)    
+    const query = 'INSERT INTO `m_purchase`(`date`, `account_subjects_num`,`purchase_id`, `purchase_name`, `purchase_quantity`, `purchase_unit`, `purchase_price`, `supplier_num`, `remark`,`create_user`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+
+    connection.query(query, [data.date, data.account_subjects_num, data.material_id, data.material_name, data.purchase_quantity, data.purchase_unit, data.purchase_price, data.supplier_num, data.remark, data.create_user], (error, results, fields) => {
+        if (error) {
+            console.error(error);
+            return(error);
+        } else {
+            // let arr = obj_to_dict(results)
+            console.log('新增存貨成功');
+            return('新增存貨成功');
+
         }
     });
 }
@@ -574,7 +600,7 @@ function del_supplier(condition) {
 }
 
 function del_value_target(condition) {
-    console.log(condition)
+    console.log("cond", condition)
     const deleteQuery = "DELETE FROM `value_target` WHERE `value_target`.`target_num` = ?";
     
     connection.query(deleteQuery,condition,(error, results, fields) => {
@@ -925,7 +951,7 @@ function update_supplier(updatedata) {
     
     let updateQuery = 'UPDATE `supplier` SET status = ? WHERE `supplier`.`supplier_num` = ?';
     var stat = "1";
-    if(updatedata.status ==='false'){
+    if(updatedata.status ==='1'){
         stat = '0';
     }
     if(updatedata.task === "change_state"){

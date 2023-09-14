@@ -18,10 +18,11 @@ export const SupplierTable = (props) => {
     const [origs, setOrigs] = useState("")
     const [supplier, setSupplier] = useState({
       status:"",
-      supplier_num: "",
+      supplier_num:"",
       supplier_name:"",
-      update_time: "",
+      update_time:"",
       update_user:"",
+
     })
 
     const {sup, setSup} = useChat();
@@ -30,59 +31,46 @@ export const SupplierTable = (props) => {
     const Search = props.searchInd
 
     const handleRowEditDelete = (states, supNum, supName, updateUsr, updateTime, status) => {
+        console.log(states, supNum, supName, updateUsr, updateTime, status)
         setStates(states)
-        setRemoveModal(true);
-        setSupplier({ supplier_num: supNum, supplier_name:supName, update_time: updateTime, update_user: updateUsr, status:status});
+        
+        setSupplier({supplier_num: supNum, supplier_name:supName, update_time: updateTime, update_user: updateUsr, status:status});
         setOrigs(supNum)
+        if(states !== "changing_state"){
+          setRemoveModal(true);
+        }
     }
     
-    const handleEditSupplier = async(sup)=>{
-      console.log("sup", sup)
-      const jsonData = {
-        orig: `${origs}`,
-        status:`${sup}`,
-        update_user: `${supplier.update_user}`,
-        update_time: `${supplier.update_time}`,
-        supplier_num: `${supplier.supplier_num}`,
-        supplier_name: `${supplier.supplier_name}`,
-        task:"change_state"
+    const handleEditSupplier = async()=>{
+      
+      if(supplier.supplier_name !== ""){
+        setSup(null)
+        const jsonData = {
+          orig: `${origs}`,
+          status:`${supplier.status}`,
+          update_user: `${supplier.update_user}`,
+          update_time: `${supplier.update_time}`,
+          supplier_num: `${supplier.supplier_num}`,
+          supplier_name: `${supplier.supplier_name}`,
+          task:"change_state"
 
-      };
-      const response = await instance.post('/update_supplier', {
-        ID:JSON.stringify(jsonData)
-      })
-      console.log(response.data)
-      alert("已成功修改供應商顯示狀態")
-      setRemoveModal(false)
-
-  
-    }
-
-    const handleChangeState = (supNum, supName, updateUsr, updateTime, status) =>{
-      setOrigs(supNum)
-      setSupplier({
-        supplier_num: supNum,
-        supplier_name:supName,
-        update_time: updateTime,
-        update_user:updateUsr,
-      })
-      console.log(status)
-      if(status === 1){
-        setSup(false)
-      }
-      else{
-        setSup(true)
+        };
+        console.log(jsonData)
+        const response = await instance.post('/update_supplier', {
+          ID:JSON.stringify(jsonData)
+        })
+        setSup('change')
+        alert("已成功修改供應商顯示狀態")
+        setStates("")
+        setOrigs("")  
       }
     }
 
   useEffect(()=>{
-    console.log(sup)
-    if(origs !== ''){
-      setSupplier({status :sup})
-      handleEditSupplier(sup)
+    if(states === "changing_state"){
+      handleEditSupplier()
     }
-    setOrigs("")    
-  },[sup])
+  },[supplier])
   
     const TableRow = (props) => {
       const { supplier_num, supplier_name, update_user,  update_time, status } = props;
@@ -104,11 +92,11 @@ export const SupplierTable = (props) => {
             </span>
           </td>
           <td>
-            <Button variant="outline-primary" onClick={() => {handleChangeState(supplier_num, supplier_name, update_user, update_time, status)}}>變更</Button>
+            <Button variant="outline-primary" onClick={() => {handleRowEditDelete("changing_state", supplier_num, supplier_name, update_user, update_time, status)}}>變更</Button>
           </td>
           <td>
             <span className="fw-normal">
-            {parseFloat(update_user).toFixed(0)}
+            {update_user}
             </span>
           </td>
           <td>

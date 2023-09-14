@@ -97,10 +97,7 @@ const handleUpload = () => {
     setShowSupplierModal(false);
   };
 
-  // const handleSaveSupplier = (supplierData) => {
-  //   console.log("Supplier Data:", supplierData);
-  //   setShowSupplierModal(false);
-  // };
+
   const handleViewSupplier= async () => {
 
     setResult(await instance.get('/sel_supplier'));
@@ -108,6 +105,7 @@ const handleUpload = () => {
   }
 
   useEffect(()=>{
+    console.log("called")
       handleViewSupplier()
       setSup(null)
   },[sup])

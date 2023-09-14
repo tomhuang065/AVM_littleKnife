@@ -81,13 +81,14 @@ const RemoveModal = ({ onHide, show, states, supplier, origs }) =>{
         setEditing(false); //not to show the input bar
         setSup("del")
       }
-    
       const handleEditSupplier = async()=>{
         const jsonData = {
           orig: `${origs}`,
           status: `${newSupplier.status}`,
           supplier_num: `${newSupplier.supplier_num}`,
           supplier_name: `${newSupplier.supplier_name}`,
+          update_user: `${newSupplier.update_user}`,
+          update_time: `${newSupplier.update_time}`,
           task :"modify"
         };
         setSup(null)
@@ -104,6 +105,7 @@ const RemoveModal = ({ onHide, show, states, supplier, origs }) =>{
         onHide()
       }
 
+      
     const supplierArray = ['供應商代碼','供應商名稱']
 
     return(
