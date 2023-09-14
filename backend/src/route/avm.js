@@ -334,9 +334,71 @@ router.post('/del_inventory', async (req, res) => {
     res.send('已成功刪除庫存資料');
 });
 
+router.post('/del_bom_first', async (req, res) => {
+    // const condition = req.body; // 假設客戶端以 JSON 格式傳送刪除條件
+    // del_inventory(condition);
+    console.log('req.body.ID',JSON.parse(req.body.ID).product_id)
+    console.log(JSON.parse(req.body.ID))    
+    await del_bom_first(JSON.parse(req.body.ID).product_id)
+    res.send('已成功刪除BOM第一階資料');
+});
+
+router.post('/del_bom_second', async (req, res) => {
+    // const condition = req.body; // 假設客戶端以 JSON 格式傳送刪除條件
+    // del_inventory(condition);
+    console.log(JSON.parse(req.body.ID))
+    await del_bom_second(JSON.parse(req.body.ID).product_first_id)
+    res.send('已成功刪除BOM第二階資料');
+});
+
+router.post('/update_bom_first', async(req, res) => {
+    console.log(JSON.parse(req.body.ID))
+    await update_bom_first(JSON.parse(req.body.ID))
+    res.send('已成功修改BOM第一階資料');
+
+});
 
 
 export default router
+
+//BOM第一階刪除(對應到bom_first table)
+function del_bom_first(condition) {
+    const deleteQuery = 'DELETE FROM bom_first WHERE bom_first.product_id = ?';
+    connection.query(deleteQuery, condition, (error, results, fields) => {
+        if (error) {
+            console.error('刪除資料庫錯誤：', error);
+        } else {
+            console.log('已成功刪除資料');
+        }
+    });
+}
+
+//BOM第二階刪除(對應到bom_second table)
+function del_bom_second(condition) {
+    const deleteQuery = 'DELETE FROM bom_second WHERE ?';
+    connection.query(deleteQuery, condition, (error, results, fields) => {
+        if (error) {
+            console.error('刪除資料庫錯誤：', error);
+        } else {
+            console.log('已成功刪除資料');
+        }
+    });
+}
+
+//BOM第一階修改(對應到bom_first table)
+function update_bom_first(updatedata) {
+    const condition = updatedata.orig;
+    const updateQuery = 'UPDATE bom_first SET product_id = ?, product_name = ?, update_user = ?, update_time = ? WHERE product_id = ?';
+    connection.query(updateQuery, [updatedata.product_id, updatedata.product_name, updatedata.update_user, updatedata.update_time, condition], (error, results, fields) => {
+        if (error) {
+            console.error('修改資料庫錯誤：', error);
+        } else {
+            console.log('已成功修改資料');
+            console.log('results', results)
+            console.log('product_id', updatedata.product_id)
+        }
+    });
+}
 
 //BOM第一階新增(對應到bom_first table)
 async function add_bom_first(data) {
@@ -344,28 +406,25 @@ async function add_bom_first(data) {
         console.log('data', data)
         const id = data.product_id;
 
-        const check = await bom_id_check(id)
-        if (check.length != 0) {
-            console.log('已有此產品代碼存在，請重新輸入新的產品代碼')
-        } else {
-            const query = 'INSERT INTO `bom_first`(`product_id`, `product_name`, `product_sec_id`, `use_quantity`, `update_user`, `update_time`) VALUES ?'
-            // const now = new Date();
-            // const sqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
-            // data.push(sqlDatetime)
-            // data = [data]
-            connection.query(query, data.product_id, data.product_name, data.product_sec_id, data.use_quantity, data.update_user, data.update_time, (error, results, fields) => {
-                if (error) {
-                    console.error('新增錯誤', error);
-                } else {
-                    // let arr = obj_to_dict(results)
-                    console.log('新增成功');
-                }
-            });
-        }
+        // const check = await bom_id_check(id)
+        // if (check.length != 0) {
+        //     console.log('已有此產品代碼存在，請重新輸入新的產品代碼')
+        // } else {
+            return new Promise((resolve, reject) => {
+                const query = 'INSERT INTO `bom_first`(`product_id`, `product_name`, `update_user`) VALUES (?, ?, ?)'
+                connection.query(query, [data.product_id, data.product_name, data.update_user], (error, results, fields) => {
+                    if (error) {
+                        reject(error)
+                    }
+                    else {
+                        resolve(results)
+                    }
+                })
+            })
+        // }
     } catch (error) {
         console.log(error)
     }
-
 }
 
 //BOM一階代碼防呆
@@ -1094,6 +1153,7 @@ async function calculateProductCost() {
             const productKey = `${product_id}-${product_name}`;
             if (!productCosts[productKey]) {
                 productCosts[productKey] = {
+                    product_id: product_id,
                     product_name: product_name,
                     product_cost: 0,
                 };
@@ -1105,6 +1165,7 @@ async function calculateProductCost() {
                 const productKey_sec = `${productKey}:${product_sec_id}-${product_sec_name}`;
                 if (!productCosts_sec[productKey_sec]) {
                     productCosts_sec[productKey_sec] = {
+                        product_sec_id: product_sec_id,
                         prev_level_name: productKey,
                         product_sec_name: product_sec_name,
                         useage: 0,
@@ -1124,6 +1185,7 @@ async function calculateProductCost() {
                     const productKey_third = `${productKey_sec}-${material_id}`;
                     if (!productCosts_third[productKey_third]) {
                         productCosts_third[productKey_third] = {
+                            material_id: material_id,
                             prev_level_name: productKey_sec,
                             material_name: m_name,
                             useage: bomSecondUseQuantity,

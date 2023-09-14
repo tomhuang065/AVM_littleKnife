@@ -8,13 +8,13 @@ import ExcelJs from "exceljs";
 import AddBOMModal from './BomModal';
 import { useChat } from "../../api/context";
 import axios from 'axios';
-import ProductTable from "../../components/pl";
+import ProductTable from "../../components/BomTable";
 
 
 export default () => {
   const [excelFile, setExcelFile] = useState(null);
-  const {val, setVal, sendValue, signIn, suppliers, msg} = useChat();
-  const [showSupplierModal, setShowSupplierModal] = useState(false);
+  const {val, setVal, sendValue, signIn, Boms, msg} = useChat();
+  const [showBomModal, setShowBomModal] = useState(false);
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [result, setResult] = useState([]);
   const [bomdata, setBomdata] = useState(null);
@@ -106,15 +106,15 @@ export default () => {
   };
 
   const handleSingleAdd = () => {
-    setShowSupplierModal(true);
+    setShowBomModal(true);
   };
 
-  const handleCloseSupplierModal = () => {
-    setShowSupplierModal(false);
+  const handleCloseBomModal = () => {
+    setShowBomModal(false);
   };
 
-  const handleSaveSupplier = async () => {
-    // Handle the logic to save the supplier data
+  const handleSaveBom = async () => {
+    // Handle the logic to save the Bom data
     setResult(await instance.get('/get_bom'))
     console.log(result.data)
   };
@@ -211,11 +211,11 @@ export default () => {
         </Row>
       </Tab.Container>
 
-      {/* Supplier Form Modal */}
+      {/* Bom Form Modal */}
       <AddBOMModal
-        show={showSupplierModal}
-        onHide={handleCloseSupplierModal}
-        onSave={handleSaveSupplier}
+        show={showBomModal}
+        onHide={handleCloseBomModal}
+        onSave={handleSaveBom}
       />
     </>
   );
