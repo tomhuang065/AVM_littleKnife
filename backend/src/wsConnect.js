@@ -739,37 +739,51 @@ function upload_bom(name) {
     const user = "測試人員"
     const status = 1
 
+    //一階bom
     const insert_first = updatedArr.map(element => [
         element.product_id,
         element.product_name,
+        status,
+        user,
+        sqlDate
+    ]);
+    // console.log(insert_first)
+    //存取一階bom之唯一值
+    const unique_first = Array.from(new Set(insert_first.map(JSON.stringify)), JSON.parse);
+    // console.log(unique_first);
+
+    //二階bom
+    const insert_second = updatedArr.map(element => [
+        element.product_id,
         element.product_sec_id,
+        element.product_sec_name,
         element.sec_use_quantity,
         status,
         user,
         sqlDate
     ]);
+    //存取二階bom唯一
+    const unique_second = Array.from(new Set(insert_second.map(JSON.stringify)), JSON.parse);
 
-    console.log(insert_first)
-    const unique_first = Array.from(new Set(insert_first.map(JSON.stringify)), JSON.parse);
-
-    console.log(unique_first);
-
-    const insert_second = updatedArr
+    //三階bom
+    const insert_third = updatedArr
         .filter(element => element.product_thr_id && element.thr_use_quantity) // 過濾掉 product_thr_id 和 thr_use_quantity 不存在的項目
         .map(element => [
             element.product_id,
             element.product_sec_id,
-            element.product_sec_name,
             element.product_thr_id,
             element.thr_use_quantity,
+            status,
             user,
             sqlDate
         ]);
+    // console.log(insert_third)
 
-    const first_query = 'INSERT INTO bom_first (`product_id`, `product_name`, `product_sec_id`, `use_quantity`,`status`, `update_user`, `update_time`) VALUES ?';
-    const second_query = 'INSERT INTO bom_second ( `product_id`, `product_sec_id`, `product_sec_name`, `material_id`, `use_quantity`, `update_user`, `update_time`) VALUES ?';
+    const first_query = 'INSERT INTO bom_first ( `product_id`, `product_name`, `status`, `update_user`, `update_time`) VALUES ?';
+    const second_query = 'INSERT INTO bom_second ( `product_id`, `product_sec_id`, `product_sec_name`, `use_quantity`, `status`, `update_user`, `update_time`) VALUES ?';
+    const thrid_query = 'INSERT INTO bom_third (  `product_id`, `product_sec_id`, `material_id`, `use_quantity`, `status`, `update_user`, `update_time`) VALUES ?';
 
-
+    //寫入資料庫
     connection.query(first_query, [unique_first], (error, results, fields) => {
         if (error) {
             console.error('寫入資料庫錯誤：', error);
@@ -778,8 +792,16 @@ function upload_bom(name) {
         console.log('已成功將資料寫入資料庫');
     });
 
-    if(insert_second.length != 0){
-        connection.query(second_query, [insert_second], (error, results, fields) => {
+    connection.query(second_query, [unique_second], (error, results, fields) => {
+        if (error) {
+            console.error('寫入資料庫錯誤：', error);
+            return;
+        }
+        console.log('已成功將資料寫入資料庫')
+    })
+
+    if (insert_third.length != 0) {
+        connection.query(thrid_query, [insert_third], (error, results, fields) => {
             if (error) {
                 console.error('寫入資料庫錯誤：', error);
                 return;//這邊看你們要return什麼給前端
@@ -915,11 +937,11 @@ function sel_inventory() {
 }
 
 // 計算BOM成本&呈現
-// 計算BOM成本&呈現
 async function calculateProductCost() {
     try {
         const bomFirstData = await getBomFirstData();
         const bomSecondData = await getBomSecondData();
+        const bomThirdData = await getBomThirdData();
         const mInventorySetupData = await getInventorySetupData();
 
         // 第一階產品成本
@@ -930,68 +952,87 @@ async function calculateProductCost() {
         const productCosts_third = {};
 
         bomFirstData.forEach((row) => {
-            const { product_id, product_name, product_sec_id, use_quantity } = row;
+            const { product_id, product_name, status, update_user, update_time } = row;
             const productKey = `${product_id}-${product_name}`;
             if (!productCosts[productKey]) {
                 productCosts[productKey] = {
+                    product_id: product_id,
                     product_name: product_name,
                     product_cost: 0,
+                    status: status,
+                    user: update_user,
+                    time: update_time
                 };
             }
 
-            const bomSecondRows = bomSecondData.filter((bomSecondRow) => bomSecondRow.product_sec_id === product_sec_id);
+            //二階資料
+            const bomSecondRows = bomSecondData.filter((bomSecondRow) => bomSecondRow.product_id === product_id);
+            bomSecondRows.forEach((bomSecondRow) => {
+                const { product_sec_id, product_sec_name, use_quantity: sec_use_quantity, status: sec_status, update_user: sec_user, update_time: sec_time } = bomSecondRow;
+                const productKey_sec = `${productKey}:${product_sec_id}-${product_sec_name}`;
+                if (!productCosts_sec[productKey_sec]) {
+                    productCosts_sec[productKey_sec] = {
+                        product_sec_name: product_sec_name,
+                        useage: 0,
+                        unit_price: 0,
+                        total_price: 0,
+                        status: sec_status,
+                        user: sec_user,
+                        time: sec_time
+                    };
+                }
 
-            //假設有二階與三階
-            if (bomSecondRows.length != 0) {
-                bomSecondRows.forEach((bomSecondRow) => {
-                    const { product_sec_id, product_sec_name, material_id, use_quantity: bomSecondUseQuantity } = bomSecondRow;
-                    const productKey_sec = `${productKey}:${product_sec_id}-${product_sec_name}`;
-                    if (!productCosts_sec[productKey_sec]) {
-                        productCosts_sec[productKey_sec] = {
-                            product_sec_name: product_sec_name,
-                            useage: 0,
-                            unit_price: 0,
-                            total_price: 0,
-                        };
-                    }
+                const bomThirdRows = bomThirdData.filter((bomThirdRow) => bomThirdRow.product_sec_id === product_sec_id);
 
+                //假設有三階
+                if (bomThirdRows.length != 0) {
+                    bomThirdRows.forEach((bomThirdRow) => {
+                        const { material_id, use_quantity: thr_use_quantity, status: thr_status, update_user: thr_user, update_time: thr_time } = bomThirdRow;
+                        const mInventorySetupRow = mInventorySetupData.find((mInventoryRow) => mInventoryRow.m_id === material_id);
+                        if (mInventorySetupRow) {
+                            const { m_name, start_unit_price } = mInventorySetupRow;
+                            productCosts_sec[productKey_sec].useage += thr_use_quantity;
+                            productCosts_sec[productKey_sec].unit_price += thr_use_quantity * start_unit_price;
+                            productCosts_sec[productKey_sec].total_price += thr_use_quantity * start_unit_price * sec_use_quantity;
+                            productCosts[productKey].product_cost += thr_use_quantity * start_unit_price * sec_use_quantity;
+
+                            const productKey_third = `${productKey_sec}-${material_id}`;
+                            if (!productCosts_third[productKey_third]) {
+                                productCosts_third[productKey_third] = {
+                                    material_name: m_name,
+                                    useage: thr_use_quantity,
+                                    unit_price: start_unit_price,
+                                    total_price: thr_use_quantity * start_unit_price,
+                                    status: thr_status,
+                                    update_user: thr_user,
+                                    update_time: thr_time
+                                };
+                            }
+                        }
+                    })
+                } else { //若沒有三階(直接對到原料)
+                    let material_id = product_sec_id
                     const mInventorySetupRow = mInventorySetupData.find((mInventoryRow) => mInventoryRow.m_id === material_id);
                     if (mInventorySetupRow) {
                         const { m_name, start_unit_price } = mInventorySetupRow;
-                        productCosts_sec[productKey_sec].useage += bomSecondUseQuantity;
-                        productCosts_sec[productKey_sec].unit_price += bomSecondUseQuantity * start_unit_price;
-                        productCosts_sec[productKey_sec].total_price += bomSecondUseQuantity * start_unit_price * use_quantity;
-                        productCosts[productKey].product_cost += bomSecondUseQuantity * start_unit_price * use_quantity;
-
-                        const productKey_third = `${productKey_sec}-${material_id}`;
-                        if (!productCosts_third[productKey_third]) {
-                            productCosts_third[productKey_third] = {
-                                material_name: m_name,
-                                useage: bomSecondUseQuantity,
-                                unit_price: start_unit_price,
-                                total_price: bomSecondUseQuantity * start_unit_price,
-                            };
-                        }
-                    }
-                });
-            } else { //若沒有二階(直接對到原料)
-                let material_id = product_sec_id
-                const mInventorySetupRow = mInventorySetupData.find((mInventoryRow) => mInventoryRow.m_id === material_id);
-                if (mInventorySetupRow) {
-                    const { m_name, start_unit_price } = mInventorySetupRow;
-                    //直接計算bom一階成本
-                    productCosts[productKey].product_cost += start_unit_price * use_quantity;
-                    const productKey_sec = `${productKey}:${product_sec_id}-${m_name}`;
-                    if (!productCosts_sec[productKey_sec]) {
+                        //直接計算bom一階成本
+                        productCosts[productKey].product_cost += start_unit_price * sec_use_quantity;
+                        //bom二階成本
+                        const productKey_sec = `${productKey}:${product_sec_id}-${m_name}`;
                         productCosts_sec[productKey_sec] = {
                             product_sec_name: m_name,
-                            useage: use_quantity,
+                            useage: sec_use_quantity,
                             unit_price: start_unit_price,
-                            total_price: use_quantity * start_unit_price,
+                            total_price: sec_use_quantity * start_unit_price,
+                            status: sec_status,
+                            user: sec_user,
+                            time: sec_time
                         };
                     }
                 }
             }
+            );
+
 
         });
 
@@ -1200,6 +1241,20 @@ function getBomSecondData() {
     });
 }
 
+//bom_third_id
+function getBomThirdData() {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM bom_third', (error, results, fields) => {
+            if (error) {
+                console.error('查詢 bom_third 錯誤：', error);
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+}
+
 //取m_invetory_setup
 function getInventorySetupData() {
     return new Promise((resolve, reject) => {
@@ -1216,29 +1271,24 @@ function getInventorySetupData() {
 
 //BOM第一階新增(對應到bom_first table)
 async function add_bom_first(data) {
-    try {
-
-        id = data[0]
-        check = await bom_id_check(id)
-        if (check.length != 0) {
-            console.log('已有此產品代碼存在，請重新輸入新的產品代碼')
-        } else {
-            query = 'INSERT INTO `bom_first`(`product_id`, `product_name`, `product_sec_id`, `use_quantity`, `update_user`, `update_time`) VALUES ?'
-            const now = new Date();
-            const sqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
-            data.push(sqlDatetime)
-            data = [data]
-            connection.query(query, [data], (error, results, fields) => {
-                if (error) {
-                    console.error('新增錯誤', error);
-                } else {
-                    // let arr = obj_to_dict(results)
-                    console.log('新增成功');
-                }
-            });
-        }
-    } catch (error) {
-        console.log(error)
+    id = data[0]
+    check = await bom_id_check(id)
+    if (check.length != 0) {
+        console.log('已有此產品代碼存在，請重新輸入新的產品代碼')
+    } else {
+        query = 'INSERT INTO `bom_first`( `product_id`, `product_name`, `status`, `update_user`, `update_time`) VALUES ?'
+        const now = new Date();
+        const sqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
+        data.push(sqlDatetime)
+        data = [data]
+        connection.query(query, [data], (error, results, fields) => {
+            if (error) {
+                console.error('新增錯誤', error);
+            } else {
+                // let arr = obj_to_dict(results)
+                console.log('新增成功');
+            }
+        });
     }
 
 }
@@ -1257,22 +1307,86 @@ function bom_id_check(id) {
         })
     })
 }
-//BOM第二階新增(對應到bom_second table)
-function add_bom_second(data) {
-    query = 'INSERT INTO `bom_second`(`product_id`, `product_sec_id`, `product_sec_name`, `material_id`, `use_quantity`, `update_user`, `update_time`) VALUES  ?'
-    const now = new Date();
-    const sqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
-    data.push(sqlDatetime)
-    data = [data]
-    connection.query(query, [data], (error, results, fields) => {
-        if (error) {
-            console.error('新增錯誤', error);
-        } else {
-            // let arr = obj_to_dict(results)
-            console.log('新增成功');
-        }
-    });
 
+//BOM第二階新增(對應到bom_second table)
+async function add_bom_second(data) {
+    product_id = data[0];
+    product_sec_id = data[1];
+    //檢查有無重複之代碼
+    check = await bom_secid_check(product_id, product_sce_id);
+    if (check != 0) {
+        console.log('此產品有此二階產品代碼存在，請重新輸入新的產品代碼')
+    } else {
+        query = 'INSERT INTO `bom_second`( `product_id`, `product_sec_id`, `product_sec_name`, `use_quantity`, `status`, `update_user`, `update_time`) VALUES  ?'
+        const now = new Date();
+        const sqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
+        data.push(sqlDatetime)
+        data = [data]
+        connection.query(query, [data], (error, results, fields) => {
+            if (error) {
+                console.error('新增錯誤', error);
+            } else {
+                // let arr = obj_to_dict(results)
+                console.log('新增成功');
+            }
+        });
+    }
+}
+
+//BOM二階代碼防呆
+function bom_secid_check(product_id, product_sce_id) {
+    query = 'SELECT * FROM `bom_second` WHERE `product_id` = ? AND `product_sec_id` = ?';
+    return new Promise((resolve, reject) => {
+        connection.query(query, [product_id, product_sce_id], (error, results, fields) => {
+            if (error) {
+                reject(error)
+            }
+            else {
+                resolve(results)
+            }
+        })
+    })
+}
+
+//BOM第三階新增(對應到bom_third table)
+async function add_bom_third(data) {
+    product_id = data[0];
+    product_sec_id = data[1];
+    material_id = data[2];
+    //檢查有無重複之代碼
+    check = await bom_thrid_check(product_id, product_sce_id, material_id);
+    if (check != 0) {
+        console.log('此產品已有此原料代碼存在，請重新輸入新的原料代碼')
+    } else {
+        query = 'INSERT INTO `bom_third`( `product_id`, `product_sec_id`, `material_id`, `use_quantity`, `status`, `update_user`, `update_time`) VALUES  ?'
+        const now = new Date();
+        const sqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
+        data.push(sqlDatetime)
+        data = [data]
+        connection.query(query, [data], (error, results, fields) => {
+            if (error) {
+                console.error('新增錯誤', error);
+            } else {
+                // let arr = obj_to_dict(results)
+                console.log('新增成功');
+            }
+        });
+    }
+}
+
+//BOM三階代碼防呆
+function bom_thrid_check(product_id, product_sce_id, material_id) {
+    query = 'SELECT * FROM `bom_third` WHERE `product_id` = ? AND `product_sec_id` = ? AND `material_id` =?';
+    return new Promise((resolve, reject) => {
+        connection.query(query, [product_id, product_sce_id, material_id], (error, results, fields) => {
+            if (error) {
+                reject(error)
+            }
+            else {
+                resolve(results)
+            }
+        })
+    })
 }
 
 //BOM第一階修改(對應到bom_first table)
@@ -1301,7 +1415,7 @@ function update_bom_second(condition, updatedata) {
 
 //BOM第一階刪除(對應到bom_first table)
 function del_bom_first(condition) {
-    const deleteQuery = 'DELETE FROM bom_first WHERE ?';
+    const deleteQuery = 'UPDATE bom_first SET `status` = 0 WHERE ? ';
     connection.query(deleteQuery, condition, (error, results, fields) => {
         if (error) {
             console.error('刪除資料庫錯誤：', error);
@@ -1313,7 +1427,7 @@ function del_bom_first(condition) {
 
 //BOM第二階刪除(對應到bom_second table)
 function del_bom_second(condition) {
-    const deleteQuery = 'DELETE FROM bom_second WHERE ?';
+    const deleteQuery = 'UPDATE bom_second SET `status` = 0 WHERE ?  ?';
     connection.query(deleteQuery, condition, (error, results, fields) => {
         if (error) {
             console.error('刪除資料庫錯誤：', error);
@@ -1323,6 +1437,17 @@ function del_bom_second(condition) {
     });
 }
 
+//BOM第三階刪除(對應到bom_third table)
+function del_bom_third(condition) {
+    const deleteQuery = 'UPDATE bom_third SET `status` = 0 WHERE ?  ?';
+    connection.query(deleteQuery, condition, (error, results, fields) => {
+        if (error) {
+            console.error('刪除資料庫錯誤：', error);
+        } else {
+            console.log('已成功刪除資料');
+        }
+    });
+}
 //login [帳號,密碼]
 async function login(data) {
     try {
@@ -1644,6 +1769,7 @@ async function add_material_useage(product_id, quantity, remark, user) {
         try {
             const bomFirstData = await getBomFirstData();
             const bomSecondData = await getBomSecondData();
+            const bomThirdData = await getBomThirdData();
             const mInventorySetupData = await getInventorySetupData();
             // console.log(mInventorySetupData)
 
@@ -1657,18 +1783,18 @@ async function add_material_useage(product_id, quantity, remark, user) {
             // console.log(sqlDate)
 
 
-            const bomFirstRows = bomFirstData.filter((bomFirstRow) => bomFirstRow.product_id === product_id);
-            // console.log(bomFirstRows)
-            bomFirstRows.forEach((bomFirstRow) => {
-                const { product_sec_id, use_quantity } = bomFirstRow;
-                // console.log(bomFirstRow)
 
-                const bomSecondRows = bomSecondData.filter((bomSecondRow) => bomSecondRow.product_sec_id === product_sec_id);
-                bomSecondRows.forEach((bomSecondRow) => {
-                    const { material_id, use_quantity: bomSecondUseQuantity } = bomSecondRow;
-                    // console.log("==================")
-                    // console.log(bomSecondRow)
 
+            //二階
+            const bomSecondRows = bomSecondData.filter((bomSecondRow) => bomSecondRow.product_id === product_id);
+            bomSecondRows.forEach((bomSecondRow) => {
+                const { product_sec_id, use_quantity: bomSecondUseQuantity } = bomSecondRow;
+                // console.log("==================")
+                // console.log(bomSecondRow)
+
+                const bomThirdRows = bomThirdData.filter((bomThirdRow) => bomThirdRow.product_sec_id === product_sec_id);
+                bomThirdRows.forEach((bomThirdRow) => {
+                    const { material_id, use_quantity: bomThirdUseQuantity } = bomThirdRow;
                     const mInventorySetupRow = mInventorySetupData.find((mInventoryRow) => mInventoryRow.m_id === material_id && mInventoryRow.date.toISOString().split('T')[0] === sqlLastDate);
                     // console.log(mInventorySetupRow)
                     if (mInventorySetupRow) {
@@ -1685,12 +1811,14 @@ async function add_material_useage(product_id, quantity, remark, user) {
                                 create_user: user,
                             }
                         }
-                        material_useage[m_id].usage_quantity += use_quantity * bomSecondUseQuantity * quantity;
-                        material_useage[m_id].usage_price += use_quantity * bomSecondUseQuantity * quantity * start_unit_price;
+                        material_useage[m_id].usage_quantity += bomThirdUseQuantity * bomSecondUseQuantity * quantity;
+                        material_useage[m_id].usage_price += bomThirdUseQuantity * bomSecondUseQuantity * quantity * start_unit_price;
                     }
                 })
 
             })
+
+
 
             // console.log(material_useage);
 

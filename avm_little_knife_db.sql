@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2023-09-12 09:31:01
+-- 產生時間： 2023-09-19 09:24:16
 -- 伺服器版本： 10.4.27-MariaDB
 -- PHP 版本： 8.2.0
 
@@ -183,6 +183,29 @@ CREATE TABLE `bom_first` (
   `id` int(11) NOT NULL COMMENT '編號',
   `product_id` varchar(25) NOT NULL COMMENT '產品代碼',
   `product_name` varchar(25) NOT NULL COMMENT '產品名稱',
+  `status` int(11) NOT NULL COMMENT '狀態(1:True,0:False)',
+  `update_user` varchar(25) NOT NULL COMMENT '更新人員',
+  `update_time` datetime NOT NULL COMMENT '更新時間'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- 傾印資料表的資料 `bom_first`
+--
+
+INSERT INTO `bom_first` (`id`, `product_id`, `product_name`, `status`, `update_user`, `update_time`) VALUES
+(1, 'P001', '小刀產品1', 1, '測試人員', '2023-09-18 00:00:00'),
+(2, 'P002', '小刀產品2', 1, '測試人員', '2023-09-18 00:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `bom_first_tmp`
+--
+
+CREATE TABLE `bom_first_tmp` (
+  `id` int(11) NOT NULL COMMENT '編號',
+  `product_id` varchar(25) NOT NULL COMMENT '產品代碼',
+  `product_name` varchar(25) NOT NULL COMMENT '產品名稱',
   `product_sec_id` varchar(25) NOT NULL COMMENT '二階產品代碼',
   `use_quantity` int(11) NOT NULL COMMENT '使用量',
   `status` int(11) NOT NULL COMMENT '狀態(1:True,0:False)',
@@ -191,10 +214,10 @@ CREATE TABLE `bom_first` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 傾印資料表的資料 `bom_first`
+-- 傾印資料表的資料 `bom_first_tmp`
 --
 
-INSERT INTO `bom_first` (`id`, `product_id`, `product_name`, `product_sec_id`, `use_quantity`, `status`, `update_user`, `update_time`) VALUES
+INSERT INTO `bom_first_tmp` (`id`, `product_id`, `product_name`, `product_sec_id`, `use_quantity`, `status`, `update_user`, `update_time`) VALUES
 (1, 'P001', '小刀產品1', 'P001-1', 5, 1, '測試人員', '2023-09-12 00:00:00'),
 (2, 'P001', '小刀產品1', 'P001-2', 6, 1, '測試人員', '2023-09-12 00:00:00'),
 (3, 'P002', '小刀產品2', 'M001', 1, 1, '測試人員', '2023-09-12 00:00:00'),
@@ -208,6 +231,33 @@ INSERT INTO `bom_first` (`id`, `product_id`, `product_name`, `product_sec_id`, `
 
 CREATE TABLE `bom_second` (
   `id` int(11) NOT NULL COMMENT '編號',
+  `product_id` varchar(25) NOT NULL COMMENT '一階產品代碼',
+  `product_sec_id` varchar(25) NOT NULL COMMENT '二階產品代碼',
+  `product_sec_name` varchar(25) NOT NULL COMMENT '二階產品名稱',
+  `use_quantity` int(11) NOT NULL COMMENT '使用量',
+  `status` int(11) NOT NULL COMMENT '狀態(1:True,0:False)',
+  `update_user` varchar(25) NOT NULL COMMENT '更新人員',
+  `update_time` datetime NOT NULL COMMENT '更新時間'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- 傾印資料表的資料 `bom_second`
+--
+
+INSERT INTO `bom_second` (`id`, `product_id`, `product_sec_id`, `product_sec_name`, `use_quantity`, `status`, `update_user`, `update_time`) VALUES
+(1, 'P001', 'P001-1', '小刀產品1-1', 5, 1, '測試人員', '2023-09-18 00:00:00'),
+(2, 'P001', 'P001-2', '小刀產品1-2', 6, 1, '測試人員', '2023-09-18 00:00:00'),
+(3, 'P002', 'M001', '材料1', 1, 1, '測試人員', '2023-09-18 00:00:00'),
+(4, 'P002', 'M002', '材料2', 2, 1, '測試人員', '2023-09-18 00:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `bom_second_tmp`
+--
+
+CREATE TABLE `bom_second_tmp` (
+  `id` int(11) NOT NULL COMMENT '編號',
   `product_id` varchar(25) NOT NULL COMMENT '一階產品代碼	',
   `product_sec_id` varchar(25) NOT NULL COMMENT '二階產品代碼	',
   `product_sec_name` varchar(25) NOT NULL COMMENT '二階產品名稱	',
@@ -218,15 +268,43 @@ CREATE TABLE `bom_second` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 傾印資料表的資料 `bom_second`
+-- 傾印資料表的資料 `bom_second_tmp`
 --
 
-INSERT INTO `bom_second` (`id`, `product_id`, `product_sec_id`, `product_sec_name`, `material_id`, `use_quantity`, `update_user`, `update_time`) VALUES
+INSERT INTO `bom_second_tmp` (`id`, `product_id`, `product_sec_id`, `product_sec_name`, `material_id`, `use_quantity`, `update_user`, `update_time`) VALUES
 (1, 'P001', 'P001-1', '小刀產品1-1', 'M001', 2, '測試人員', '2023-09-12 00:00:00'),
 (2, 'P001', 'P001-1', '小刀產品1-1', 'M002', 3, '測試人員', '2023-09-12 00:00:00'),
 (3, 'P001', 'P001-2', '小刀產品1-2', 'M001', 2, '測試人員', '2023-09-12 00:00:00'),
 (4, 'P001', 'P001-2', '小刀產品1-2', 'M002', 3, '測試人員', '2023-09-12 00:00:00'),
 (5, 'P001', 'P001-2', '小刀產品1-2', 'M003', 1, '測試人員', '2023-09-12 00:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `bom_third`
+--
+
+CREATE TABLE `bom_third` (
+  `id` int(11) NOT NULL COMMENT '編號',
+  `product_id` varchar(25) NOT NULL COMMENT '一階產品代碼',
+  `product_sec_id` varchar(25) NOT NULL COMMENT '二階產品代碼',
+  `material_id` varchar(25) NOT NULL COMMENT '三階產品代碼',
+  `use_quantity` int(11) NOT NULL COMMENT '使用量',
+  `status` int(11) NOT NULL COMMENT '狀態(1:True,0:False)',
+  `update_user` varchar(25) NOT NULL COMMENT '更新人員',
+  `update_time` datetime NOT NULL COMMENT '更新時間'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- 傾印資料表的資料 `bom_third`
+--
+
+INSERT INTO `bom_third` (`id`, `product_id`, `product_sec_id`, `material_id`, `use_quantity`, `status`, `update_user`, `update_time`) VALUES
+(1, 'P001', 'P001-1', 'M001', 2, 1, '測試人員', '2023-09-18 00:00:00'),
+(2, 'P001', 'P001-1', 'M002', 3, 1, '測試人員', '2023-09-18 00:00:00'),
+(3, 'P001', 'P001-2', 'M001', 2, 1, '測試人員', '2023-09-18 00:00:00'),
+(4, 'P001', 'P001-2', 'M002', 3, 1, '測試人員', '2023-09-18 00:00:00'),
+(5, 'P001', 'P001-2', 'M003', 1, 1, '測試人員', '2023-09-18 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -511,9 +589,27 @@ ALTER TABLE `bom_first`
   ADD PRIMARY KEY (`id`);
 
 --
+-- 資料表索引 `bom_first_tmp`
+--
+ALTER TABLE `bom_first_tmp`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- 資料表索引 `bom_second`
 --
 ALTER TABLE `bom_second`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- 資料表索引 `bom_second_tmp`
+--
+ALTER TABLE `bom_second_tmp`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- 資料表索引 `bom_third`
+--
+ALTER TABLE `bom_third`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -590,12 +686,30 @@ ALTER TABLE `account_subjects`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `bom_first`
 --
 ALTER TABLE `bom_first`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號', AUTO_INCREMENT=3;
+
+--
+-- 使用資料表自動遞增(AUTO_INCREMENT) `bom_first_tmp`
+--
+ALTER TABLE `bom_first_tmp`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號', AUTO_INCREMENT=5;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `bom_second`
 --
 ALTER TABLE `bom_second`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號', AUTO_INCREMENT=5;
+
+--
+-- 使用資料表自動遞增(AUTO_INCREMENT) `bom_second_tmp`
+--
+ALTER TABLE `bom_second_tmp`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號', AUTO_INCREMENT=6;
+
+--
+-- 使用資料表自動遞增(AUTO_INCREMENT) `bom_third`
+--
+ALTER TABLE `bom_third`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '編號', AUTO_INCREMENT=6;
 
 --
