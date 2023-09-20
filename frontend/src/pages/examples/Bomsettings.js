@@ -141,8 +141,10 @@ export default () => {
     }
   }
 
-  
-
+  const [remove , setRemove] = useState(false)
+  const handleViewRemove = () => {
+    setRemove(true)
+  }
 
   return (
     <>
@@ -194,15 +196,19 @@ export default () => {
               <Tab.Pane eventKey="browse">
               {/* Browse content here */}
               {/* You can display a table or a list of files here */}
-              <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+              <div className="d-flex justify-content-between flex-wrap flex-md-nowrap py-2">
                 {/* 單筆新增按鈕 */}
                 <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
                   <FontAwesomeIcon icon={faPlus} className="me-2" />
                   新增一階產品
                 </Button>
+                <Button className="me-2" variant="primary" onClick={handleViewRemove}>
+                  <FontAwesomeIcon className="me-2" />
+                  查看刪除產品
+                </Button>
               </div>
               {/* <TransactionsTable /> */}
-              {bomdata !== null && <ProductTable data={bomdata} />}
+              {bomdata !== null && <ProductTable data={bomdata} data2={remove}/>}
             </Tab.Pane>
             </Tab.Content>
 

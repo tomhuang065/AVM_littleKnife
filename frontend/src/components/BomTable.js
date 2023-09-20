@@ -8,7 +8,7 @@ import { useChat } from "../api/context";
 import { AddBOMModal2 } from '../pages/examples/BomModal';
 
 
-function ProductTable({ data }) {
+function ProductTable({data }, data2) {
   const [expandedRows, setExpandedRows] = useState([]);
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [removeModal, setRemoveModal] = useState(false);
@@ -24,9 +24,6 @@ function ProductTable({ data }) {
   const {result, setResult} = useState("");
 
   const [showBomModal, setShowBomModal] = useState(false);
-
-
-
 
 
   const {sup, setSup} = useChat();
@@ -76,14 +73,14 @@ const handleChangeState = (supid, supName, updateUsr, updateTime, status) =>{
   }
 }
 
-useEffect(()=>{
-console.log(sup)
-if(origs !== ''){
-  setproduct({status :sup})
-  handleEditproduct(sup)
-}
-setOrigs("")    
-},[sup])
+  useEffect(()=>{
+    console.log(sup)
+    if(origs !== ''){
+      setproduct({status :sup})
+      handleEditproduct(sup)
+    }
+    setOrigs("")    
+  },[sup])
 
   const handleRowClick = (rowKey) => {
     if (expandedRows.includes(rowKey)) {
@@ -93,7 +90,8 @@ setOrigs("")
     }
   };
 
-  const handleSingleAdd = () => {
+  const handleSingleAdd = (product_id, product_name) => {
+    setproduct({product_id: product_id, product_name: product_name})
     setShowBomModal(true);
   };
   const handleCloseBomModal = () => {
@@ -105,10 +103,6 @@ setOrigs("")
     setResult(await instance.get('/get_bom'))
     console.log(result.data)
   };
-
-  const handleRowEdit = (rowKey) => {
-    console.log(rowKey)
-  }
 
   const handleRowEdit2 = (rowKey) => {
     console.log(rowKey)
@@ -150,7 +144,7 @@ setOrigs("")
                   <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete2()}}>
                     <FontAwesomeIcon icon={faTrashAlt} className="me-0.5" /> 
                   </Button>
-                  <Button variant="link" onClick={handleSingleAdd}>
+                  <Button variant="link" onClick={() => handleSingleAdd(subData[subKey].product_sec_id, subData[subKey].product_sec_name)}>
                     <FontAwesomeIcon icon={faPlus} className="me-0.5" />
                   </Button>
               </td>
@@ -228,7 +222,7 @@ setOrigs("")
                   <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete("deleting",  data.productCosts[key].product_id, data.productCosts[key].product_name)}}>
                     <FontAwesomeIcon icon={faTrashAlt} className="me-0.5" /> 
                   </Button>
-                  <Button variant="link" onClick={handleSingleAdd}>
+                  <Button variant="link" onClick={() => handleSingleAdd(data.productCosts[key].product_id , data.productCosts[key].product_name)}>
                     <FontAwesomeIcon icon={faPlus} className="me-1" />
                     新增二階產品
                   </Button>
@@ -258,6 +252,7 @@ setOrigs("")
             show={showBomModal}
             onHide={handleCloseBomModal}
             onSave={handleSaveBom}
+            product_in ={product}
 
     />
   </Card>
