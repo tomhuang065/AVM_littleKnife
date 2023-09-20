@@ -121,7 +121,7 @@ setOrigs("")
 
   const renderNestedTable = (subData , prevLevelName) => {
     return (
-      <Card border="light" className="shadow-sm mb-6">
+      //<Card border="light" className="shadow-sm mb-6">
       <Table  className="user-table table-striped">
         <thead>
           <tr>
@@ -166,13 +166,13 @@ setOrigs("")
           ))}
         </tbody>
       </Table>
-    </Card>
+    //</Card>
     );
   };
 
   const renderNestedTable2 = (subData , prevLevelName) => {
     return (
-      <Card border="light" className="shadow-sm mb-3">
+      //<Card border="light" className="shadow-sm mb-3">
       <Table className="user-table align-items-center table-striped">
         <thead>
           <tr>
@@ -199,7 +199,7 @@ setOrigs("")
           ))}
         </tbody>
       </Table>
-    </Card>
+    //</Card>
     );
   };
 

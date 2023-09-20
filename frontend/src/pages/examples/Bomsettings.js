@@ -215,7 +215,7 @@ export default () => {
       <AddBOMModal
         show={showBomModal}
         onHide={handleCloseBomModal}
-        onSave={handleSaveBom}
+        onSave={handleViewBom}
       />
     </>
   );
