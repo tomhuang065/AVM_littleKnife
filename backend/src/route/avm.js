@@ -75,6 +75,16 @@ router.post('/add_purchase', async (req, res) => {
 
     }
 })
+router.get('/sel_transaction', async (req, res) => {
+    try {
+        const result = await sel_transaction();
+        res.json(result);
+    } catch (error) {
+        console.error('發生錯誤：', error);
+        res.status(500).send('伺服器發生錯誤');
+
+    }
+});
 router.post('/add_material', async(req, res) => {
     try {
         const result = await add_material_purchase(JSON.parse(req.body.ID));
@@ -452,11 +462,12 @@ function bom_id_check(id) {
     })
 }
 
+
 function add_product_purchase(data) {
     console.log(data)    
     const query = 'INSERT INTO `p_purchase`(`date`, `account_subjects_num`,`purchase_id`, `purchase_name`,`purchase_quantity`, `purchase_unit`, `purchase_price`, `supplier_num`,`remark`,`create_user`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
 
-    connection.query(query, [data.date, data.account_subjects_num, data.purchase_id, data.purchase_name,  data.purchase_quantity, data.purchase_unit, data.purchase_price, data.supplier_num, data.comment, data.create_user], (error, results, fields) => {
+    connection.query(query, [data.date, data.account_subjects_num, data.purchase_id, data.purchase_name,  data.purchase_quantity, data.purchase_unit, data.purchase_price, data.supplier_num, data.remark, data.create_user], (error, results, fields) => {
         if (error) {
             console.error(error);
         } else {
@@ -717,6 +728,20 @@ function sel_value_target(task) {
             } else {
                 let arr = obj_to_dict(results);
                 console.log('查詢結果：', arr);
+                resolve(arr);
+            }
+        });
+    });
+}
+function sel_transaction() {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM p_purchase', (error, results, fields) => {
+            if (error) {
+                console.error('查詢錯誤：', error);
+                reject(error);
+            } else {
+                let arr = obj_to_dict(results)
+                // console.log('查詢結果：', arr);
                 resolve(arr);
             }
         });

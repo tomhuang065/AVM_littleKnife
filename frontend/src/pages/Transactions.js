@@ -8,6 +8,7 @@ import { useChat } from "../api/context";
 import accRows from "./data/accountData"
 import moment from "moment";
 import ExcelJs from "exceljs";
+import {TransactionTable} from "../components/TransactionTable"
 var xlsx = require("xlsx")
 
 // FontAwesome.library.add(faCheckSquare, faCoffee);
@@ -30,6 +31,8 @@ export default () => {
   const [searchInd4, setSearchInd4] = useState("")
   const [searchIndV, setSearchIndV] = useState("")
   const [searchIndS, setSearchIndS] = useState("")
+  const [searchInd, setSearchInd] = useState("")
+  const [transactionResult, setTransactionResult] = useState([])
 
   const [supplierResult, setSupplierResult] = useState([]);
   const [salesData, setSalesData] = useState({
@@ -49,7 +52,9 @@ export default () => {
   });
 
 
-
+  const handleSearchIndChange = (e) => {
+    setSearchInd(e.target.value)
+  };
   const handleSearchInd3Change = (e) => {
     setSearchInd3(e.target.value)
   };
@@ -301,6 +306,12 @@ export default () => {
       }
     }
   }
+  
+  const handleViewTransaction= async () => {
+
+    setTransactionResult(await instance.get('/sel_transaction'));
+    console.log(transactionResult);
+  }
 
   return (
     <>
@@ -320,9 +331,9 @@ export default () => {
               <Nav.Item>
                 <Nav.Link eventKey="add" >單筆新增</Nav.Link>
               </Nav.Item>
-              {/* <Nav.Item>
-                <Nav.Link eventKey="browse" >瀏覽</Nav.Link>
-              </Nav.Item> */}
+              <Nav.Item onClick={handleViewTransaction}>
+                <Nav.Link eventKey="browse">瀏覽</Nav.Link>
+              </Nav.Item>
             </Nav>
 
             {/* Tab Content */}
@@ -576,12 +587,27 @@ export default () => {
                 </Col>
                 </div>
               </Tab.Pane>
-              {/* <Tab.Pane eventKey="browse" >
-                <div className="d-flex flex-wrap flex-md-nowrap align-items-center py-3">
-瀏覽
-                </div>
-               
-              </Tab.Pane> */}
+              <Tab.Pane eventKey="browse">
+              {/* Browse content here */}
+              {/* You can display a table or a list of files here */}
+              <div className="d-flex flex-wrap flex-md-nowrap align-items-center py-3">
+                <Form className="d-flex me-2"  >
+                  <Form.Control
+                    type="search"
+                    placeholder="搜尋"
+                    className="me-2"
+                    aria-label="Search"
+                    onChange={handleSearchIndChange}
+                    value={searchInd}
+                  />
+                </Form>
+                {/* <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
+                  <FontAwesomeIcon icon={faPlus} className="me-2" />單筆新增
+                </Button> */}
+                <br></br>
+              </div>
+              <TransactionTable transaction = {transactionResult.data} account = {accountResult} supplier = {supplierResult} searchInd={searchInd} />
+            </Tab.Pane>
               
             </Tab.Content >
           </Col>
