@@ -5,7 +5,7 @@ import {useState, useEffect} from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp, faArrowDown, faArrowUp, faEdit, faEllipsisH, faExternalLinkAlt, faEye, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { Form, Nav, Card, Button, Table, Dropdown, ProgressBar,  InputGroup, Pagination, ButtonGroup } from '@themesberg/react-bootstrap';
-import RemoveModal from "../pages/examples/ValueTargetEditModal"
+import RemoveModal from "../pages/examples/TransactionEditFormModal"
 import moment from "moment";
 import { useChat } from "../api/context";
 
@@ -16,11 +16,16 @@ export const TransactionTable = (props) => {
     const {val, setVal, valType, setValType} = useChat()
     const [states, setStates] = useState("");
     const [removeModal, setRemoveModal] = useState(false)
-    const [valueTarget, setValueTarget] = useState({
-      target_status:"",
-      target_num: "",
-      target_name:"",
-      category:"",
+    const [trans, setTrans] = useState({
+      account_subjects_num:"",
+      purchase_id:"", 
+      purchase_name:"",
+      purchase_quantity:"",
+      purchase_unit:"", 
+      purchase_price:"", 
+      supplier_num :"",
+      remark:"",
+      create_user:"",
   
     })
     
@@ -30,49 +35,26 @@ export const TransactionTable = (props) => {
     const supplier = props.supplier
     const account = props.account
 
-    const handleRowEditDelete = (states, target_num, target_name, target_status, category) => {
-      setStates(states)
+    const handleRowEditDelete = (stat, id, account_subjects_num, purchase_id, purchase_name, purchase_quantity, purchase_unit, purchase_price, supplier_num, remark,create_user) => {
+    //   setStates(states)
       setRemoveModal(true);
-      setValueTarget({ target_num: target_num, target_name:target_name, target_status:target_status, category:category});
-      setOrig(target_num)
-    }
-
-    const handleChangeState = (orig, status,  target_name, category) =>{
-      setValueTarget({ target_num: orig, target_name:target_name, target_status:status, category:category});
-      setOrig(orig)
-      if(status === 1){
-        setVal(false)
-      }
-      else{
-        setVal(true)
-      }
-    }
-
-    useEffect(()=>{
-      console.log(val)
-      if(orig !== ''){
-        handleEditValueTarget(val)
-      }
-      setOrig("")    
-    },[val])
-
-    const handleEditValueTarget = async(stat)=>{
-      console.log(valueTarget)
-      const jsonData = {
-        orig: `${orig}`,
-        status:`${stat}`,
-        target_num: `${valueTarget.target_num}`,
-        target_name: `${valueTarget.target_name}`,
-        target_status: `${valueTarget.target_status}`,
-      };
-      const response = await instance.post('/mod_value_target', {
-        ID:JSON.stringify(jsonData)
-      })
-      alert(response.data);
+      setTrans({  
+        account_subjects_num: account_subjects_num,
+        purchase_id:purchase_id, 
+        purchase_name:purchase_name,
+        purchase_quantity:purchase_quantity,
+        purchase_unit:purchase_unit, 
+        purchase_price:purchase_price, 
+        supplier_num :supplier_num,
+        remark:remark,
+        create_user:create_user
+      });
+      setOrig(id)
+      setStates(stat)
     }
   
     const TableRow = (props) => {
-      const { date, account_subjects_num, purchase_id, purchase_name, purchase_quantity, purchase_unit, purchase_price, supplier_num, remark,create_user} = props;
+      const { id, date, account_subjects_num, purchase_id, purchase_name, purchase_quantity, purchase_unit, purchase_price, supplier_num, remark,create_user} = props;
       return (
         <tr>
           <td>
@@ -127,14 +109,14 @@ export const TransactionTable = (props) => {
           </td>
          
          
-          {/* <td>
-            <Button variant = "link"onClick={() => {handleRowEditDelete("editing", target_num, target_name, target_status, category)}}>
+          <td>
+            <Button variant = "link"onClick={() => {handleRowEditDelete("editing",id,  account_subjects_num, purchase_id, purchase_name, purchase_quantity, purchase_unit, purchase_price, supplier_num, remark,create_user)}}>
               <FontAwesomeIcon icon={faEdit} className="me-0.5" /> 
             </Button>
-            <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete("deleting", target_num, target_name, target_status, category)}}>
+            <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete("deleting",id,  account_subjects_num, purchase_id, purchase_name, purchase_quantity, purchase_unit, purchase_price, supplier_num, remark,create_user)}}>
               <FontAwesomeIcon icon={faTrashAlt} className="me-0.5" /> 
             </Button>
-          </td>  */}
+          </td> 
         </tr>
       );
     };
@@ -163,15 +145,14 @@ export const TransactionTable = (props) => {
             </tbody>
           </Table>
         </Card.Body>
-        {removeModal?
-          <RemoveModal /** 編輯視窗 */
+        {/* {removeModal?
+          <RemoveModal 
             show={removeModal}
             onHide={() => setRemoveModal(false)}
-            onSave={(num, name) => setValueTarget({target_num : num, target_name:name})}
             states ={states}
-            valueTarget ={valueTarget}
+            transaction ={transaction}
             orig={orig}
-        />:<div></div>}
+        />:<div></div>} */}
       </Card>
     );
   };
