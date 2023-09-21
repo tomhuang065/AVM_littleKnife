@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDownload, faFileAlt,  faPlus,  faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faFileAlt,  faPlus,  faUpload, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Button, Form , Tab ,Nav } from '@themesberg/react-bootstrap';
 import { SupplierTable } from "../../components/SupplierTable";
 // import api from "../../api/api";
@@ -18,9 +18,13 @@ export default () => {
   const [result, setResult] = useState("")
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [searchInd, setSearchInd] = useState("")
+  const [deleteInd, setDeleteInd] = useState(false)
 
 
 
+  const handleViewDeletion = () =>{
+    setDeleteInd(!deleteInd)
+  }
   const handleSearchIndChange = (e) => {
     setSearchInd(e.target.value)
   };
@@ -130,6 +134,9 @@ const handleUpload = () => {
               <Nav.Item onClick={handleViewSupplier}>
                 <Nav.Link eventKey="browse">瀏覽</Nav.Link>
               </Nav.Item>
+              {/* <Nav.Item onClick={handleViewSupplier}>
+                <Nav.Link eventKey="browse">失效</Nav.Link>
+              </Nav.Item> */}
             </Nav>
 
             {/* Tab Content */}
@@ -176,9 +183,13 @@ const handleUpload = () => {
                 <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
                   <FontAwesomeIcon icon={faPlus} className="me-2" />單筆新增
                 </Button>
+                &nbsp;&nbsp;  
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleViewDeletion}>
+                  <FontAwesomeIcon icon={faTrashAlt} className="me-2" />失效資料
+                </Button>
                 <br></br>
               </div>
-              <SupplierTable supplier = {result.data} searchInd={searchInd} />
+              <SupplierTable supplier = {result.data} searchInd={searchInd} deleteInd={deleteInd} />
             </Tab.Pane>
             </Tab.Content>
           </Col>

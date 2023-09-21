@@ -29,6 +29,7 @@ export const SupplierTable = (props) => {
 
     const Acc = props.supplier
     const Search = props.searchInd
+    const deleteInd = props.deleteInd
 
     const handleRowEditDelete = (states, supNum, supName, updateUsr, updateTime, status) => {
         console.log(states, supNum, supName, updateUsr, updateTime, status)
@@ -71,71 +72,119 @@ export const SupplierTable = (props) => {
       handleEditSupplier()
     }
   },[supplier])
-  
-    const TableRow = (props) => {
-      const { supplier_num, supplier_name, update_user,  update_time, status } = props;
-      return (
-        <tr >
-          <td >
-            <Card.Link as={Link} to={Routes.Invoice.path} className="fw-normal">
-              {supplier_num}
-            </Card.Link>
-          </td>
-          <td>
-            <span className="fw-normal">
-              {supplier_name}
-            </span>
-          </td>
-          <td>
-            <span className="fw-normal">
-              {status === 1? "開啟":"關閉"}
-            </span>
-          </td>
-          <td>
-            <Button variant="outline-primary" onClick={() => {handleRowEditDelete("changing_state", supplier_num, supplier_name, update_user, update_time, status)}}>變更</Button>
-          </td>
-          <td>
-            <span className="fw-normal">
-            {update_user}
-            </span>
-          </td>
-          <td>
-            <span className="fw-normal">
-            {update_time === null?"---":moment(update_time).format('YYYY-MM-DD HH:mm:ss')}
-            </span>
-          </td>
-          <td>
-            <Button variant = "link"onClick={() => {handleRowEditDelete("editing", supplier_num, supplier_name, update_user,  update_time, status)}}>
-              <FontAwesomeIcon icon={faEdit} className="me-0.5" /> 
-            </Button>
-            <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete("deleting",  supplier_num, supplier_name, update_user,  update_time, status)}}>
-              <FontAwesomeIcon icon={faTrashAlt} className="me-0.5" /> 
-            </Button>
-          </td>
-        </tr>
-      );
-    };
+  const NulledTableRow = (props) => {
+    const { supplier_num, supplier_name, update_user,  update_time, status } = props;
+    return (
+      <tr >
+        <td >
+          <Card.Link as={Link} to={Routes.Invoice.path} className="fw-normal">
+            {supplier_num}
+          </Card.Link>
+        </td>
+        <td>
+          <span className="fw-normal">
+            {supplier_name}
+          </span>
+        </td>
+        <td>
+          <span className="fw-normal">
+            {status === 1? "開啟":status === 0?"關閉":"失效"}
+          </span>
+        </td>
+        {/* <td>
+          <Button variant="outline-primary" onClick={() => {handleRowEditDelete("changing_state", supplier_num, supplier_name, update_user, update_time, status)}}>變更</Button>
+        </td> */}
+        <td>
+          <span className="fw-normal">
+          {update_user}
+          </span>
+        </td>
+        <td>
+          <span className="fw-normal">
+          {update_time === null?"---":moment(update_time).format('YYYY-MM-DD HH:mm:ss')}
+          </span>
+        </td>
+        {/* <td>
+          <Button variant = "link"onClick={() => {handleRowEditDelete("editing", supplier_num, supplier_name, update_user,  update_time, status)}}>
+            <FontAwesomeIcon icon={faEdit} className="me-0.5" /> 
+          </Button>
+          <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete("deleting",  supplier_num, supplier_name, update_user,  update_time, status)}}>
+            <FontAwesomeIcon icon={faTrashAlt} className="me-0.5" /> 
+          </Button>
+        </td> */}
+      </tr>
+    );
+  };
+
+  const TableRow = (props) => {
+    const { supplier_num, supplier_name, update_user,  update_time, status } = props;
+    return (
+      <tr >
+        <td >
+          <Card.Link as={Link} to={Routes.Invoice.path} className="fw-normal">
+            {supplier_num}
+          </Card.Link>
+        </td>
+        <td>
+          <span className="fw-normal">
+            {supplier_name}
+          </span>
+        </td>
+        <td>
+          <span className="fw-normal">
+            {status === 1? "開啟":status === 0?"關閉":"失效"}
+          </span>
+        </td>
+        <td>
+          <Button variant="outline-primary" onClick={() => {handleRowEditDelete("changing_state", supplier_num, supplier_name, update_user, update_time, status)}}>變更</Button>
+        </td>
+        <td>
+          <span className="fw-normal">
+          {update_user}
+          </span>
+        </td>
+        <td>
+          <span className="fw-normal">
+          {update_time === null?"---":moment(update_time).format('YYYY-MM-DD HH:mm:ss')}
+          </span>
+        </td>
+        <td>
+          <Button variant = "link"onClick={() => {handleRowEditDelete("editing", supplier_num, supplier_name, update_user,  update_time, status)}}>
+            <FontAwesomeIcon icon={faEdit} className="me-0.5" /> 
+          </Button>
+          <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete("deleting",  supplier_num, supplier_name, update_user,  update_time, status)}}>
+            <FontAwesomeIcon icon={faTrashAlt} className="me-0.5" /> 
+          </Button>
+        </td>
+      </tr>
+    );
+  };
 
     return (
       <Card border="light" className="table-wrapper table-responsive shadow-sm" style ={{width:"120%"}}>
         <Card.Body className="pt-0">
           <Table hover className="user-table align-items-center table-striped">
             <thead>
+              
               <tr>
                 <th className="border-bottom">供應商代碼</th>
                 <th className="border-bottom">供應商名稱</th>
                 <th className="border-bottom">供應商狀態</th>
-                <th className="border-bottom">變更供應商狀態</th>
+                {deleteInd? null:<th className="border-bottom">變更供應商狀態</th>}
                 <th className="border-bottom">更新人員</th>
                 <th className="border-bottom">更新時間</th>
-                <th className="border-bottom">  選項</th>
+                {deleteInd? null:<th className="border-bottom">  選項</th>}
               </tr>
             </thead>
             <tbody>
-              {typeof(Acc) === "undefined" ? null : Acc.filter((sup) =>  
-                                   sup.supplier_num.includes(Search) ||
-                                   sup.supplier_name.includes(Search))
-                                .map(t => <TableRow key={`transaction-${t.id}`} {...t} />)}
+              {typeof(Acc) === "undefined" ? null : deleteInd?
+                                    Acc.filter((sup) =>sup.status > 1).map(t => <NulledTableRow key={`transaction-${t.id}`} {...t} />)
+                                    :
+                                    Acc.filter((sup) =>  
+                                    (sup.supplier_num.includes(Search) ||
+                                    sup.supplier_name.includes(Search) )&& sup.status <= 1)
+                                    
+                                    .map(t => <TableRow key={`transaction-${t.id}`} {...t} />)}
             </tbody>
           </Table>
         </Card.Body>
