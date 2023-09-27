@@ -21,6 +21,13 @@ export default () => {
   const {stat, setStat} = useChat();
   const [searchInd, setSearchInd] = useState("")
   const [filteredResult, setFilteredResult] = useState([]);
+  const [deleteInd, setDeleteInd] = useState(false)
+
+
+
+  const handleViewDeletion = () =>{
+    setDeleteInd(!deleteInd)
+  }
 
   const onHandleAccountDownload = async () => {
     const workbook = new ExcelJs.Workbook(); // 創建試算表檔案
@@ -155,7 +162,7 @@ export default () => {
                     下載
                   </Button> */}
                   
-                  <Form className="d-flex me-2" style ={{position: "Absolute", top: 152, right: 7, width:300 }} >
+                  <Form className="d-flex me-2" style ={{position: "Absolute", top: 172, right: 7, width:300 }} >
                     <Form.Control
                       type="search"
                       placeholder="搜尋會計科目"
@@ -166,10 +173,13 @@ export default () => {
                     />
                     {/* <Button variant="primary"className="me-2" onClick={handleSearchIndFilter} style ={{width: 100 }} >搜尋</Button> */}
                   </Form>
+                  <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleViewDeletion}>
+                    <FontAwesomeIcon  className="me-2" />{deleteInd?"查看顯示會科":"查看未顯示會科"}
+                  </Button>
                   <br></br>
                 </div>
                
-                <AccountTable accounts={result} search ={searchInd}/>
+                <AccountTable accounts={result} search ={searchInd} deleteInd={deleteInd}/>
               </Tab.Pane>
               <Tab.Pane eventKey="upload">
                 <div className="d-flex justify-content-center align-items-center mb-3">

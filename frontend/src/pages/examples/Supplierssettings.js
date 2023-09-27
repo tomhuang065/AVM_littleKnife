@@ -185,7 +185,7 @@ const handleUpload = () => {
                 </Button>
                 &nbsp;&nbsp;  
                 <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleViewDeletion}>
-                  <FontAwesomeIcon icon={faTrashAlt} className="me-2" />失效資料
+                  <FontAwesomeIcon  className="me-2" />{deleteInd?"查看未失效資料":"查看失效資料"}
                 </Button>
                 <br></br>
               </div>

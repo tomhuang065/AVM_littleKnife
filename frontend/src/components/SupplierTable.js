@@ -178,7 +178,8 @@ export const SupplierTable = (props) => {
             </thead>
             <tbody>
               {typeof(Acc) === "undefined" ? null : deleteInd?
-                                    Acc.filter((sup) =>sup.status > 1).map(t => <NulledTableRow key={`transaction-${t.id}`} {...t} />)
+                                    Acc.filter((sup) =>sup.status > 1&& (sup.supplier_num.includes(Search) ||
+                                    sup.supplier_name.includes(Search) )).map(t => <NulledTableRow key={`transaction-${t.id}`} {...t} />)
                                     :
                                     Acc.filter((sup) =>  
                                     (sup.supplier_num.includes(Search) ||

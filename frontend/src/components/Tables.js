@@ -37,6 +37,7 @@ export const AccountTable = (props) => {
 
   const Acc = props.accounts
   const Search = props.search
+  const deleteInd = props.deleteInd
 
   useEffect(()=>{
     // console.log(stat)
@@ -133,12 +134,19 @@ export const AccountTable = (props) => {
             </tr>
           </thead>
           <tbody>
-            {Acc.filter((acc) => acc.third_subjects_cn.includes(Search) ||
+            {deleteInd?Acc.filter((acc) => (acc.status === 0)&&(acc.third_subjects_cn.includes(Search) ||
                                  acc.third_subjects_cn.includes(Search) ||
                                  acc.fourth_subjects_eng.includes(Search) ||
                                  acc.fourth_subjects_cn.includes(Search) ||
                                  String(acc.third).includes(Search) ||
-                                 String(acc.fourth).includes(Search)
+                                 String(acc.fourth).includes(Search))
+                                 ).map(t => <TableRow className = "overflow-auto" key={`transaction-${t.id}`} {...t} />)
+                      :Acc.filter((acc) => (acc.status === 1)&& (acc.third_subjects_cn.includes(Search) ||
+                                 acc.third_subjects_cn.includes(Search) ||
+                                 acc.fourth_subjects_eng.includes(Search) ||
+                                 acc.fourth_subjects_cn.includes(Search) ||
+                                 String(acc.third).includes(Search) ||
+                                 String(acc.fourth).includes(Search))
                       ).map(t => <TableRow className = "overflow-auto" key={`transaction-${t.id}`} {...t} />)}
 
           </tbody>

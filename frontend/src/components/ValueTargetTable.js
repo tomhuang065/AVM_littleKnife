@@ -27,6 +27,7 @@ export const ValuetargetsTable = (props) => {
     const value = props.valueTarget.data
     const type = props.type
     const Search = props.search
+    const deleteInd = props.deleteInd
 
     const handleRowEditDelete = (states, target_num, target_name, target_status, category) => {
       setStates(states)
@@ -36,7 +37,7 @@ export const ValuetargetsTable = (props) => {
     }
 
     const handleChangeState = (orig, status,  target_name, category) =>{
-      setValType(type)
+      console.log(val, status)
       setValueTarget({ target_num: orig, target_name:target_name, target_status:status, category:category});
       setOrig(orig)
       if(status === 1){
@@ -49,7 +50,7 @@ export const ValuetargetsTable = (props) => {
 
     useEffect(()=>{
       console.log(val)
-      if(orig !== ''){
+      if(orig !== '' && val !== null){
         handleEditValueTarget(val)
       }
       setOrig("")    
@@ -68,6 +69,11 @@ export const ValuetargetsTable = (props) => {
         ID:JSON.stringify(jsonData)
       })
       alert(response.data);
+      setValType(type)
+      setVal(null)
+
+
+      
     }
   
     const TableRow = (props) => {
@@ -88,7 +94,7 @@ export const ValuetargetsTable = (props) => {
          
           <td>
             <span className="fw-normal">
-              {target_status === 1?"開啟":"關閉"}
+              {target_status === 1?"開啟":target_status === 0?"關閉":"失效"}
             </span>
           </td>
           <td>
@@ -110,6 +116,49 @@ export const ValuetargetsTable = (props) => {
         </tr>
       );
     };
+    const NulledTableRow = (props) => {
+      const { id, target_num, target_name, target_status, update_time, category } = props;
+      
+      return (
+        <tr>
+          <td>
+            <span className="fw-normal">
+              {target_num}
+            </span>
+          </td>
+          <td>
+            <span className="fw-normal">
+              {target_name}
+            </span>
+          </td>
+         
+          <td>
+            <span className="fw-normal">
+              {target_status === 1?"開啟":target_status === 0?"關閉":"失效"}
+
+            </span>
+          </td>
+          <td>
+            {/* <Button variant="outline-primary" onClick={() => {handleChangeState(target_num, target_status, target_name, category)}}>變更</Button> */}
+            無法變更
+          </td>
+          <td>
+            <span className="fw-normal">
+              {update_time === null?"---":moment(update_time).format('YYYY-MM-DD HH:mm:ss')}
+            </span>
+          </td>
+          <td>
+            {/* <Button variant = "link"onClick={() => {handleRowEditDelete("editing", target_num, target_name, target_status, category)}}>
+              <FontAwesomeIcon icon={faEdit} className="me-0.5" /> 
+            </Button>
+            <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete("deleting", target_num, target_name, target_status, category)}}>
+              <FontAwesomeIcon icon={faTrashAlt} className="me-0.5" /> 
+            </Button> */}
+            ---
+          </td>
+        </tr>
+      );
+    };
   
     return (
       <Card border="light" className="table-wrapper table-responsive shadow-sm" style ={{width:"120%"}}>
@@ -127,9 +176,18 @@ export const ValuetargetsTable = (props) => {
               </tr>
             </thead>
             <tbody>
-              {typeof(value) === "undefined"? null:value.filter((acc) => 
+              {typeof(value) === "undefined"? null:
+                                  deleteInd?
+                                  value.filter((acc) => 
+                                  (acc.target_status === 0 || acc.target_status > 1)&&(
                                    acc.target_num.includes(Search) ||
-                                   acc.target_name.includes(Search))
+                                   acc.target_name.includes(Search)))
+                                  .map(t => t.target_status === 0?<TableRow  {...t}/> : <NulledTableRow  {...t}/>)
+                                  :
+                                  value.filter((acc) => 
+                                  acc.target_status === 1 &&(
+                                   acc.target_num.includes(Search) ||
+                                   acc.target_name.includes(Search)))
                                   .map(t => <TableRow  {...t} />)}
             </tbody>
           </Table>

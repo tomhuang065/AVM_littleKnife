@@ -599,9 +599,10 @@ function find_old_password(data) {
 
 function del_supplier(condition) {
     console.log("consition", condition)
-    const deleteQuery = "DELETE FROM `supplier` WHERE `supplier`.`supplier_num` = ?";
+    const deleteQuery = 'UPDATE `supplier` SET `status` = ? WHERE `supplier`.`supplier_num` = ?';
     
-    connection.query(deleteQuery,condition,(error, results, fields) => {
+    
+    connection.query(deleteQuery,[2, condition],(error, results, fields) => {
         if (error) {
             console.error('刪除資料庫錯誤：', error);
         } else {
@@ -612,9 +613,9 @@ function del_supplier(condition) {
 
 function del_value_target(condition) {
     console.log("cond", condition)
-    const deleteQuery = "DELETE FROM `value_target` WHERE `value_target`.`target_num` = ?";
-    
-    connection.query(deleteQuery,condition,(error, results, fields) => {
+    // const deleteQuery = "DELETE FROM `value_target` WHERE `value_target`.`target_num` = ?";
+    const deleteQuery ='UPDATE `value_target` SET `target_status` = ? WHERE`value_target`.`target_num` = ?'
+    connection.query(deleteQuery,[2, condition],(error, results, fields) => {
         if (error) {
             console.error('刪除資料庫錯誤：', error);
         } else {
@@ -944,7 +945,9 @@ function identical_material_name(name) {
 function del_inventory(condition) {
     console.log(condition)
     const deleteQuery = 'DELETE FROM `m_inventory_setup` WHERE `m_inventory_setup`.`m_id` = ?';
-    connection.query(deleteQuery, condition, (error, results, fields) => {
+    // const deleteQuery = 'UPDATE `m_inventory_setup` SET `status` = ? WHERE `m_inventory_setup`.`m_id` = ?';
+
+    connection.query(deleteQuery,[2, condition] , (error, results, fields) => {
         if (error) {
             console.error('刪除資料庫錯誤：', error);
         } else {
