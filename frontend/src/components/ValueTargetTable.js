@@ -64,6 +64,8 @@ export const ValuetargetsTable = (props) => {
         target_num: `${valueTarget.target_num}`,
         target_name: `${valueTarget.target_name}`,
         target_status: `${valueTarget.target_status}`,
+        category:`${type}`,
+        task:"change_state"
       };
       const response = await instance.post('/mod_value_target', {
         ID:JSON.stringify(jsonData)

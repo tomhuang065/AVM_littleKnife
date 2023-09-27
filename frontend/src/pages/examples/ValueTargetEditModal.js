@@ -84,6 +84,9 @@ const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
           target_num: `${newValueTarget.target_num}`,
           target_name: `${newValueTarget.target_name}`,
           target_status: `${newValueTarget.target_status}`,
+          category: `${newValueTarget.category}`,
+          task:"update_item"
+
         };
         setValType(null)
 
@@ -91,13 +94,14 @@ const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
           ID:JSON.stringify(jsonData)
         }
       )
+      console.log(response)
         onSave(newValueTarget.target_num, newValueTarget.target_name)
         setValType(newValueTarget.category)
         setEditing(false); //not to show the input bar
         setPlaceHolder("") //placeholder in the modal input bar
         setForChange("")
         setIndex("選擇修改項目") //the index button in the 
-        alert("已變更價值標的");
+        alert(response.data);
         // setMat("edit")
         onHide()
       }

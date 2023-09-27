@@ -169,8 +169,9 @@ router.post('/mod_account_subjects', async (req, res) => {
 });
 
 router.post('/mod_value_target', async (req, res) => {
-    await update_value_target(JSON.parse(req.body.ID))
-    res.send('已成功變更價值標的狀態');
+    const result = await update_value_target(JSON.parse(req.body.ID))
+    console.log(result)
+    res.send(result);
 });
 
 
@@ -863,7 +864,7 @@ function identical_valuetarget_num(data) {
             if (error) {
                 reject(error);
             } else {
-                resolve(results);
+                resolve(results.filter(val => val.target_status !== 2));
             }
         });
     });
@@ -875,7 +876,7 @@ function identical_valuetarget_name(name, category) {
             if (error) {
                 reject(error);
             } else {
-                resolve(results);
+                resolve(results.filter(val => val.target_status !== 2));
             }
         });
     });
@@ -1016,38 +1017,78 @@ function update_supplier(updatedata) {
     });
 }
 
-function update_value_target(updatedata) {
+async function update_value_target(updatedata) {
     const condition = updatedata.orig
     console.log(updatedata)
-    let updateQuery = 'UPDATE `value_target` SET target_status = ? WHERE `value_target`.`target_num` = ?';
-    var stat = "1";
-    if(updatedata.status ==='false'){
-        stat = '0';
+    const check_valuetarget_code = await identical_valuetarget_num(updatedata.target_num)
+    const check_valuetarget_name = await identical_valuetarget_name(updatedata.target_name, updatedata.category)
+    
+    console.log(check_valuetarget_code)
+    console.log(check_valuetarget_name)
+
+        let updateQuery = 'UPDATE `value_target` SET target_status = ? WHERE `value_target`.`target_num` = ?';
+        var stat = "1";
+        if(updatedata.status ==='false'){
+            stat = '0';
+        }
+        if(updatedata.task === "change_state"){
+            console.log(1111111111)
+
+            connection.query(updateQuery, [stat, condition], (error, results, fields) => {
+                if (error) {
+                    console.error('修改資料庫錯誤：', error);
+                        return('已成功修改價值標的狀態')
+                } else {
+                    console.log('已成功修改資料');
+                        return('已成功修改價值標的狀態')
+                }
+            }
+        )}
+        else if(updatedata.task === "update_item" && updatedata.orig === updatedata.target_num){
+            console.log(22222222)
+            if (check_valuetarget_name.length > 0) {
+                    return('價值標的名稱重複與原本相同，請重新填寫')      
+            }
+            else{
+                updateQuery = 'UPDATE `value_target` SET target_name = ? WHERE `value_target`.`target_num` = ?';
+                connection.query(updateQuery, [updatedata.target_name, condition], (error, results, fields) => {
+                    if (error) {
+                        console.error('修改資料庫錯誤：', error);
+                        return(error)
+                    } else {
+                        console.log('已成功價值標的名稱');
+                        return('已成功修改價值標的名稱')
+    
+                    }
+                });
+            }
+
+        }
+        else{
+            console.log(333333)
+
+            if(check_valuetarget_code.length > 0){
+                return('價值標的代碼重複或與原本相同，請重新填寫')      
+            }
+            else{
+                updateQuery = 'UPDATE `value_target` SET target_num = ? WHERE `value_target`.`target_num` = ?';
+                connection.query(updateQuery, [updatedata.target_num, condition], (error, results, fields) => {
+                    if (error) {
+                        console.error('修改資料庫錯誤：', error);
+                        return(error)
+    
+                    } else {
+                        console.log('已成功修改價值標的代碼');
+                        return('已成功修改價值標的代碼')
+    
+                    }
+                });
+            }
+        }
     }
-    connection.query(updateQuery, [stat, condition], (error, results, fields) => {
-        if (error) {
-            console.error('修改資料庫錯誤：', error);
-        } else {
-            console.log('已成功修改資料');
-        }
-    });
-    updateQuery = 'UPDATE `value_target` SET target_num = ? WHERE `value_target`.`target_num` = ?';
-    connection.query(updateQuery, [updatedata.target_num, condition], (error, results, fields) => {
-        if (error) {
-            console.error('修改資料庫錯誤：', error);
-        } else {
-            console.log('已成功修改資料');
-        }
-    });
-    updateQuery = 'UPDATE `value_target` SET target_name = ? WHERE `value_target`.`target_num` = ?';
-    connection.query(updateQuery, [updatedata.target_name, condition], (error, results, fields) => {
-        if (error) {
-            console.error('修改資料庫錯誤：', error);
-        } else {
-            console.log('已成功修改資料');
-        }
-    });
-}
+
+   
+
 
 function update_inventory(updatedata) {
     const condition = updatedata.orig
