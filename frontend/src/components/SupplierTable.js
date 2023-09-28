@@ -91,9 +91,10 @@ export const SupplierTable = (props) => {
             {status === 1? "開啟":status === 0?"關閉":"失效"}
           </span>
         </td>
-        {/* <td>
-          <Button variant="outline-primary" onClick={() => {handleRowEditDelete("changing_state", supplier_num, supplier_name, update_user, update_time, status)}}>變更</Button>
-        </td> */}
+        <td>
+          無法變更
+          {/* <Button variant="outline-primary" onClick={() => {handleRowEditDelete("changing_state", supplier_num, supplier_name, update_user, update_time, status)}}>變更</Button> */}
+        </td>
         <td>
           <span className="fw-normal">
           {update_user}
@@ -104,14 +105,14 @@ export const SupplierTable = (props) => {
           {update_time === null?"---":moment(update_time).format('YYYY-MM-DD HH:mm:ss')}
           </span>
         </td>
-        {/* <td>
-          <Button variant = "link"onClick={() => {handleRowEditDelete("editing", supplier_num, supplier_name, update_user,  update_time, status)}}>
+        <td>
+          {/* <Button variant = "link"onClick={() => {handleRowEditDelete("editing", supplier_num, supplier_name, update_user,  update_time, status)}}>
             <FontAwesomeIcon icon={faEdit} className="me-0.5" /> 
           </Button>
           <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete("deleting",  supplier_num, supplier_name, update_user,  update_time, status)}}>
             <FontAwesomeIcon icon={faTrashAlt} className="me-0.5" /> 
-          </Button>
-        </td> */}
+          </Button> */}
+        </td>
       </tr>
     );
   };
@@ -170,20 +171,20 @@ export const SupplierTable = (props) => {
                 <th className="border-bottom">供應商代碼</th>
                 <th className="border-bottom">供應商名稱</th>
                 <th className="border-bottom">供應商狀態</th>
-                {deleteInd? null:<th className="border-bottom">變更供應商狀態</th>}
+                <th className="border-bottom">變更供應商狀態</th>
                 <th className="border-bottom">更新人員</th>
                 <th className="border-bottom">更新時間</th>
-                {deleteInd? null:<th className="border-bottom">  選項</th>}
+                <th className="border-bottom">  選項</th>
               </tr>
             </thead>
             <tbody>
               {typeof(Acc) === "undefined" ? null : deleteInd?
-                                    Acc.filter((sup) =>sup.status > 1&& (sup.supplier_num.includes(Search) ||
-                                    sup.supplier_name.includes(Search) )).map(t => <NulledTableRow key={`transaction-${t.id}`} {...t} />)
+                                    Acc.filter((sup) =>sup.status !== 1&& (sup.supplier_num.includes(Search) ||
+                                    sup.supplier_name.includes(Search) )).map(t => t.status === 0? <TableRow key={`transaction-${t.id}`} {...t}/>: <NulledTableRow key={`transaction-${t.id}`} {...t} />)
                                     :
                                     Acc.filter((sup) =>  
                                     (sup.supplier_num.includes(Search) ||
-                                    sup.supplier_name.includes(Search) )&& sup.status <= 1)
+                                    sup.supplier_name.includes(Search) )&& sup.status === 1)
                                     
                                     .map(t => <TableRow key={`transaction-${t.id}`} {...t} />)}
             </tbody>

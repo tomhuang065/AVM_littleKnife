@@ -299,8 +299,8 @@ router.post('/del_supplier', async (req, res) => {
 
 router.post('/update_supplier', async(req, res) => {
     console.log(JSON.parse(req.body.ID))
-    await update_supplier(JSON.parse(req.body.ID))
-    res.send('已成功修改供應商資料');
+    const result = await update_supplier(JSON.parse(req.body.ID))
+    res.send(result);
 
 });
 router.post('/add_supplier', async (req, res) => {
@@ -803,7 +803,7 @@ function identical_supplier_num(data) {
             if (error) {
                 reject(error);
             } else {
-                resolve(results);
+                resolve(results.filter(t => t.status !== 2));
             }
         });
     });
@@ -815,7 +815,7 @@ function identical_supplier_name(data) {
             if (error) {
                 reject(error);
             } else {
-                resolve(results);
+                resolve(results.filter(t => t.status !== 2));
             }
         });
     });
@@ -975,8 +975,11 @@ function update_account_subjects(updatedata) {
     
 }
 
-function update_supplier(updatedata) {
+async function update_supplier(updatedata) {
     const condition = updatedata.orig
+
+    const check_supplier_code = await identical_supplier_num(updatedata.supplier_num)
+    const check_supplier_name = await identical_supplier_name(updatedata.supplier_name)
     
     let updateQuery = 'UPDATE `supplier` SET status = ? WHERE `supplier`.`supplier_num` = ?';
     var stat = "1";
@@ -994,27 +997,42 @@ function update_supplier(updatedata) {
             }
         });
     }
-    
-    updateQuery = 'UPDATE `supplier` SET supplier_num = ? WHERE `supplier`.`supplier_num` = ?';
-    connection.query(updateQuery, [updatedata.supplier_num, condition], (error, results, fields) => {
-        if (error) {
-            console.error('修改資料庫錯誤：', error);
-            return('修改資料庫錯誤：', error)
-        } else {
-            console.log('已成功修改期初庫存資料');
-            return('已成功修改期初庫存資料')
+    else if(updatedata.task === "modify"&& updatedata.orig === updatedata.num){
+        if (check_supplier_name.length > 0 ) {
+            return('供應商名稱重複或與原本相同，請重新填寫')      
         }
-    });
-    updateQuery = 'UPDATE `supplier` SET supplier_name = ? WHERE `supplier`.`supplier_num` = ?';
-    connection.query(updateQuery, [updatedata.supplier_name, condition], (error, results, fields) => {
-        if (error) {
-            console.error('修改資料庫錯誤：', error);
-            return('修改資料庫錯誤：', error)
-        } else {
-            console.log('已成功修改期初庫存資料');
-            return('已成功修改期初庫存資料')
+        else{
+            updateQuery = 'UPDATE `supplier` SET supplier_name = ? WHERE `supplier`.`supplier_num` = ?';
+            connection.query(updateQuery, [updatedata.supplier_name, condition], (error, results, fields) => {
+                if (error) {
+                    console.error('修改資料庫錯誤：', error);
+                    return('修改資料庫錯誤：', error)
+                } else {
+                    console.log('已成功修改期初庫存資料');
+                    return('已成功修改期初庫存資料')
+                }
+             });
         }
-    });
+    }
+    else
+    {
+        if (check_supplier_code.length > 0 ) {
+            return('供應商代碼重複或與原本相同，請重新填寫')    
+            console.log("nulled")  
+        }
+        else{
+            updateQuery = 'UPDATE `supplier` SET supplier_num = ? WHERE `supplier`.`supplier_num` = ?';
+            connection.query(updateQuery, [updatedata.supplier_num, condition], (error, results, fields) => {
+                if (error) {
+                    console.error('修改資料庫錯誤：', error);
+                    return('修改資料庫錯誤：', error)
+                } else {
+                    console.log('已成功修改期初庫存資料');
+                    return('已成功修改期初庫存資料')
+                }
+            });
+        }
+    }
 }
 
 async function update_value_target(updatedata) {
@@ -1032,7 +1050,6 @@ async function update_value_target(updatedata) {
             stat = '0';
         }
         if(updatedata.task === "change_state"){
-            console.log(1111111111)
 
             connection.query(updateQuery, [stat, condition], (error, results, fields) => {
                 if (error) {
@@ -1045,7 +1062,6 @@ async function update_value_target(updatedata) {
             }
         )}
         else if(updatedata.task === "update_item" && updatedata.orig === updatedata.target_num){
-            console.log(22222222)
             if (check_valuetarget_name.length > 0) {
                     return('價值標的名稱重複與原本相同，請重新填寫')      
             }
@@ -1065,7 +1081,6 @@ async function update_value_target(updatedata) {
 
         }
         else{
-            console.log(333333)
 
             if(check_valuetarget_code.length > 0){
                 return('價值標的代碼重複或與原本相同，請重新填寫')      

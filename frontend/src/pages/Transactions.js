@@ -483,7 +483,7 @@ export default () => {
                                   // onClick = {()=> console.log(thirdAccountResult[0].third)}
                                 />
                               </Form>
-                              {valueResult.filter(value => (value.category===type)&&((String(value.target_num).includes(searchIndV))||(String(value.target_name).includes(searchIndV)))).map(value=> (
+                              {valueResult.filter(value => (value.category===type)&&(value.target_status === 1)&&((String(value.target_num).includes(searchIndV))||(String(value.target_name).includes(searchIndV)))).map(value=> (
                                 <Dropdown.Item onClick={()=> setSalesData({...salesData, target_num: value.target_num, target_name:value.target_name})}>
                                     <div className = "me-2">{value.target_num} {value.target_name}</div>
                                 </Dropdown.Item>
@@ -530,7 +530,7 @@ export default () => {
                                 // onClick = {()=> console.log(thirdAccountResult[0].third)}
                               />
                             </Form>
-                            {supplierResult.filter(sup => String(sup.supplier_num).includes(searchIndS)||String(sup.supplier_name).includes(searchIndS)).map(t => 
+                            {supplierResult.filter(sup => sup.status === 1 && (String(sup.supplier_num).includes(searchIndS)||String(sup.supplier_name).includes(searchIndS))).map(t => 
                               <Dropdown.Item onClick={() => setSalesData({...salesData, supplier_num : t.supplier_num, supplier_name : t.supplier_name})}>
                                   <div className = "me-2">{t.supplier_num} {t.supplier_name}</div>
                               </Dropdown.Item>)}

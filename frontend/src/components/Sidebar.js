@@ -102,11 +102,11 @@ export default (props = {}) => {
                 <NavItem title="損益表" link={Routes.BootstrapTables.path} />
                 <NavItem title="進銷存管理報表" link={Routes.BootstrapTables.path} />
               </CollapsableNavItem>
-              <CollapsableNavItem eventKey="tables/" title="使用者權限設定" icon={faBook}>
+              {/* <CollapsableNavItem eventKey="tables/" title="使用者權限設定" icon={faBook}>
                 <NavItem title="使用者權限設定" link={Routes.Settings.path} />
                 <NavItem title="報表權限設定" link={Routes.Settings.path} />
               </CollapsableNavItem>
-              <NavItem title="編輯個人資料" icon={faHandHoldingUsd} link={Routes.ChangeProfile.path} />
+              <NavItem title="編輯個人資料" icon={faHandHoldingUsd} link={Routes.ChangeProfile.path} /> */}
               <NavItem title="登出" link={Routes.Presentation.path} icon={faSignOutAlt} />
               <Dropdown.Divider className="my-3 border-indigo" />
 

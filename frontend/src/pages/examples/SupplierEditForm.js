@@ -100,7 +100,7 @@ const RemoveModal = ({ onHide, show, states, supplier, origs }) =>{
         setPlaceHolder("") //placeholder in the modal input bar
         setForChange("")
         setIndex("選擇修改項目") //the index button in the 
-        alert("已成功修改供應商資料");
+        alert(response.data);
         setSup("edit")
         onHide()
       }
