@@ -88,7 +88,7 @@ export default (props = {}) => {
               <NavItem title="首頁" link={Routes.DashboardOverview.path} icon={faChartPie} />
               <NavItem title="財會系統" icon={faHandHoldingUsd} link={Routes.Transactions.path} />
               <CollapsableNavItem eventKey="examples/" title="進銷存" icon={faBoxOpen}>
-                <NavItem title="進貨" link={Routes.Purchase.path} />
+                {/* <NavItem title="進貨" link={Routes.Purchase.path} /> */}
                 <NavItem title="原物料期初庫存設定" link={Routes.BeginningInventorysettings.path} />
               </CollapsableNavItem>
               <CollapsableNavItem eventKey="examples/" title="基礎設定" icon={faCog}>
@@ -102,11 +102,11 @@ export default (props = {}) => {
                 <NavItem title="損益表" link={Routes.BootstrapTables.path} />
                 <NavItem title="進銷存管理報表" link={Routes.BootstrapTables.path} />
               </CollapsableNavItem>
-              <CollapsableNavItem eventKey="tables/" title="使用者權限設定" icon={faBook}>
+              {/* <CollapsableNavItem eventKey="tables/" title="使用者權限設定" icon={faBook}>
                 <NavItem title="使用者權限設定" link={Routes.Settings.path} />
                 <NavItem title="報表權限設定" link={Routes.Settings.path} />
               </CollapsableNavItem>
-              <NavItem title="編輯個人資料" icon={faHandHoldingUsd} link={Routes.ChangeProfile.path} />
+              <NavItem title="編輯個人資料" icon={faHandHoldingUsd} link={Routes.ChangeProfile.path} /> */}
               <NavItem title="登出" link={Routes.Presentation.path} icon={faSignOutAlt} />
               <Dropdown.Divider className="my-3 border-indigo" />
 

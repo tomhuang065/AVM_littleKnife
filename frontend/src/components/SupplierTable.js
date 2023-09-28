@@ -18,121 +18,155 @@ export const SupplierTable = (props) => {
     const [origs, setOrigs] = useState("")
     const [supplier, setSupplier] = useState({
       status:"",
-      supplier_num: "",
+      supplier_num:"",
       supplier_name:"",
-      update_time: "",
+      update_time:"",
       update_user:"",
+
     })
 
     const {sup, setSup} = useChat();
 
     const Acc = props.supplier
     const Search = props.searchInd
+    const deleteInd = props.deleteInd
 
     const handleRowEditDelete = (states, supNum, supName, updateUsr, updateTime, status) => {
+        console.log(states, supNum, supName, updateUsr, updateTime, status)
         setStates(states)
-        setRemoveModal(true);
-        setSupplier({ supplier_num: supNum, supplier_name:supName, update_time: updateTime, update_user: updateUsr, status:status});
+        
+        setSupplier({supplier_num: supNum, supplier_name:supName, update_time: updateTime, update_user: updateUsr, status:status});
         setOrigs(supNum)
+        if(states !== "changing_state"){
+          setRemoveModal(true);
+        }
     }
     
-    const handleEditSupplier = async(sup)=>{
-      console.log("sup", sup)
-      const jsonData = {
-        orig: `${origs}`,
-        status:`${sup}`,
-        update_user: `${supplier.update_user}`,
-        update_time: `${supplier.update_time}`,
-        supplier_num: `${supplier.supplier_num}`,
-        supplier_name: `${supplier.supplier_name}`,
-        task:"change_state"
+    const handleEditSupplier = async()=>{
+      
+      if(supplier.supplier_name !== ""){
+        setSup(null)
+        const jsonData = {
+          orig: `${origs}`,
+          status:`${supplier.status}`,
+          update_user: `${supplier.update_user}`,
+          update_time: `${supplier.update_time}`,
+          supplier_num: `${supplier.supplier_num}`,
+          supplier_name: `${supplier.supplier_name}`,
+          task:"change_state"
 
-      };
-      const response = await instance.post('/update_supplier', {
-        ID:JSON.stringify(jsonData)
-      })
-      console.log(response.data)
-      alert("已成功修改供應商顯示狀態")
-      setRemoveModal(false)
-
-  
-    }
-
-    const handleChangeState = (supNum, supName, updateUsr, updateTime, status) =>{
-      setOrigs(supNum)
-      setSupplier({
-        supplier_num: supNum,
-        supplier_name:supName,
-        update_time: updateTime,
-        update_user:updateUsr,
-      })
-      console.log(status)
-      if(status === 1){
-        setSup(false)
-      }
-      else{
-        setSup(true)
+        };
+        console.log(jsonData)
+        const response = await instance.post('/update_supplier', {
+          ID:JSON.stringify(jsonData)
+        })
+        setSup('change')
+        alert("已成功修改供應商顯示狀態")
+        setStates("")
+        setOrigs("")  
       }
     }
 
   useEffect(()=>{
-    console.log(sup)
-    if(origs !== ''){
-      setSupplier({status :sup})
-      handleEditSupplier(sup)
+    if(states === "changing_state"){
+      handleEditSupplier()
     }
-    setOrigs("")    
-  },[sup])
-  
-    const TableRow = (props) => {
-      const { supplier_num, supplier_name, update_user,  update_time, status } = props;
-      return (
-        <tr >
-          <td >
-            <Card.Link as={Link} to={Routes.Invoice.path} className="fw-normal">
-              {supplier_num}
-            </Card.Link>
-          </td>
-          <td>
-            <span className="fw-normal">
-              {supplier_name}
-            </span>
-          </td>
-          <td>
-            <span className="fw-normal">
-              {status === 1? "開啟":"關閉"}
-            </span>
-          </td>
-          <td>
-            <Button variant="outline-primary" onClick={() => {handleChangeState(supplier_num, supplier_name, update_user, update_time, status)}}>變更</Button>
-          </td>
-          <td>
-            <span className="fw-normal">
-            {parseFloat(update_user).toFixed(0)}
-            </span>
-          </td>
-          <td>
-            <span className="fw-normal">
-            {update_time === null?"---":moment(update_time).format('YYYY-MM-DD HH:mm:ss')}
-            </span>
-          </td>
-          <td>
-            <Button variant = "link"onClick={() => {handleRowEditDelete("editing", supplier_num, supplier_name, update_user,  update_time, status)}}>
-              <FontAwesomeIcon icon={faEdit} className="me-0.5" /> 
-            </Button>
-            <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete("deleting",  supplier_num, supplier_name, update_user,  update_time, status)}}>
-              <FontAwesomeIcon icon={faTrashAlt} className="me-0.5" /> 
-            </Button>
-          </td>
-        </tr>
-      );
-    };
+  },[supplier])
+  const NulledTableRow = (props) => {
+    const { supplier_num, supplier_name, update_user,  update_time, status } = props;
+    return (
+      <tr >
+        <td >
+          <Card.Link as={Link} to={Routes.Invoice.path} className="fw-normal">
+            {supplier_num}
+          </Card.Link>
+        </td>
+        <td>
+          <span className="fw-normal">
+            {supplier_name}
+          </span>
+        </td>
+        <td>
+          <span className="fw-normal">
+            {status === 1? "開啟":status === 0?"關閉":"失效"}
+          </span>
+        </td>
+        <td>
+          無法變更
+          {/* <Button variant="outline-primary" onClick={() => {handleRowEditDelete("changing_state", supplier_num, supplier_name, update_user, update_time, status)}}>變更</Button> */}
+        </td>
+        <td>
+          <span className="fw-normal">
+          {update_user}
+          </span>
+        </td>
+        <td>
+          <span className="fw-normal">
+          {update_time === null?"---":moment(update_time).format('YYYY-MM-DD HH:mm:ss')}
+          </span>
+        </td>
+        <td>
+          {/* <Button variant = "link"onClick={() => {handleRowEditDelete("editing", supplier_num, supplier_name, update_user,  update_time, status)}}>
+            <FontAwesomeIcon icon={faEdit} className="me-0.5" /> 
+          </Button>
+          <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete("deleting",  supplier_num, supplier_name, update_user,  update_time, status)}}>
+            <FontAwesomeIcon icon={faTrashAlt} className="me-0.5" /> 
+          </Button> */}
+        </td>
+      </tr>
+    );
+  };
+
+  const TableRow = (props) => {
+    const { supplier_num, supplier_name, update_user,  update_time, status } = props;
+    return (
+      <tr >
+        <td >
+          <Card.Link as={Link} to={Routes.Invoice.path} className="fw-normal">
+            {supplier_num}
+          </Card.Link>
+        </td>
+        <td>
+          <span className="fw-normal">
+            {supplier_name}
+          </span>
+        </td>
+        <td>
+          <span className="fw-normal">
+            {status === 1? "開啟":status === 0?"關閉":"失效"}
+          </span>
+        </td>
+        <td>
+          <Button variant="outline-primary" onClick={() => {handleRowEditDelete("changing_state", supplier_num, supplier_name, update_user, update_time, status)}}>變更</Button>
+        </td>
+        <td>
+          <span className="fw-normal">
+          {update_user}
+          </span>
+        </td>
+        <td>
+          <span className="fw-normal">
+          {update_time === null?"---":moment(update_time).format('YYYY-MM-DD HH:mm:ss')}
+          </span>
+        </td>
+        <td>
+          <Button variant = "link"onClick={() => {handleRowEditDelete("editing", supplier_num, supplier_name, update_user,  update_time, status)}}>
+            <FontAwesomeIcon icon={faEdit} className="me-0.5" /> 
+          </Button>
+          <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete("deleting",  supplier_num, supplier_name, update_user,  update_time, status)}}>
+            <FontAwesomeIcon icon={faTrashAlt} className="me-0.5" /> 
+          </Button>
+        </td>
+      </tr>
+    );
+  };
 
     return (
       <Card border="light" className="table-wrapper table-responsive shadow-sm" style ={{width:"120%"}}>
         <Card.Body className="pt-0">
           <Table hover className="user-table align-items-center table-striped">
             <thead>
+              
               <tr>
                 <th className="border-bottom">供應商代碼</th>
                 <th className="border-bottom">供應商名稱</th>
@@ -144,10 +178,15 @@ export const SupplierTable = (props) => {
               </tr>
             </thead>
             <tbody>
-              {typeof(Acc) === "undefined" ? null : Acc.filter((sup) =>  
-                                   sup.supplier_num.includes(Search) ||
-                                   sup.supplier_name.includes(Search))
-                                .map(t => <TableRow key={`transaction-${t.id}`} {...t} />)}
+              {typeof(Acc) === "undefined" ? null : deleteInd?
+                                    Acc.filter((sup) =>sup.status !== 1&& (sup.supplier_num.includes(Search) ||
+                                    sup.supplier_name.includes(Search) )).map(t => t.status === 0? <TableRow key={`transaction-${t.id}`} {...t}/>: <NulledTableRow key={`transaction-${t.id}`} {...t} />)
+                                    :
+                                    Acc.filter((sup) =>  
+                                    (sup.supplier_num.includes(Search) ||
+                                    sup.supplier_name.includes(Search) )&& sup.status === 1)
+                                    
+                                    .map(t => <TableRow key={`transaction-${t.id}`} {...t} />)}
             </tbody>
           </Table>
         </Card.Body>

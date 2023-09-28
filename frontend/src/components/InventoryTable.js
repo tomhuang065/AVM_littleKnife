@@ -23,6 +23,7 @@ export const RawMaterialInventoryTable = (props) => {
 
     const Acc = props.rawMaterials.data;
     const Search = props.searchInd;
+    const deleteInd = props.deleteInd
   
     const handleRowEditDelete = (state, id, m_id, m_name, date, start_quantity,start_unit, start_unit_price, start_cost) => {
       setStates(state)
@@ -33,6 +34,40 @@ export const RawMaterialInventoryTable = (props) => {
 
 
     const TableRow = (props) => {
+      const {
+        id,
+        m_id,
+        m_name,
+        date,
+        start_quantity,
+        start_unit,
+        start_unit_price,
+        start_cost,
+      } = props;
+  
+      return (
+        <tr>
+          {/* <td>{id}</td> */}
+          <td>{m_id}</td>
+          <td>{m_name}</td>
+        
+          <td>{start_quantity}</td>
+          <td>{start_unit}</td>
+          <td>{start_unit_price}</td>
+          <td>{start_cost}</td>
+          <td>{date === null?"---":moment(date).format('YYYY-MM-DD')}</td>
+          <td>
+            <Button variant = "link"onClick={() => {handleRowEditDelete("editing", id, m_id, m_name, date, start_quantity,start_unit, start_unit_price, start_cost)}}>
+              <FontAwesomeIcon icon={faEdit} className="me-0.5" /> 
+            </Button>
+            <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete("deleting", id, m_id, m_name, date, start_quantity,start_unit, start_unit_price, start_cost)}}>
+              <FontAwesomeIcon icon={faTrashAlt} className="me-0.5" /> 
+            </Button>
+          </td>
+        </tr>
+      );
+    };
+    const NulledTableRow = (props) => {
       const {
         id,
         m_id,
@@ -90,16 +125,10 @@ export const RawMaterialInventoryTable = (props) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {Acc.filter((acc) => acc.m_id.includes(Search) ||
-                                   acc.m_name.includes(Search) 
-                                  //  acc.start_unit.includes(Search) ||
-                                  //  acc.date.includes(Search) ||
-                                  //  String(acc.start_cost).includes(Search) ||
-                                  //  String(acc.start_quantity).includes(Search) ||
-                                  //  String(acc.start_unit_price).includes(Search) ||
-                                  //  String(acc.id).includes(Search)
-                        ).map((t) => (
-                    <TableRow key={`transaction-${t.id}`} {...t} />
+                  {
+                        Acc.filter((acc) => acc.m_id.includes(Search) ||
+                        acc.m_name.includes(Search) 
+                        ).map((t) => (<TableRow {...t} />
                   ))}
                 </tbody>
               </Table>

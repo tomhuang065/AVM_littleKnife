@@ -165,21 +165,25 @@ export default () => {
               supplier_num:`${inventoryData.supplier}`,
             };
             console.log(jsonData)
-            // const response = await instance.post('/add_material', {
-            //   ID:JSON.stringify(jsonData)
-            // })
+            const response = await instance.post('/add_material', {
+              ID:JSON.stringify(jsonData)
+            })
+            console.log(response)
             alert("已新增存貨資料")
-            console.log(inventoryData)
+            // console.log(inventoryData)
             setInventoryData({
-              supplier: "",
               date: moment(new Date()).format('MM/DD/YYYY'),
               quantity: "",
               price: "",
               comment: "",
-              material:"",
+              unit:"",
+              material_num:"",
+              supplier: "",
+              material_name:"選擇原料",
+          
             });
             setMaterial([])
-            setSupplier("選擇供應商")
+            setSupplier({supNum:"", supName:"選擇供應商"})
 
           }
           
@@ -282,6 +286,8 @@ export default () => {
                       required
                     />
                   </Form.Group>
+                  <br></br>
+
                   <Form.Group controlId="openingQuantity">
                     <Form.Label>單位</Form.Label>
                     <Form.Control
@@ -293,8 +299,10 @@ export default () => {
                       required
                     />
                   </Form.Group>
+                  <br></br>
+
                   <Form.Group controlId="openingQuantity">
-                    {((Number(inventoryData.price)>0)&&(Number(inventoryData.quantity)>0))?<div>總價: {Number(inventoryData.price)*Number(inventoryData.quantity)}</div>:<div>總價:</div  >}
+                    {((Number(inventoryData.price)>0)&&(Number(inventoryData.quantity)>0))?<p style={{fontSize: 18}}><b>總價: {Number(inventoryData.price)*Number(inventoryData.quantity)}</b></p>:<p style={{fontSize: 17}}>總價:</p  >}
                   </Form.Group>
                   <br></br>
                   <Form.Group controlId="comment">

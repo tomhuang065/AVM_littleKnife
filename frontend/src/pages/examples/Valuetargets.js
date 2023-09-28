@@ -20,8 +20,13 @@ export default () => {
   const [type, setType] = useState("") //for add form
   const [searchPH, setSearchPH] = useState("")
   const [selectedFile, setSelectedFile] = useState(null);
-  
-  
+  const [deleteInd, setDeleteInd] = useState(false)
+
+
+
+  const handleViewDeletion = () =>{
+    setDeleteInd(!deleteInd)
+  }
   const handleSearchIndChange = (e) => {
     setSearchInd(e.target.value)
   };
@@ -212,9 +217,14 @@ const handleUpload = () => {
                     <Button icon={faFileAlt} className="me-2" variant="primary" onClick={() => handleSingleAdd(val)}>
                       <FontAwesomeIcon icon={faPlus} className="me-2" />單筆新增
                     </Button>
+                    &nbsp;&nbsp;  
+                    <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleViewDeletion}>
+                      <FontAwesomeIcon  className="me-2" />{deleteInd?type === "原料"?"查看未失效原料":type === "產品"?"查看未失效產品":type === "顧客"?"查看未失效顧客":"查看未失效部門":type === "原料"?"查看失效原料":type === "產品"?"查看失效產品":type === "顧客"?"查看失效顧客":"查看失效部門"}
+                      {/* {type === "原料"?"原料":type === "產品"?"產品":type === "顧客"?"顧客":"部門"} */}
+                    </Button>
                     <br></br>
                   </div>
-                  <ValuetargetsTable valueTarget={valResult} type ={val} search ={searchInd}/>
+                  <ValuetargetsTable valueTarget={valResult} type ={val} search ={searchInd} deleteInd ={deleteInd}/>
                 </Tab.Pane>
               ))}
             </Tab.Content>

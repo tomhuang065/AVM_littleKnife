@@ -81,13 +81,14 @@ const RemoveModal = ({ onHide, show, states, supplier, origs }) =>{
         setEditing(false); //not to show the input bar
         setSup("del")
       }
-    
       const handleEditSupplier = async()=>{
         const jsonData = {
           orig: `${origs}`,
           status: `${newSupplier.status}`,
           supplier_num: `${newSupplier.supplier_num}`,
           supplier_name: `${newSupplier.supplier_name}`,
+          update_user: `${newSupplier.update_user}`,
+          update_time: `${newSupplier.update_time}`,
           task :"modify"
         };
         setSup(null)
@@ -99,11 +100,12 @@ const RemoveModal = ({ onHide, show, states, supplier, origs }) =>{
         setPlaceHolder("") //placeholder in the modal input bar
         setForChange("")
         setIndex("選擇修改項目") //the index button in the 
-        alert("已成功修改供應商資料");
+        alert(response.data);
         setSup("edit")
         onHide()
       }
 
+      
     const supplierArray = ['供應商代碼','供應商名稱']
 
     return(

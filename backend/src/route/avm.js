@@ -66,8 +66,28 @@ router.post('/upload', (req, res) => {
 
 router.post('/add_purchase', async (req, res) => {
     try {
-        console.log("got")
         const result = await add_product_purchase(JSON.parse(req.body.ID));
+        console.log(result)
+        res.json(result);
+    } catch (error) {
+        console.error('發生錯誤：', error);
+        res.status(500).send('伺服器發生錯誤');
+
+    }
+})
+router.get('/sel_transaction', async (req, res) => {
+    try {
+        const result = await sel_transaction();
+        res.json(result);
+    } catch (error) {
+        console.error('發生錯誤：', error);
+        res.status(500).send('伺服器發生錯誤');
+
+    }
+});
+router.post('/add_material', async(req, res) => {
+    try {
+        const result = await add_material_purchase(JSON.parse(req.body.ID));
         console.log(result)
         res.json(result);
     } catch (error) {
@@ -149,8 +169,9 @@ router.post('/mod_account_subjects', async (req, res) => {
 });
 
 router.post('/mod_value_target', async (req, res) => {
-    await update_value_target(JSON.parse(req.body.ID))
-    res.send('已成功變更價值標的狀態');
+    const result = await update_value_target(JSON.parse(req.body.ID))
+    console.log(result)
+    res.send(result);
 });
 
 
@@ -202,7 +223,7 @@ router.post('/add_value_target', async (req, res) => {
 });
 
 router.post('/del_value_target', async (req, res) => {
-    await del_value_target(JSON.parse(req.body.ID).content);
+    await del_value_target(JSON.parse(req.body.ID).target_num);
     res.send('已成功刪除價值標的');
 });
 
@@ -278,8 +299,8 @@ router.post('/del_supplier', async (req, res) => {
 
 router.post('/update_supplier', async(req, res) => {
     console.log(JSON.parse(req.body.ID))
-    await update_supplier(JSON.parse(req.body.ID))
-    res.send('已成功修改供應商資料');
+    const result = await update_supplier(JSON.parse(req.body.ID))
+    res.send(result);
 
 });
 router.post('/add_supplier', async (req, res) => {
@@ -334,9 +355,71 @@ router.post('/del_inventory', async (req, res) => {
     res.send('已成功刪除庫存資料');
 });
 
+router.post('/del_bom_first', async (req, res) => {
+    // const condition = req.body; // 假設客戶端以 JSON 格式傳送刪除條件
+    // del_inventory(condition);
+    console.log('req.body.ID',JSON.parse(req.body.ID).product_id)
+    console.log(JSON.parse(req.body.ID))    
+    await del_bom_first(JSON.parse(req.body.ID).product_id)
+    res.send('已成功刪除BOM第一階資料');
+});
+
+router.post('/del_bom_second', async (req, res) => {
+    // const condition = req.body; // 假設客戶端以 JSON 格式傳送刪除條件
+    // del_inventory(condition);
+    console.log(JSON.parse(req.body.ID))
+    await del_bom_second(JSON.parse(req.body.ID).product_first_id)
+    res.send('已成功刪除BOM第二階資料');
+});
+
+router.post('/update_bom_first', async(req, res) => {
+    console.log(JSON.parse(req.body.ID))
+    await update_bom_first(JSON.parse(req.body.ID))
+    res.send('已成功修改BOM第一階資料');
+
+});
 
 
 export default router
+
+//BOM第一階刪除(對應到bom_first table)
+function del_bom_first(condition) {
+    const deleteQuery = 'DELETE FROM bom_first WHERE bom_first.product_id = ?';
+    connection.query(deleteQuery, condition, (error, results, fields) => {
+        if (error) {
+            console.error('刪除資料庫錯誤：', error);
+        } else {
+            console.log('已成功刪除資料');
+        }
+    });
+}
+
+//BOM第二階刪除(對應到bom_second table)
+function del_bom_second(condition) {
+    const deleteQuery = 'DELETE FROM bom_second WHERE ?';
+    connection.query(deleteQuery, condition, (error, results, fields) => {
+        if (error) {
+            console.error('刪除資料庫錯誤：', error);
+        } else {
+            console.log('已成功刪除資料');
+        }
+    });
+}
+
+//BOM第一階修改(對應到bom_first table)
+function update_bom_first(updatedata) {
+    const condition = updatedata.orig;
+    const updateQuery = 'UPDATE bom_first SET product_id = ?, product_name = ?, update_user = ?, update_time = ? WHERE product_id = ?';
+    connection.query(updateQuery, [updatedata.product_id, updatedata.product_name, updatedata.update_user, updatedata.update_time, condition], (error, results, fields) => {
+        if (error) {
+            console.error('修改資料庫錯誤：', error);
+        } else {
+            console.log('已成功修改資料');
+            console.log('results', results)
+            console.log('product_id', updatedata.product_id)
+        }
+    });
+}
 
 //BOM第一階新增(對應到bom_first table)
 async function add_bom_first(data) {
@@ -344,28 +427,25 @@ async function add_bom_first(data) {
         console.log('data', data)
         const id = data.product_id;
 
-        const check = await bom_id_check(id)
-        if (check.length != 0) {
-            console.log('已有此產品代碼存在，請重新輸入新的產品代碼')
-        } else {
-            const query = 'INSERT INTO `bom_first`(`product_id`, `product_name`, `product_sec_id`, `use_quantity`, `update_user`, `update_time`) VALUES ?'
-            // const now = new Date();
-            // const sqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
-            // data.push(sqlDatetime)
-            // data = [data]
-            connection.query(query, data.product_id, data.product_name, data.product_sec_id, data.use_quantity, data.update_user, data.update_time, (error, results, fields) => {
-                if (error) {
-                    console.error('新增錯誤', error);
-                } else {
-                    // let arr = obj_to_dict(results)
-                    console.log('新增成功');
-                }
-            });
-        }
+        // const check = await bom_id_check(id)
+        // if (check.length != 0) {
+        //     console.log('已有此產品代碼存在，請重新輸入新的產品代碼')
+        // } else {
+            return new Promise((resolve, reject) => {
+                const query = 'INSERT INTO `bom_first`(`product_id`, `product_name`, `update_user`) VALUES (?, ?, ?)'
+                connection.query(query, [data.product_id, data.product_name, data.update_user], (error, results, fields) => {
+                    if (error) {
+                        reject(error)
+                    }
+                    else {
+                        resolve(results)
+                    }
+                })
+            })
+        // }
     } catch (error) {
         console.log(error)
     }
-
 }
 
 //BOM一階代碼防呆
@@ -383,16 +463,33 @@ function bom_id_check(id) {
     })
 }
 
+
 function add_product_purchase(data) {
     console.log(data)    
-    const query = 'INSERT INTO `p_purchase`(`date`, `account_subjects_num`,`purchase_id`, `purchase_name`, `purchase_qunatity`, `purchase_unit`, `purchase_price`,`remark`,`create_user`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    const query = 'INSERT INTO `p_purchase`(`date`, `account_subjects_num`,`purchase_id`, `purchase_name`,`purchase_quantity`, `purchase_unit`, `purchase_price`, `supplier_num`,`remark`,`create_user`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
 
-    connection.query(query, [data.date, data.account_subjects_num, data.purchase_id, data.purchase_name, data.purchase_quantity, data.purchase_unit, data.purchase_price, data.comment, data.create_user], (error, results, fields) => {
+    connection.query(query, [data.date, data.account_subjects_num, data.purchase_id, data.purchase_name,  data.purchase_quantity, data.purchase_unit, data.purchase_price, data.supplier_num, data.remark, data.create_user], (error, results, fields) => {
         if (error) {
             console.error(error);
         } else {
             // let arr = obj_to_dict(results)
             console.log('新增成功');
+        }
+    });
+}
+function add_material_purchase(data) {
+    console.log(data)    
+    const query = 'INSERT INTO `m_purchase`(`date`, `account_subjects_num`,`purchase_id`, `purchase_name`, `purchase_quantity`, `purchase_unit`, `purchase_price`, `supplier_num`, `remark`,`create_user`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+
+    connection.query(query, [data.date, data.account_subjects_num, data.material_id, data.material_name, data.purchase_quantity, data.purchase_unit, data.purchase_price, data.supplier_num, data.remark, data.create_user], (error, results, fields) => {
+        if (error) {
+            console.error(error);
+            return(error);
+        } else {
+            // let arr = obj_to_dict(results)
+            console.log('新增存貨成功');
+            return('新增存貨成功');
+
         }
     });
 }
@@ -503,9 +600,10 @@ function find_old_password(data) {
 
 function del_supplier(condition) {
     console.log("consition", condition)
-    const deleteQuery = "DELETE FROM `supplier` WHERE `supplier`.`supplier_num` = ?";
+    const deleteQuery = 'UPDATE `supplier` SET `status` = ? WHERE `supplier`.`supplier_num` = ?';
     
-    connection.query(deleteQuery,condition,(error, results, fields) => {
+    
+    connection.query(deleteQuery,[2, condition],(error, results, fields) => {
         if (error) {
             console.error('刪除資料庫錯誤：', error);
         } else {
@@ -515,10 +613,10 @@ function del_supplier(condition) {
 }
 
 function del_value_target(condition) {
-    console.log(condition)
-    const deleteQuery = "DELETE FROM `value_target` WHERE `value_target`.`target_num` = ?";
-    
-    connection.query(deleteQuery,condition,(error, results, fields) => {
+    console.log("cond", condition)
+    // const deleteQuery = "DELETE FROM `value_target` WHERE `value_target`.`target_num` = ?";
+    const deleteQuery ='UPDATE `value_target` SET `target_status` = ? WHERE`value_target`.`target_num` = ?'
+    connection.query(deleteQuery,[2, condition],(error, results, fields) => {
         if (error) {
             console.error('刪除資料庫錯誤：', error);
         } else {
@@ -637,6 +735,20 @@ function sel_value_target(task) {
         });
     });
 }
+function sel_transaction() {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM p_purchase', (error, results, fields) => {
+            if (error) {
+                console.error('查詢錯誤：', error);
+                reject(error);
+            } else {
+                let arr = obj_to_dict(results)
+                // console.log('查詢結果：', arr);
+                resolve(arr);
+            }
+        });
+    });
+}
 function sel_supplier() {
     return new Promise((resolve, reject) => {
         connection.query('SELECT * FROM supplier', (error, results, fields) => {
@@ -691,7 +803,7 @@ function identical_supplier_num(data) {
             if (error) {
                 reject(error);
             } else {
-                resolve(results);
+                resolve(results.filter(t => t.status !== 2));
             }
         });
     });
@@ -703,7 +815,7 @@ function identical_supplier_name(data) {
             if (error) {
                 reject(error);
             } else {
-                resolve(results);
+                resolve(results.filter(t => t.status !== 2));
             }
         });
     });
@@ -752,7 +864,7 @@ function identical_valuetarget_num(data) {
             if (error) {
                 reject(error);
             } else {
-                resolve(results);
+                resolve(results.filter(val => val.target_status !== 2));
             }
         });
     });
@@ -764,7 +876,7 @@ function identical_valuetarget_name(name, category) {
             if (error) {
                 reject(error);
             } else {
-                resolve(results);
+                resolve(results.filter(val => val.target_status !== 2));
             }
         });
     });
@@ -834,7 +946,9 @@ function identical_material_name(name) {
 function del_inventory(condition) {
     console.log(condition)
     const deleteQuery = 'DELETE FROM `m_inventory_setup` WHERE `m_inventory_setup`.`m_id` = ?';
-    connection.query(deleteQuery, condition, (error, results, fields) => {
+    // const deleteQuery = 'UPDATE `m_inventory_setup` SET `status` = ? WHERE `m_inventory_setup`.`m_id` = ?';
+
+    connection.query(deleteQuery,[2, condition] , (error, results, fields) => {
         if (error) {
             console.error('刪除資料庫錯誤：', error);
         } else {
@@ -861,12 +975,15 @@ function update_account_subjects(updatedata) {
     
 }
 
-function update_supplier(updatedata) {
+async function update_supplier(updatedata) {
     const condition = updatedata.orig
+
+    const check_supplier_code = await identical_supplier_num(updatedata.supplier_num)
+    const check_supplier_name = await identical_supplier_name(updatedata.supplier_name)
     
     let updateQuery = 'UPDATE `supplier` SET status = ? WHERE `supplier`.`supplier_num` = ?';
     var stat = "1";
-    if(updatedata.status ==='false'){
+    if(updatedata.status ==='1'){
         stat = '0';
     }
     if(updatedata.task === "change_state"){
@@ -880,61 +997,113 @@ function update_supplier(updatedata) {
             }
         });
     }
-    
-    updateQuery = 'UPDATE `supplier` SET supplier_num = ? WHERE `supplier`.`supplier_num` = ?';
-    connection.query(updateQuery, [updatedata.supplier_num, condition], (error, results, fields) => {
-        if (error) {
-            console.error('修改資料庫錯誤：', error);
-            return('修改資料庫錯誤：', error)
-        } else {
-            console.log('已成功修改期初庫存資料');
-            return('已成功修改期初庫存資料')
+    else if(updatedata.task === "modify"&& updatedata.orig === updatedata.num){
+        if (check_supplier_name.length > 0 ) {
+            return('供應商名稱重複或與原本相同，請重新填寫')      
         }
-    });
-    updateQuery = 'UPDATE `supplier` SET supplier_name = ? WHERE `supplier`.`supplier_num` = ?';
-    connection.query(updateQuery, [updatedata.supplier_name, condition], (error, results, fields) => {
-        if (error) {
-            console.error('修改資料庫錯誤：', error);
-            return('修改資料庫錯誤：', error)
-        } else {
-            console.log('已成功修改期初庫存資料');
-            return('已成功修改期初庫存資料')
+        else{
+            updateQuery = 'UPDATE `supplier` SET supplier_name = ? WHERE `supplier`.`supplier_num` = ?';
+            connection.query(updateQuery, [updatedata.supplier_name, condition], (error, results, fields) => {
+                if (error) {
+                    console.error('修改資料庫錯誤：', error);
+                    return('修改資料庫錯誤：', error)
+                } else {
+                    console.log('已成功修改期初庫存資料');
+                    return('已成功修改期初庫存資料')
+                }
+             });
         }
-    });
+    }
+    else
+    {
+        if (check_supplier_code.length > 0 ) {
+            return('供應商代碼重複或與原本相同，請重新填寫')    
+            console.log("nulled")  
+        }
+        else{
+            updateQuery = 'UPDATE `supplier` SET supplier_num = ? WHERE `supplier`.`supplier_num` = ?';
+            connection.query(updateQuery, [updatedata.supplier_num, condition], (error, results, fields) => {
+                if (error) {
+                    console.error('修改資料庫錯誤：', error);
+                    return('修改資料庫錯誤：', error)
+                } else {
+                    console.log('已成功修改期初庫存資料');
+                    return('已成功修改期初庫存資料')
+                }
+            });
+        }
+    }
 }
 
-function update_value_target(updatedata) {
+async function update_value_target(updatedata) {
     const condition = updatedata.orig
     console.log(updatedata)
-    let updateQuery = 'UPDATE `value_target` SET target_status = ? WHERE `value_target`.`target_num` = ?';
-    var stat = "1";
-    if(updatedata.status ==='false'){
-        stat = '0';
+    const check_valuetarget_code = await identical_valuetarget_num(updatedata.target_num)
+    const check_valuetarget_name = await identical_valuetarget_name(updatedata.target_name, updatedata.category)
+    
+    console.log(check_valuetarget_code)
+    console.log(check_valuetarget_name)
+
+        let updateQuery = 'UPDATE `value_target` SET target_status = ? WHERE `value_target`.`target_num` = ?';
+        var stat = "1";
+        if(updatedata.status ==='false'){
+            stat = '0';
+        }
+        if(updatedata.task === "change_state"){
+
+            connection.query(updateQuery, [stat, condition], (error, results, fields) => {
+                if (error) {
+                    console.error('修改資料庫錯誤：', error);
+                        return('已成功修改價值標的狀態')
+                } else {
+                    console.log('已成功修改資料');
+                        return('已成功修改價值標的狀態')
+                }
+            }
+        )}
+        else if(updatedata.task === "update_item" && updatedata.orig === updatedata.target_num){
+            if (check_valuetarget_name.length > 0) {
+                    return('價值標的名稱重複與原本相同，請重新填寫')      
+            }
+            else{
+                updateQuery = 'UPDATE `value_target` SET target_name = ? WHERE `value_target`.`target_num` = ?';
+                connection.query(updateQuery, [updatedata.target_name, condition], (error, results, fields) => {
+                    if (error) {
+                        console.error('修改資料庫錯誤：', error);
+                        return(error)
+                    } else {
+                        console.log('已成功價值標的名稱');
+                        return('已成功修改價值標的名稱')
+    
+                    }
+                });
+            }
+
+        }
+        else{
+
+            if(check_valuetarget_code.length > 0){
+                return('價值標的代碼重複或與原本相同，請重新填寫')      
+            }
+            else{
+                updateQuery = 'UPDATE `value_target` SET target_num = ? WHERE `value_target`.`target_num` = ?';
+                connection.query(updateQuery, [updatedata.target_num, condition], (error, results, fields) => {
+                    if (error) {
+                        console.error('修改資料庫錯誤：', error);
+                        return(error)
+    
+                    } else {
+                        console.log('已成功修改價值標的代碼');
+                        return('已成功修改價值標的代碼')
+    
+                    }
+                });
+            }
+        }
     }
-    connection.query(updateQuery, [stat, condition], (error, results, fields) => {
-        if (error) {
-            console.error('修改資料庫錯誤：', error);
-        } else {
-            console.log('已成功修改資料');
-        }
-    });
-    updateQuery = 'UPDATE `value_target` SET target_num = ? WHERE `value_target`.`target_num` = ?';
-    connection.query(updateQuery, [updatedata.target_num, condition], (error, results, fields) => {
-        if (error) {
-            console.error('修改資料庫錯誤：', error);
-        } else {
-            console.log('已成功修改資料');
-        }
-    });
-    updateQuery = 'UPDATE `value_target` SET target_name = ? WHERE `value_target`.`target_num` = ?';
-    connection.query(updateQuery, [updatedata.target_name, condition], (error, results, fields) => {
-        if (error) {
-            console.error('修改資料庫錯誤：', error);
-        } else {
-            console.log('已成功修改資料');
-        }
-    });
-}
+
+   
+
 
 function update_inventory(updatedata) {
     const condition = updatedata.orig
@@ -1094,6 +1263,7 @@ async function calculateProductCost() {
             const productKey = `${product_id}-${product_name}`;
             if (!productCosts[productKey]) {
                 productCosts[productKey] = {
+                    product_id: product_id,
                     product_name: product_name,
                     product_cost: 0,
                 };
@@ -1105,6 +1275,7 @@ async function calculateProductCost() {
                 const productKey_sec = `${productKey}:${product_sec_id}-${product_sec_name}`;
                 if (!productCosts_sec[productKey_sec]) {
                     productCosts_sec[productKey_sec] = {
+                        product_sec_id: product_sec_id,
                         prev_level_name: productKey,
                         product_sec_name: product_sec_name,
                         useage: 0,
@@ -1124,6 +1295,7 @@ async function calculateProductCost() {
                     const productKey_third = `${productKey_sec}-${material_id}`;
                     if (!productCosts_third[productKey_third]) {
                         productCosts_third[productKey_third] = {
+                            material_id: material_id,
                             prev_level_name: productKey_sec,
                             material_name: m_name,
                             useage: bomSecondUseQuantity,

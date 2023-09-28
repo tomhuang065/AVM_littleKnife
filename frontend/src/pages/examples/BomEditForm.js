@@ -1,59 +1,64 @@
 
 import React, { useState } from "react";
 import axios from "axios";
+import moment from "moment";
 import { useChat } from "../../api/context";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp, faArrowDown, faArrowUp, faEdit, faEllipsisH, faExternalLinkAlt, faEye, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { Modal, Form, Nav, Card, Button, Table, Dropdown, ProgressBar,  InputGroup, Pagination, ButtonGroup } from '@themesberg/react-bootstrap';
 
 
-const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
+const RemoveModal = ({ onHide, show, states, product, origs }) =>{
 
     const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
     const [placeHolder, setPlaceHolder] = useState("")
     const [editing, setEditing] = useState(false)
     const [index, setIndex] = useState("選擇修改項目")
-    const {val, setVal, valType, setValType} = useChat()
     const [forChange, setForChange] = useState("")
-    const [newValueTarget, setNewValueTarget] = useState({
-        target_status: valueTarget.target_status,
-        target_name: valueTarget.target_name,
-        target_num:valueTarget.target_num,
-        category : valueTarget.category,
-        
+    const {sup, setSup} = useChat();
+    
+    const [newproduct, setNewproduct] = useState({
+        product_id: product.product_id,
+        product_name: product.product_name,
+        update_user: product.update_user,
+        update_time: product.update_time,
+        status:product.status,
       });
 
-    const handleValueTargetChange =(e) =>{
+    const handleproductChange =(e) =>{
         const { name, value } = e.target;
-        // console.log(name, value)
-        setNewValueTarget({
-            ...newValueTarget,
+        setNewproduct({
+            ...newproduct,
             [name]: value,
         });
     }
 
-    const editValueTarget = (content) =>{
+    const editproduct = (content) =>{
         console.log(forChange, placeHolder)
-        // setForChange("")
-        // setPlaceHolder("")
         setEditing(true)
         switch(content) {
-          case "價值標的狀態" :{
+          case "產品名稱" :{
             setIndex(content)
-            setPlaceHolder(newValueTarget.target_status)
-            setForChange('target_status')
+            setPlaceHolder(newproduct.product_name)
+            setForChange('product_name')
             break;
           }
-          case "價值標的代碼" :{
-            setPlaceHolder(newValueTarget.target_num)
+          case "產品代碼" :{
+            setPlaceHolder(newproduct.product_id)
             setIndex(content)
-            setForChange("target_num")
+            setForChange("product_id")
             break;
           }
-          case "價值標的名稱" :{
+          case "更新人員" :{
             setIndex(content)
-            setPlaceHolder(newValueTarget.target_name)
-            setForChange("target_name")
+            setPlaceHolder(newproduct.update_user)
+            setForChange("update_user")
+            break;
+          }
+          case "更新日期" :{
+            setIndex(content)
+            setPlaceHolder(newproduct.update_time)
+            setForChange("update_time")
             break;
           }
           default:{
@@ -62,51 +67,46 @@ const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
         }
       }
 
-      const handleDeleteValueTarget = async()=>{
+      const handleDeleteproduct = async()=>{
         const jsonData = {
-          target_num: `${newValueTarget.target_num}`
+          product_id: `${newproduct.product_id}`
         };
-        console.log(jsonData)
-        setValType(null)
-        const response = await instance.post('/del_value_target', {
+        setSup(null)
+        console.log('JsonData: ', jsonData); //for debug
+        const response = await instance.post('/del_bom_first', {
           ID:JSON.stringify(jsonData)
         }
       )
+        
         alert(response.data);
         onHide()
         setEditing(false); //not to show the input bar
-        setValType(newValueTarget.category)
+        setSup("del")
       }
     
-      const handleEditValueTarget = async()=>{
+      const handleEditproduct = async()=>{
         const jsonData = {
-          orig: `${orig}`,
-          target_num: `${newValueTarget.target_num}`,
-          target_name: `${newValueTarget.target_name}`,
-          target_status: `${newValueTarget.target_status}`,
-          category: `${newValueTarget.category}`,
-          task:"update_item"
-
+          orig: `${origs}`,
+          status: `${newproduct.status}`,
+          product_id: `${newproduct.product_id}`,
+          product_name: `${newproduct.product_name}`,
+          task :"modify"
         };
-        setValType(null)
-
-        const response = await instance.post('/mod_value_target', {
+        setSup(null)
+        const response = await instance.post('/update_bom_first', {
           ID:JSON.stringify(jsonData)
-        }
-      )
-      console.log(response)
-        onSave(newValueTarget.target_num, newValueTarget.target_name)
-        setValType(newValueTarget.category)
+        })
+
         setEditing(false); //not to show the input bar
         setPlaceHolder("") //placeholder in the modal input bar
         setForChange("")
         setIndex("選擇修改項目") //the index button in the 
-        alert(response.data);
-        // setMat("edit")
+        alert("已成功修改產品資料");
+        setSup("edit")
         onHide()
       }
 
-    const valueTargetArray = ['價值標的代碼','價值標的名稱']
+    const productArray = ['產品代碼','產品名稱']
 
     return(
     <Modal
@@ -117,13 +117,12 @@ const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
     >
       <Modal.Header closeButton>
         <Modal.Title id="contained-modal-title-vcenter">
-          {states === "deleting" ? "刪除價值標的" : "編輯價值標的"}
+          {states === "deleting" ? "刪除產品" : "編輯產品"}
         </Modal.Title>
       </Modal.Header>
       {states === "deleting"?
         <Modal.Body>
-          {/* 三階代碼 : {third} / 三階科目中文名稱 : {thirdCn} / 三階科目英文名稱 : {thirdEng} /<br></br> 四階代碼 : {fourth} / 四階科目中文名稱 : {fourthCn} / 四階科目英文名稱 :{fourthEng} */}
-          價值標的代碼：{newValueTarget.target_num} <br></br> 價值標的名稱 : {newValueTarget.target_name}  
+          產品代碼 : {newproduct.product_id} / 產品名稱 : {newproduct.product_name} <br></br> 更新時間 : {moment(newproduct.update_time).format('YYYY-MM-DD HH:mm:ss')} / 更新人員 : {newproduct.update_user}
         </Modal.Body>
         :
         <Modal.Body className="d-flex flex-wrap flex-md-nowrap align-items-center  py-4">
@@ -132,8 +131,8 @@ const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
               <Button variant="outline-primary" >{index}</Button>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-                {valueTargetArray.map((inv) =>  (
-                    <Dropdown.Item onClick={() => {editValueTarget(inv)}}>
+                {productArray.map((inv) =>  (
+                    <Dropdown.Item onClick={() => {editproduct(inv)}}>
                         <FontAwesomeIcon  className="me-2" /> {inv}
                     </Dropdown.Item> 
                   ))}
@@ -148,13 +147,13 @@ const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
               <InputGroup.Text>
                 <FontAwesomeIcon  />
               </InputGroup.Text>
-              <Form.Control type="text" style ={{width : 500}} placeholder = {placeHolder} name={forChange}  onChange={handleValueTargetChange} />
+              <Form.Control type="text" style ={{width : 500}} placeholder = {placeHolder} name={forChange}  onChange={handleproductChange} />
             </InputGroup>
           </Form>:null}
         </Modal.Body>
       }
       <Modal.Footer>
-        {states === "deleting"?<Button variant="outline-secondary" onClick={handleDeleteValueTarget}>確認</Button> :<Button variant="outline-secondary" onClick={handleEditValueTarget}>修改</Button>  }
+        {states === "deleting"?<Button variant="outline-secondary" onClick={handleDeleteproduct}>確認</Button> :<Button variant="outline-secondary" onClick={handleEditproduct}>修改</Button>  }
         <Button variant="outline-primary">取消</Button>
       </Modal.Footer>
     </Modal>

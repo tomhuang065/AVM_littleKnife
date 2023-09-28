@@ -7,7 +7,7 @@ import { faAngleDown, faAngleUp, faArrowDown, faArrowUp, faEdit, faEllipsisH, fa
 import { Modal, Form, Nav, Card, Button, Table, Dropdown, ProgressBar,  InputGroup, Pagination, ButtonGroup } from '@themesberg/react-bootstrap';
 
 
-const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
+const RemoveModal = ({ onHide,show, states, transaction, orig }) =>{
 
     const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
     const [placeHolder, setPlaceHolder] = useState("")
@@ -15,24 +15,24 @@ const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
     const [index, setIndex] = useState("選擇修改項目")
     const {val, setVal, valType, setValType} = useChat()
     const [forChange, setForChange] = useState("")
-    const [newValueTarget, setNewValueTarget] = useState({
-        target_status: valueTarget.target_status,
-        target_name: valueTarget.target_name,
-        target_num:valueTarget.target_num,
-        category : valueTarget.category,
+    const [newTransaction, setNewTransaction] = useState({
+        target_status: transaction.target_status,
+        target_name: transaction.target_name,
+        target_num:transaction.target_num,
+        category : transaction.category,
         
       });
 
-    const handleValueTargetChange =(e) =>{
+    const handletransactionChange =(e) =>{
         const { name, value } = e.target;
         // console.log(name, value)
-        setNewValueTarget({
-            ...newValueTarget,
+        setNewTransaction({
+            ...newTransaction,
             [name]: value,
         });
     }
 
-    const editValueTarget = (content) =>{
+    const edittransaction = (content) =>{
         console.log(forChange, placeHolder)
         // setForChange("")
         // setPlaceHolder("")
@@ -40,19 +40,19 @@ const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
         switch(content) {
           case "價值標的狀態" :{
             setIndex(content)
-            setPlaceHolder(newValueTarget.target_status)
+            setPlaceHolder(newTransaction.target_status)
             setForChange('target_status')
             break;
           }
           case "價值標的代碼" :{
-            setPlaceHolder(newValueTarget.target_num)
+            setPlaceHolder(newTransaction.target_num)
             setIndex(content)
             setForChange("target_num")
             break;
           }
           case "價值標的名稱" :{
             setIndex(content)
-            setPlaceHolder(newValueTarget.target_name)
+            setPlaceHolder(newTransaction.target_name)
             setForChange("target_name")
             break;
           }
@@ -62,9 +62,9 @@ const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
         }
       }
 
-      const handleDeleteValueTarget = async()=>{
+      const handleDeletetransaction = async()=>{
         const jsonData = {
-          target_num: `${newValueTarget.target_num}`
+          target_num: `${newTransaction.target_num}`
         };
         console.log(jsonData)
         setValType(null)
@@ -75,18 +75,15 @@ const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
         alert(response.data);
         onHide()
         setEditing(false); //not to show the input bar
-        setValType(newValueTarget.category)
+        setValType(newTransaction.category)
       }
     
-      const handleEditValueTarget = async()=>{
+      const handleEdittransaction = async()=>{
         const jsonData = {
           orig: `${orig}`,
-          target_num: `${newValueTarget.target_num}`,
-          target_name: `${newValueTarget.target_name}`,
-          target_status: `${newValueTarget.target_status}`,
-          category: `${newValueTarget.category}`,
-          task:"update_item"
-
+          target_num: `${newTransaction.target_num}`,
+          target_name: `${newTransaction.target_name}`,
+          target_status: `${newTransaction.target_status}`,
         };
         setValType(null)
 
@@ -94,19 +91,18 @@ const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
           ID:JSON.stringify(jsonData)
         }
       )
-      console.log(response)
-        onSave(newValueTarget.target_num, newValueTarget.target_name)
-        setValType(newValueTarget.category)
+        // onSave(newTransaction.target_num, newTransaction.target_name)
+        setValType(newTransaction.category)
         setEditing(false); //not to show the input bar
         setPlaceHolder("") //placeholder in the modal input bar
         setForChange("")
         setIndex("選擇修改項目") //the index button in the 
-        alert(response.data);
+        alert("已變更價值標的");
         // setMat("edit")
         onHide()
       }
 
-    const valueTargetArray = ['價值標的代碼','價值標的名稱']
+    const transactionArray = ['價值標的代碼','價值標的名稱']
 
     return(
     <Modal
@@ -123,7 +119,7 @@ const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
       {states === "deleting"?
         <Modal.Body>
           {/* 三階代碼 : {third} / 三階科目中文名稱 : {thirdCn} / 三階科目英文名稱 : {thirdEng} /<br></br> 四階代碼 : {fourth} / 四階科目中文名稱 : {fourthCn} / 四階科目英文名稱 :{fourthEng} */}
-          價值標的代碼：{newValueTarget.target_num} <br></br> 價值標的名稱 : {newValueTarget.target_name}  
+          價值標的代碼：{newTransaction.target_num} <br></br> 價值標的名稱 : {newTransaction.target_name}  
         </Modal.Body>
         :
         <Modal.Body className="d-flex flex-wrap flex-md-nowrap align-items-center  py-4">
@@ -132,8 +128,8 @@ const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
               <Button variant="outline-primary" >{index}</Button>
             </Dropdown.Toggle>
             <Dropdown.Menu>
-                {valueTargetArray.map((inv) =>  (
-                    <Dropdown.Item onClick={() => {editValueTarget(inv)}}>
+                {transactionArray.map((inv) =>  (
+                    <Dropdown.Item onClick={() => {edittransaction(inv)}}>
                         <FontAwesomeIcon  className="me-2" /> {inv}
                     </Dropdown.Item> 
                   ))}
@@ -148,13 +144,13 @@ const RemoveModal = ({ onHide,onSave, show, states, valueTarget, orig }) =>{
               <InputGroup.Text>
                 <FontAwesomeIcon  />
               </InputGroup.Text>
-              <Form.Control type="text" style ={{width : 500}} placeholder = {placeHolder} name={forChange}  onChange={handleValueTargetChange} />
+              <Form.Control type="text" style ={{width : 500}} placeholder = {placeHolder} name={forChange}  onChange={handletransactionChange} />
             </InputGroup>
           </Form>:null}
         </Modal.Body>
       }
       <Modal.Footer>
-        {states === "deleting"?<Button variant="outline-secondary" onClick={handleDeleteValueTarget}>確認</Button> :<Button variant="outline-secondary" onClick={handleEditValueTarget}>修改</Button>  }
+        {states === "deleting"?<Button variant="outline-secondary" onClick={handleDeletetransaction}>確認</Button> :<Button variant="outline-secondary" onClick={handleEdittransaction}>修改</Button>  }
         <Button variant="outline-primary">取消</Button>
       </Modal.Footer>
     </Modal>

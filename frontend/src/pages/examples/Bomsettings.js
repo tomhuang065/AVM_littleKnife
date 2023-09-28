@@ -8,13 +8,13 @@ import ExcelJs from "exceljs";
 import AddBOMModal from './BomModal';
 import { useChat } from "../../api/context";
 import axios from 'axios';
-import ProductTable from "../../components/pl";
+import ProductTable from "../../components/BomTable";
 
 
 export default () => {
   const [excelFile, setExcelFile] = useState(null);
-  const {val, setVal, sendValue, signIn, suppliers, msg} = useChat();
-  const [showSupplierModal, setShowSupplierModal] = useState(false);
+  const {val, setVal, sendValue, signIn, Boms, msg} = useChat();
+  const [showBomModal, setShowBomModal] = useState(false);
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [result, setResult] = useState([]);
   const [bomdata, setBomdata] = useState(null);
@@ -106,15 +106,15 @@ export default () => {
   };
 
   const handleSingleAdd = () => {
-    setShowSupplierModal(true);
+    setShowBomModal(true);
   };
 
-  const handleCloseSupplierModal = () => {
-    setShowSupplierModal(false);
+  const handleCloseBomModal = () => {
+    setShowBomModal(false);
   };
 
-  const handleSaveSupplier = async () => {
-    // Handle the logic to save the supplier data
+  const handleSaveBom = async () => {
+    // Handle the logic to save the Bom data
     setResult(await instance.get('/get_bom'))
     console.log(result.data)
   };
@@ -141,8 +141,10 @@ export default () => {
     }
   }
 
-  
-
+  const [remove , setRemove] = useState(false)
+  const handleViewRemove = () => {
+    setRemove(true)
+  }
 
   return (
     <>
@@ -194,15 +196,19 @@ export default () => {
               <Tab.Pane eventKey="browse">
               {/* Browse content here */}
               {/* You can display a table or a list of files here */}
-              <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+              <div className="d-flex justify-content-between flex-wrap flex-md-nowrap py-2">
                 {/* 單筆新增按鈕 */}
                 <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
                   <FontAwesomeIcon icon={faPlus} className="me-2" />
                   新增一階產品
                 </Button>
+                <Button className="me-2" variant="primary" onClick={handleViewRemove}>
+                  <FontAwesomeIcon className="me-2" />
+                  查看刪除產品
+                </Button>
               </div>
               {/* <TransactionsTable /> */}
-              {bomdata !== null && <ProductTable data={bomdata} />}
+              {bomdata !== null && <ProductTable data={bomdata} data2={remove}/>}
             </Tab.Pane>
             </Tab.Content>
 
@@ -211,11 +217,11 @@ export default () => {
         </Row>
       </Tab.Container>
 
-      {/* Supplier Form Modal */}
+      {/* Bom Form Modal */}
       <AddBOMModal
-        show={showSupplierModal}
-        onHide={handleCloseSupplierModal}
-        onSave={handleSaveSupplier}
+        show={showBomModal}
+        onHide={handleCloseBomModal}
+        onSave={handleViewBom}
       />
     </>
   );

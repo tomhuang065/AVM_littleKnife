@@ -19,8 +19,12 @@ export default () => {
   const [filteredResult, setFilteredResult] = useState([]);
   const [searchInd, setSearchInd] = useState("")
   const {mat, setMat} = useChat();
+  const [deleteInd, setDeleteInd] = useState(false)
 
 
+  const handleViewDeletion = () =>{
+    setDeleteInd(!deleteInd)
+  }
   const handleExcelUpload = (event) => {
     const file = event.target.files[0];
     setExcelFile(file);
@@ -145,6 +149,11 @@ export default () => {
                   <FontAwesomeIcon icon={faPlus} className="me-2" />
                   單筆新增
                 </Button>
+                {/* &nbsp;&nbsp; 
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleViewDeletion}>
+                  <FontAwesomeIcon  className="me-2" />
+                  {deleteInd?"查看未失效資料":"查看失效資料"}
+                </Button> */}
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <Form className="d-flex"  style ={{position: "Absolute", top: 180, right: 15, width:300 }}>
                   <Form.Control
@@ -158,7 +167,7 @@ export default () => {
                 </Form>
               </div>
               
-              <RawMaterialInventoryTable rawMaterials={result} searchInd={searchInd} />
+              <RawMaterialInventoryTable rawMaterials={result} searchInd={searchInd} deleteInd= {deleteInd}/>
             </Tab.Pane>
             </Tab.Content>
 
