@@ -88,7 +88,7 @@ export const SupplierTable = (props) => {
         </td>
         <td>
           <span className="fw-normal">
-            {status === 1? "開啟":status === 0?"關閉":"失效"}
+            {status === 1? "顯示":status === 0?"未顯示":"未顯示"}
           </span>
         </td>
         <td>
@@ -106,6 +106,7 @@ export const SupplierTable = (props) => {
           </span>
         </td>
         <td>
+          ---
           {/* <Button variant = "link"onClick={() => {handleRowEditDelete("editing", supplier_num, supplier_name, update_user,  update_time, status)}}>
             <FontAwesomeIcon icon={faEdit} className="me-0.5" /> 
           </Button>
@@ -133,7 +134,7 @@ export const SupplierTable = (props) => {
         </td>
         <td>
           <span className="fw-normal">
-            {status === 1? "開啟":status === 0?"關閉":"失效"}
+            {status === 1? "顯示":status === 0?"未顯示":"未顯示(已刪除)"}
           </span>
         </td>
         <td>

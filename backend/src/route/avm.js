@@ -174,6 +174,18 @@ router.post('/mod_value_target', async (req, res) => {
     res.send(result);
 });
 
+router.post('/mod_transaction', async (req, res) => {
+    const result = await update_transaction(JSON.parse(req.body.ID))
+    console.log(result)
+    res.send(result);
+});
+
+router.post('/del_transaction', async (req, res) => {
+    const result = await del_transaction(JSON.parse(req.body.ID))
+    console.log(result)
+    res.send(result);
+});
+
 
 router.get('/sel_value_target_customer', async (req, res) => {
     try {
@@ -612,6 +624,40 @@ function del_supplier(condition) {
     });
 }
 
+function del_transaction(condition) {
+    console.log("condition", condition)
+    const deleteQuery = 'UPDATE `p_purchase` SET `id` = ? WHERE `p_purchase`.`id` = ?';
+    
+    
+    connection.query(deleteQuery,[0, condition.orig],(error, results, fields) => {
+        if (error) {
+            console.error('刪除資料庫錯誤：', error);
+        } else {
+            console.log('已成功刪除交易');
+        }
+    });
+}
+function update_transaction(condition) {
+    console.log("condition", condition)
+    let deleteQuery = 'UPDATE `p_purchase` SET `purchase_id` = ? WHERE `p_purchase`.`id` = ?';
+    connection.query(deleteQuery,[condition.purchase_id, condition],(error, results, fields) => {
+        if (error) {
+            console.error('刪除資料庫錯誤：', error);
+        } else {
+            console.log('已成功修改交易代碼');
+        }
+    });
+
+    deleteQuery = 'UPDATE `p_purchase` SET `purchase_name` = ? WHERE `p_purchase`.`id` = ?';
+    connection.query(deleteQuery,[condition.purchase_name, condition],(error, results, fields) => {
+        if (error) {
+            console.error('刪除資料庫錯誤：', error);
+        } else {
+            console.log('已成功修改交易名稱');
+        }
+    });
+}
+
 function del_value_target(condition) {
     console.log("cond", condition)
     // const deleteQuery = "DELETE FROM `value_target` WHERE `value_target`.`target_num` = ?";
@@ -981,13 +1027,13 @@ async function update_supplier(updatedata) {
     const check_supplier_code = await identical_supplier_num(updatedata.supplier_num)
     const check_supplier_name = await identical_supplier_name(updatedata.supplier_name)
     
-    let updateQuery = 'UPDATE `supplier` SET status = ? WHERE `supplier`.`supplier_num` = ?';
+    let updateQuery = 'UPDATE `supplier` SET status = ? WHERE `supplier`.`supplier_num` = ? AND`supplier`.`status` <> ? ';
     var stat = "1";
     if(updatedata.status ==='1'){
         stat = '0';
     }
     if(updatedata.task === "change_state"){
-        connection.query(updateQuery, [stat, condition], (error, results, fields) => {
+        connection.query(updateQuery, [stat, condition, 2], (error, results, fields) => {
             if (error) {
                 console.error('修改資料庫錯誤：', error);
                 return('修改資料庫錯誤：', error)
@@ -1002,8 +1048,8 @@ async function update_supplier(updatedata) {
             return('供應商名稱重複或與原本相同，請重新填寫')      
         }
         else{
-            updateQuery = 'UPDATE `supplier` SET supplier_name = ? WHERE `supplier`.`supplier_num` = ?';
-            connection.query(updateQuery, [updatedata.supplier_name, condition], (error, results, fields) => {
+            updateQuery = 'UPDATE `supplier` SET supplier_name = ? WHERE `supplier`.`supplier_num` = ? AND`supplier`.`status` <> ? ';
+            connection.query(updateQuery, [updatedata.supplier_name, condition, 2], (error, results, fields) => {
                 if (error) {
                     console.error('修改資料庫錯誤：', error);
                     return('修改資料庫錯誤：', error)
@@ -1021,8 +1067,8 @@ async function update_supplier(updatedata) {
             console.log("nulled")  
         }
         else{
-            updateQuery = 'UPDATE `supplier` SET supplier_num = ? WHERE `supplier`.`supplier_num` = ?';
-            connection.query(updateQuery, [updatedata.supplier_num, condition], (error, results, fields) => {
+            updateQuery = 'UPDATE `supplier` SET supplier_num = ? WHERE `supplier`.`supplier_num` = ? AND`supplier`.`status` <> ?';
+            connection.query(updateQuery, [updatedata.supplier_num, condition, 2], (error, results, fields) => {
                 if (error) {
                     console.error('修改資料庫錯誤：', error);
                     return('修改資料庫錯誤：', error)
@@ -1044,14 +1090,14 @@ async function update_value_target(updatedata) {
     console.log(check_valuetarget_code)
     console.log(check_valuetarget_name)
 
-        let updateQuery = 'UPDATE `value_target` SET target_status = ? WHERE `value_target`.`target_num` = ?';
+        let updateQuery = 'UPDATE `value_target` SET target_status = ? WHERE `value_target`.`target_num` = ? AND`value_target`.`target_status` <> ? ';
         var stat = "1";
         if(updatedata.status ==='false'){
             stat = '0';
         }
         if(updatedata.task === "change_state"){
 
-            connection.query(updateQuery, [stat, condition], (error, results, fields) => {
+            connection.query(updateQuery, [stat, condition, 2], (error, results, fields) => {
                 if (error) {
                     console.error('修改資料庫錯誤：', error);
                         return('已成功修改價值標的狀態')
@@ -1066,8 +1112,8 @@ async function update_value_target(updatedata) {
                     return('價值標的名稱重複與原本相同，請重新填寫')      
             }
             else{
-                updateQuery = 'UPDATE `value_target` SET target_name = ? WHERE `value_target`.`target_num` = ?';
-                connection.query(updateQuery, [updatedata.target_name, condition], (error, results, fields) => {
+                updateQuery = 'UPDATE `value_target` SET target_name = ? WHERE `value_target`.`target_num` = ?  AND`value_target`.`target_status` <> ?';
+                connection.query(updateQuery, [updatedata.target_name, condition, 2], (error, results, fields) => {
                     if (error) {
                         console.error('修改資料庫錯誤：', error);
                         return(error)
@@ -1086,8 +1132,8 @@ async function update_value_target(updatedata) {
                 return('價值標的代碼重複或與原本相同，請重新填寫')      
             }
             else{
-                updateQuery = 'UPDATE `value_target` SET target_num = ? WHERE `value_target`.`target_num` = ?';
-                connection.query(updateQuery, [updatedata.target_num, condition], (error, results, fields) => {
+                updateQuery = 'UPDATE `value_target` SET target_num = ? WHERE `value_target`.`target_num` = ? AND`value_target`.`target_status` <> ?';
+                connection.query(updateQuery, [updatedata.target_num, condition, 2], (error, results, fields) => {
                     if (error) {
                         console.error('修改資料庫錯誤：', error);
                         return(error)

@@ -219,7 +219,7 @@ const handleUpload = () => {
                     </Button>
                     &nbsp;&nbsp;  
                     <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleViewDeletion}>
-                      <FontAwesomeIcon  className="me-2" />{deleteInd?type === "原料"?"查看未失效原料":type === "產品"?"查看未失效產品":type === "顧客"?"查看未失效顧客":"查看未失效部門":type === "原料"?"查看失效原料":type === "產品"?"查看失效產品":type === "顧客"?"查看失效顧客":"查看失效部門"}
+                      <FontAwesomeIcon  className="me-2" />{!deleteInd?type === "原料"?"查看未顯示原料":type === "產品"?"查看未顯示產品":type === "顧客"?"查看未顯示顧客":"查看未顯示部門":type === "原料"?"查看顯示原料":type === "產品"?"查看顯示產品":type === "顧客"?"查看顯示顧客":"查看顯示部門"}
                       {/* {type === "原料"?"原料":type === "產品"?"產品":type === "顧客"?"顧客":"部門"} */}
                     </Button>
                     <br></br>

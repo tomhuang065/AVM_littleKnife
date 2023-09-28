@@ -16,14 +16,19 @@ const RemoveModal = ({ onHide,show, states, transaction, orig }) =>{
     const {val, setVal, valType, setValType} = useChat()
     const [forChange, setForChange] = useState("")
     const [newTransaction, setNewTransaction] = useState({
-        target_status: transaction.target_status,
-        target_name: transaction.target_name,
-        target_num:transaction.target_num,
-        category : transaction.category,
+        account_subjects_num:transaction.account_subjects_num,
+        purchase_id:transaction.purchase_id,
+        purchase_name:transaction.purchase_name,
+        purchase_quantity:transaction.purchase_quantity,
+        purchase_unit:transaction.purchase_unit,
+        purchase_price:transaction.purchase_price,
+        supplier_num :transaction.supplier_num,
+        remark:transaction.remark,
+        create_user:transaction.create_user
         
       });
 
-    const handletransactionChange =(e) =>{
+    const handleTransactionChange =(e) =>{
         const { name, value } = e.target;
         // console.log(name, value)
         setNewTransaction({
@@ -32,28 +37,33 @@ const RemoveModal = ({ onHide,show, states, transaction, orig }) =>{
         });
     }
 
-    const edittransaction = (content) =>{
+    const editTransaction = (content) =>{
         console.log(forChange, placeHolder)
-        // setForChange("")
-        // setPlaceHolder("")
+
         setEditing(true)
         switch(content) {
-          case "價值標的狀態" :{
+          case "商品代碼" :{
             setIndex(content)
-            setPlaceHolder(newTransaction.target_status)
-            setForChange('target_status')
+            setPlaceHolder(newTransaction.purchase_id)
+            setForChange('purchase_id')
             break;
           }
-          case "價值標的代碼" :{
-            setPlaceHolder(newTransaction.target_num)
+          case "商品名稱" :{
+            setPlaceHolder(newTransaction.purchase_name)
             setIndex(content)
-            setForChange("target_num")
+            setForChange("purchase_name")
             break;
           }
-          case "價值標的名稱" :{
+          case "商品價格" :{
             setIndex(content)
-            setPlaceHolder(newTransaction.target_name)
-            setForChange("target_name")
+            setPlaceHolder(newTransaction.purchase_price)
+            setForChange("purchase_price")
+            break;
+          }
+          case "商品數量" :{
+            setIndex(content)
+            setPlaceHolder(newTransaction.purchase_quantity)
+            setForChange("purchase_quantity")
             break;
           }
           default:{
@@ -62,47 +72,48 @@ const RemoveModal = ({ onHide,show, states, transaction, orig }) =>{
         }
       }
 
-      const handleDeletetransaction = async()=>{
+      const handleDeleteTransaction = async()=>{
         const jsonData = {
-          target_num: `${newTransaction.target_num}`
+          orig: orig,
         };
         console.log(jsonData)
-        setValType(null)
-        const response = await instance.post('/del_value_target', {
+        // setValType(null)
+        const response = await instance.post('/del_transaction', {
           ID:JSON.stringify(jsonData)
         }
       )
         alert(response.data);
         onHide()
         setEditing(false); //not to show the input bar
-        setValType(newTransaction.category)
+        // setValType(newTransaction.category)
       }
     
-      const handleEdittransaction = async()=>{
+      const handleEditTransaction = async()=>{
         const jsonData = {
           orig: `${orig}`,
-          target_num: `${newTransaction.target_num}`,
-          target_name: `${newTransaction.target_name}`,
-          target_status: `${newTransaction.target_status}`,
+          purchase_id: `${newTransaction.purchase_id}`,
+          purchase_name: `${newTransaction.purchase_name}`,
+          purchase_price: `${newTransaction.purchase_price}`,
+          purchase_quantity: `${newTransaction.purchase_quantity}`,
         };
         setValType(null)
 
-        const response = await instance.post('/mod_value_target', {
+        const response = await instance.post('/mod_transaction', {
           ID:JSON.stringify(jsonData)
         }
       )
         // onSave(newTransaction.target_num, newTransaction.target_name)
-        setValType(newTransaction.category)
+        // setValType(newTransaction.category)
         setEditing(false); //not to show the input bar
         setPlaceHolder("") //placeholder in the modal input bar
         setForChange("")
         setIndex("選擇修改項目") //the index button in the 
-        alert("已變更價值標的");
+        alert("已變更財會系統項目");
         // setMat("edit")
         onHide()
       }
 
-    const transactionArray = ['價值標的代碼','價值標的名稱']
+    const transactionArray = ['商品代碼','商品名稱']
 
     return(
     <Modal
@@ -113,13 +124,13 @@ const RemoveModal = ({ onHide,show, states, transaction, orig }) =>{
     >
       <Modal.Header closeButton>
         <Modal.Title id="contained-modal-title-vcenter">
-          {states === "deleting" ? "刪除價值標的" : "編輯價值標的"}
+          {states === "deleting" ? "刪除商品" : "編輯商品"}
         </Modal.Title>
       </Modal.Header>
       {states === "deleting"?
         <Modal.Body>
           {/* 三階代碼 : {third} / 三階科目中文名稱 : {thirdCn} / 三階科目英文名稱 : {thirdEng} /<br></br> 四階代碼 : {fourth} / 四階科目中文名稱 : {fourthCn} / 四階科目英文名稱 :{fourthEng} */}
-          價值標的代碼：{newTransaction.target_num} <br></br> 價值標的名稱 : {newTransaction.target_name}  
+          商品代碼：{newTransaction.purchase_id} <br></br> 商品名稱 : {newTransaction.purchase_name}  
         </Modal.Body>
         :
         <Modal.Body className="d-flex flex-wrap flex-md-nowrap align-items-center  py-4">
@@ -129,7 +140,7 @@ const RemoveModal = ({ onHide,show, states, transaction, orig }) =>{
             </Dropdown.Toggle>
             <Dropdown.Menu>
                 {transactionArray.map((inv) =>  (
-                    <Dropdown.Item onClick={() => {edittransaction(inv)}}>
+                    <Dropdown.Item onClick={() => {editTransaction(inv)}}>
                         <FontAwesomeIcon  className="me-2" /> {inv}
                     </Dropdown.Item> 
                   ))}
@@ -144,13 +155,13 @@ const RemoveModal = ({ onHide,show, states, transaction, orig }) =>{
               <InputGroup.Text>
                 <FontAwesomeIcon  />
               </InputGroup.Text>
-              <Form.Control type="text" style ={{width : 500}} placeholder = {placeHolder} name={forChange}  onChange={handletransactionChange} />
+              <Form.Control type="text" style ={{width : 500}} placeholder = {placeHolder} name={forChange}  onChange={handleTransactionChange} />
             </InputGroup>
           </Form>:null}
         </Modal.Body>
       }
       <Modal.Footer>
-        {states === "deleting"?<Button variant="outline-secondary" onClick={handleDeletetransaction}>確認</Button> :<Button variant="outline-secondary" onClick={handleEdittransaction}>修改</Button>  }
+        {states === "deleting"?<Button variant="outline-secondary" onClick={handleDeleteTransaction}>確認</Button> :<Button variant="outline-secondary" onClick={handleEditTransaction}>修改</Button>  }
         <Button variant="outline-primary">取消</Button>
       </Modal.Footer>
     </Modal>

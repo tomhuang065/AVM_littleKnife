@@ -50,7 +50,13 @@ export default () => {
     // user: userData.Username,
     // Add other fields as needed
   });
+  const [deleteInd, setDeleteInd] = useState(false)
 
+
+
+  const handleViewDeletion = () =>{
+    setDeleteInd(!deleteInd)
+  }
 
   const handleSearchIndChange = (e) => {
     setSearchInd(e.target.value)
@@ -601,12 +607,12 @@ export default () => {
                     value={searchInd}
                   />
                 </Form>
-                {/* <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleSingleAdd}>
-                  <FontAwesomeIcon icon={faPlus} className="me-2" />單筆新增
-                </Button> */}
+                <Button icon={faFileAlt} className="me-2" variant="primary" onClick={handleViewDeletion}>
+                  <FontAwesomeIcon className="me-2" />瀏覽未顯示交易
+                </Button>
                 <br></br>
               </div>
-              <TransactionTable transaction = {transactionResult.data} account = {accountResult} supplier = {supplierResult} searchInd={searchInd} />
+              <TransactionTable transaction = {transactionResult.data} account = {accountResult} supplier = {supplierResult} searchInd={searchInd} deleteInd ={deleteInd}/>
             </Tab.Pane>
               
             </Tab.Content >

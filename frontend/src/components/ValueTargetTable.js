@@ -96,7 +96,7 @@ export const ValuetargetsTable = (props) => {
          
           <td>
             <span className="fw-normal">
-              {target_status === 1?"開啟":target_status === 0?"關閉":"失效"}
+              {target_status === 1?"顯示":target_status === 0?"未顯示":"未顯示"}
             </span>
           </td>
           <td>
@@ -136,7 +136,7 @@ export const ValuetargetsTable = (props) => {
          
           <td>
             <span className="fw-normal">
-              {target_status === 1?"開啟":target_status === 0?"關閉":"失效"}
+              {target_status === 1?"顯示":target_status === 0?"未顯示":"未顯示"}
 
             </span>
           </td>

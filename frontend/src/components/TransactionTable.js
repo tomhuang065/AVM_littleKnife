@@ -26,17 +26,16 @@ export const TransactionTable = (props) => {
       supplier_num :"",
       remark:"",
       create_user:"",
+      // id:props.transaction.id,
   
     })
     
     const transaction = props.transaction
-    // const type = props.type
-    const Search = props.searchInd
-    const supplier = props.supplier
-    const account = props.account
+    const deleteInd = props.deleteInd
+    const serachInd = props.searchInd
 
     const handleRowEditDelete = (stat, id, account_subjects_num, purchase_id, purchase_name, purchase_quantity, purchase_unit, purchase_price, supplier_num, remark,create_user) => {
-    //   setStates(states)
+      console.log(transaction)
       setRemoveModal(true);
       setTrans({  
         account_subjects_num: account_subjects_num,
@@ -47,7 +46,8 @@ export const TransactionTable = (props) => {
         purchase_price:purchase_price, 
         supplier_num :supplier_num,
         remark:remark,
-        create_user:create_user
+        create_user:create_user,
+        
       });
       setOrig(id)
       setStates(stat)
@@ -141,18 +141,18 @@ export const TransactionTable = (props) => {
               </tr>
             </thead>
             <tbody>
-              {typeof(transaction) === "undefined"? null:transaction.map(t => <TableRow  {...t} />)}
+              {typeof(transaction) === "undefined"? null:deleteInd?transaction.filter(trans => trans.id === 0).map(t => <TableRow  {...t} />):transaction.filter(t => t.id !== 0).map(t => <TableRow  {...t} />)}
             </tbody>
           </Table>
         </Card.Body>
-        {/* {removeModal?
+        {removeModal?
           <RemoveModal 
             show={removeModal}
             onHide={() => setRemoveModal(false)}
             states ={states}
             transaction ={transaction}
             orig={orig}
-        />:<div></div>} */}
+        />:<div></div>}
       </Card>
     );
   };
