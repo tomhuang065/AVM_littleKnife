@@ -110,9 +110,9 @@ export const TransactionTable = (props) => {
          
          
           <td>
-            <Button variant = "link"onClick={() => {handleRowEditDelete("editing",id,  account_subjects_num, purchase_id, purchase_name, purchase_quantity, purchase_unit, purchase_price, supplier_num, remark,create_user)}}>
+            {/* <Button variant = "link"onClick={() => {handleRowEditDelete("editing",id,  account_subjects_num, purchase_id, purchase_name, purchase_quantity, purchase_unit, purchase_price, supplier_num, remark,create_user)}}>
               <FontAwesomeIcon icon={faEdit} className="me-0.5" /> 
-            </Button>
+            </Button> */}
             <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete("deleting",id,  account_subjects_num, purchase_id, purchase_name, purchase_quantity, purchase_unit, purchase_price, supplier_num, remark,create_user)}}>
               <FontAwesomeIcon icon={faTrashAlt} className="me-0.5" /> 
             </Button>
@@ -138,6 +138,9 @@ export const TransactionTable = (props) => {
                 <th className="border-bottom">備註</th>
                 <th className="border-bottom">新增人員</th>
                 <th className="border-bottom">新增時間</th>
+                <th className="border-bottom">
+                  選項
+                </th>
               </tr>
             </thead>
             <tbody>
