@@ -11,7 +11,7 @@ function AddBOMModal({ show, onHide }) {
     const [formData, setFormData] = useState({
         product_id: '',
         product_name: '',
-        product_sec_id: '',
+        product_second_id: '',
         use_quantity: '',
         update_user: '',
         update_time: '',
@@ -103,9 +103,9 @@ export function AddBOMModal2({ show, onHide , product_in}) {
     const [formData, setFormData] = useState({
         products: [{
             product_id: product_in.product_id,
-            product_name: product_in.product_name,
-            product_sec_id: '',
-            use_quantity: '',
+            product_second_name: product_in.product_name,
+            product_second_id: '',
+            product_second_quantity: '',
             update_user: '',
             update_time: '',
         }], // Store an array of products with initial empty product
@@ -126,10 +126,10 @@ export function AddBOMModal2({ show, onHide , product_in}) {
         setFormData({
             ...formData,
             products: [...formData.products, {
-                product_id: product_in.product_id,
-                product_name: product_in.product_name,
-                product_sec_id: '',
-                use_quantity: '',
+                product_first_id: product_in.product_id,
+                product_second_name: product_in.product_name,
+                product_second_id: '',
+                product_second_quantity: '',
                 update_user: '',
                 update_time: '',
             }],
@@ -139,10 +139,10 @@ export function AddBOMModal2({ show, onHide , product_in}) {
     const CleanForm = () => {
         setFormData({
             products: [{
-                product_id: product_in.product_id,
-                product_name: product_in.product_name,
-                product_sec_id: '',
-                use_quantity: '',
+                product_first_id: product_in.product_id,
+                product_second_name: product_in.product_name,
+                product_second_id: '',
+                product_second_quantity: '',
                 update_user: '',
                 update_time: '',
             }],
@@ -155,9 +155,9 @@ export function AddBOMModal2({ show, onHide , product_in}) {
         // Loop through the products array and send each product data to the backend
         for (const product of formData.products) {
             if (
-                product.product_name === '' ||
-                product.product_sec_id === '' ||
-                product.use_quantity === '' 
+                product.product_second_name === '' ||
+                product.product_second_id === '' ||
+                product.product_second_quantity === '' 
             ) {
                 alert('請填寫完整的產品資訊');
                 return;
@@ -168,8 +168,12 @@ export function AddBOMModal2({ show, onHide , product_in}) {
 
         // Send all products to the backend
         for (const product of formData.products) {
+            // 將product_id 設成 product_in.product_id
+            product.product_first_id = product_in.product_id;
+            // 將product_name 設成 product_in.product_name
+            product.product_second_name = product_in.product_name;
             console.log('新增 BOM 第二階', product);
-            instance.post('/add_bom_first', {ID:JSON.stringify(product)})
+            instance.post('/add_bom_second', {ID:JSON.stringify(product)})
                 .then((response) => {
                     console.log('新增成功', response.data);
                     alert('新增成功');
@@ -193,30 +197,30 @@ export function AddBOMModal2({ show, onHide , product_in}) {
                         <Card>
                         <div class="container px-4">
                         <label class="col-sm-2 col-form-label col-form-label-lg">產品 {index + 1} </label>
-                        <Form.Group controlId={`product_name_${index}`} class="col-sm-10 center">
+                        <Form.Group controlId={`product_second_name_${index}`} class="col-sm-10 center">
                             <Form.Label>二階產品名稱</Form.Label>
                             <Form.Control
                                 type="text"
-                                name="product_name"
-                                value={product.product_name}
+                                name="product_second_name"
+                                value={product.product_second_name}
                                 onChange={(e) => handleInputChange(e, index)}
                             />
                         </Form.Group>
-                        <Form.Group controlId={`product_sec_id_${index}`} class="col-sm-10 center">
+                        <Form.Group controlId={`product_second_id_${index}`} class="col-sm-10 center">
                             <Form.Label>二階產品代碼</Form.Label>
                             <Form.Control
                                 type="text"
-                                name="product_sec_id"
-                                value={product.product_sec_id}
+                                name="product_second_id"
+                                value={product.product_second_id}
                                 onChange={(e) => handleInputChange(e, index)}
                             />
                         </Form.Group>
-                        <Form.Group controlId={`use_quantity_${index}`} class="col-sm-10 center">
+                        <Form.Group controlId={`product_second_quantity_${index}`} class="col-sm-10 center">
                             <Form.Label>使用數量</Form.Label>
                             <Form.Control
                                 type="text"
-                                name="use_quantity"
-                                value={product.use_quantity}
+                                name="product_second_quantity"
+                                value={product.product_second_quantity}
                                 onChange={(e) => handleInputChange(e, index)}
                             />
                         </Form.Group>

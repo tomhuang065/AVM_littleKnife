@@ -113,10 +113,12 @@ const handleChangeState = (supid, supName, updateUsr, updateTime, status) =>{
 
   
 
-  const renderNestedTable = (subData , prevLevelName) => {
+  const renderNestedTable = (subData , prevLevelName, no_third) => {
     return (
       //<Card border="light" className="shadow-sm mb-6">
+      //console.log(prevLevelName),
       <Table  className="user-table table-striped">
+      {(no_third === false) && (
         <thead>
           <tr>
             <th className="border-bottom">二階產品代碼</th>
@@ -127,11 +129,27 @@ const handleChangeState = (supid, supName, updateUsr, updateTime, status) =>{
             <th className="border-bottom">選項</th>
           </tr>
         </thead>
+      )}
+      {(no_third === true) && (
+        <thead>
+          <tr>
+            <th className="border-bottom">三階產品代碼</th>
+            <th className="border-bottom">三階產品名稱</th>
+            <th className="border-bottom">用量</th>
+            <th className="border-bottom">單價</th>
+            <th className="border-bottom">總價</th>
+            <th className="border-bottom">選項</th>
+          </tr>
+        </thead>
+      )}
+
         <tbody>
           {Object.keys(subData).map((subKey) => (
             <React.Fragment key={subKey}>
-              {subData[subKey].prev_level_name === prevLevelName && (
+              {subData[subKey].prev_level_name === prevLevelName && no_third === false && (
+              // if no_third === false then cannot click else can click
               <tr onClick={() => handleRowClick(subKey)}>
+
                 <td>{subData[subKey].product_sec_id}</td>
                 <td>{subData[subKey].product_sec_name}</td>
                 <td>{subData[subKey].useage}</td>
@@ -149,9 +167,31 @@ const handleChangeState = (supid, supName, updateUsr, updateTime, status) =>{
                   </Button>
               </td>
               </tr>
+              )}
+              {subData[subKey].prev_level_name === prevLevelName && no_third === true && (
+              // if no_third === false then cannot click else can click
+              <tr >
+              <td>{subData[subKey].product_sec_id}</td>
+              <td>{subData[subKey].product_sec_name}</td>
+              <td>{subData[subKey].useage}</td>
+              <td>{subData[subKey].unit_price}</td>
+              <td>{subData[subKey].total_price}</td>
+              <td>
+                <Button variant = "link"onClick={() => {handleRowEdit2()}}>
+                  <FontAwesomeIcon icon={faEdit} className="me-0.5" /> 
+                </Button>
+                <Button  variant = "link" className="text-danger" onClick={() => {handleRowEditDelete2()}}>
+                  <FontAwesomeIcon icon={faTrashAlt} className="me-0.5" /> 
+                </Button>
+                <Button variant="link" onClick={() => handleSingleAdd(subData[subKey].product_sec_id, subData[subKey].product_sec_name)}>
+                  <FontAwesomeIcon icon={faPlus} className="me-0.5" />
+                </Button>
+            </td>
+              </tr>
+              
               
             )}
-              {expandedRows.includes(subKey) && (
+              {expandedRows.includes(subKey) && no_third === false && (
                 <tr>
                   <td colSpan="6">{renderNestedTable2(data.productCosts_third, subKey)}</td>
                 </tr>
@@ -232,7 +272,7 @@ const handleChangeState = (supid, supName, updateUsr, updateTime, status) =>{
               <tr>
                 {/* <Button variant="primary" onClick={handleRowClick(key)}>新增二階產品</Button>    
                          */}
-                <td colSpan="4">{renderNestedTable(data.productCosts_sec , key)}</td>
+                <td colSpan="4">{renderNestedTable(data.productCosts_sec , key, data.productCosts[key].no_third)}</td>
               </tr>
             )}
           </React.Fragment>
