@@ -41,6 +41,8 @@ function AddBOMModal({ show, onHide }) {
 
         // 設定更新時間
         formData.update_time = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+        formData.update_user = userData.Username;
+        formData.status = 1;
         // 將 formData 中的值發送到後端
         console.log('新增 BOM 第一階', formData);
         instance.post('/add_bom_first', {ID:JSON.stringify(formData)})

@@ -443,8 +443,8 @@ function del_bom_third(condition) {
 //BOM第一階修改(對應到bom_first table)
 function update_bom_first(updatedata) {
     const condition = updatedata.orig;
-    const updateQuery = 'UPDATE bom_first SET product_id = ?, product_name = ?, update_user = ?, update_time = ? WHERE product_id = ?';
-    connection.query(updateQuery, [updatedata.product_id, updatedata.product_name, updatedata.update_user, updatedata.update_time, condition], (error, results, fields) => {
+    const updateQuery = 'UPDATE bom_first SET product_id = ?, product_name = ?, update_user = ?, update_time = ?, status = ?, WHERE product_id = ?';
+    connection.query(updateQuery, [updatedata.product_id, updatedata.product_name, updatedata.update_user, updatedata.update_time, 1 , condition], (error, results, fields) => {
         if (error) {
             console.error('修改資料庫錯誤：', error);
         } else {
@@ -466,8 +466,8 @@ async function add_bom_first(data) {
         //     console.log('已有此產品代碼存在，請重新輸入新的產品代碼')
         // } else {
             return new Promise((resolve, reject) => {
-                const query = 'INSERT INTO `bom_first`(`product_id`, `product_name`, `update_user`) VALUES (?, ?, ?)'
-                connection.query(query, [data.product_id, data.product_name, data.update_user], (error, results, fields) => {
+                const query = 'INSERT INTO `bom_first`(`product_id`, `product_name`, `update_user`, `status`) VALUES (?, ?, ?, ?)'
+                connection.query(query, [data.product_id, data.product_name, data.update_user, 1], (error, results, fields) => {
                     if (error) {
                         reject(error)
                     }
