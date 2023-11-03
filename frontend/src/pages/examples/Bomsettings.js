@@ -204,7 +204,7 @@ export default () => {
                 </Button>
                 <Button className="me-2" variant="primary" onClick={handleViewRemove}>
                   <FontAwesomeIcon className="me-2" />
-                  查看刪除產品
+                  查看刪除紀錄
                 </Button>
               </div>
               {/* <TransactionsTable /> */}

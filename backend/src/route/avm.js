@@ -407,7 +407,7 @@ export default router
 
 //BOM第一階刪除(對應到bom_first table)
 function del_bom_first(condition) {
-    const deleteQuery = 'DELETE FROM bom_first WHERE bom_first.product_id = ?';
+    const deleteQuery = 'UPDATE bom_first SET `status` = 0 WHERE ? ';
     connection.query(deleteQuery, condition, (error, results, fields) => {
         if (error) {
             console.error('刪除資料庫錯誤：', error);
@@ -419,7 +419,18 @@ function del_bom_first(condition) {
 
 //BOM第二階刪除(對應到bom_second table)
 function del_bom_second(condition) {
-    const deleteQuery = 'DELETE FROM bom_second WHERE ?';
+    const deleteQuery = 'UPDATE bom_second SET `status` = 0 WHERE ?  ?';
+    connection.query(deleteQuery, condition, (error, results, fields) => {
+        if (error) {
+            console.error('刪除資料庫錯誤：', error);
+        } else {
+            console.log('已成功刪除資料');
+        }
+    });
+}
+
+function del_bom_third(condition) {
+    const deleteQuery = 'UPDATE bom_third SET `status` = 0 WHERE ?  ?';
     connection.query(deleteQuery, condition, (error, results, fields) => {
         if (error) {
             console.error('刪除資料庫錯誤：', error);

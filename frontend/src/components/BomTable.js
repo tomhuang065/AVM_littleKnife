@@ -8,7 +8,7 @@ import { useChat } from "../api/context";
 import { AddBOMModal2 } from '../pages/examples/BomModal';
 
 
-function ProductTable({data }, data2) {
+function ProductTable({data }, {data2},) {
   const [expandedRows, setExpandedRows] = useState([]);
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [removeModal, setRemoveModal] = useState(false);
@@ -251,6 +251,8 @@ const handleChangeState = (supid, supName, updateUsr, updateTime, status) =>{
       <tbody>
         {Object.keys(data.productCosts).map((key) => (
           <React.Fragment key={key}>
+            {(data.productCosts[key].status === 1 || data2 === 1 ) && (
+              console.log("data2", data2),
             <tr onClick={() => handleRowClick(key)}>
               <td>{data.productCosts[key].product_id}</td>
               <td>{data.productCosts[key].product_name}</td>
@@ -268,6 +270,7 @@ const handleChangeState = (supid, supName, updateUsr, updateTime, status) =>{
                   </Button>
               </td>
             </tr>
+            )}
             {expandedRows.includes(key) && (
               <tr>
                 {/* <Button variant="primary" onClick={handleRowClick(key)}>新增二階產品</Button>    
@@ -275,6 +278,7 @@ const handleChangeState = (supid, supName, updateUsr, updateTime, status) =>{
                 <td colSpan="4">{renderNestedTable(data.productCosts_sec , key, data.productCosts[key].no_third)}</td>
               </tr>
             )}
+            
           </React.Fragment>
         ))}
       </tbody>
