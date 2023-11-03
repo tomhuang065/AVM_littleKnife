@@ -122,7 +122,7 @@ export default () => {
       const data = await getBOMData();
       console.log('BOM data:', data);
       setBom("BOM");
-      //setBomdata(data);
+      setBomdata(data);
     } catch (error) {
       console.error('An error occurred:', error);
     }
