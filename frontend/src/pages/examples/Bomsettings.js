@@ -2,38 +2,22 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faFileAlt,  faPlus,  faUpload } from '@fortawesome/free-solid-svg-icons';
 import { Col, Row, Button, Form , Tab ,Nav } from '@themesberg/react-bootstrap';
-import { BomTable , TransactionsTable2} from "../../components/Tables";
 // import api from "../../api/api";
 import ExcelJs from "exceljs";
 import AddBOMModal from './BomModal';
 import { useChat } from "../../api/context";
 import axios from 'axios';
 import ProductTable from "../../components/BomTable";
+import { useEffect } from "react";
 
 
 export default () => {
   const [excelFile, setExcelFile] = useState(null);
-  const {val, setVal, sendValue, signIn, Boms, msg} = useChat();
   const [showBomModal, setShowBomModal] = useState(false);
   const instance = axios.create({baseURL:'http://localhost:5000/api/avm'});
   const [result, setResult] = useState([]);
   const [bomdata, setBomdata] = useState(null);
-
-  const handleExcelUpload = (event) => {
-    const file = event.target.files[0];
-    setExcelFile(file);
-  };
-
-  const handleExcelUploadSubmit = async () => {
-    const formData = new FormData();
-    // formData.append("file", excelFile);
-    // const res = await api.post("/api/excel", formData, {
-    //   headers: {
-    //     "Content-Type": "multipart/form-data",
-    //   },
-    // });
-    // console.log(res);
-  };
+  const {bom, setBom} = useChat();
 
   const handleExceldownload = async () => {
     const bom = new ExcelJs.Workbook();
@@ -73,6 +57,8 @@ export default () => {
   }
 
   const [selectedFile, setSelectedFile] = useState(null);
+
+
 
   const handleFileChange = (e) => {
       setSelectedFile(e.target.files[0]);
@@ -135,11 +121,17 @@ export default () => {
     try {
       const data = await getBOMData();
       console.log('BOM data:', data);
-      setBomdata(data);
+      setBom("BOM");
+      //setBomdata(data);
     } catch (error) {
       console.error('An error occurred:', error);
     }
   }
+
+  useEffect(() => {
+    handleViewBom();
+    setBom(null);
+  }, [bom]);
 
   const [remove , setRemove] = useState(false)
   const handleViewRemove = () => {

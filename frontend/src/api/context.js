@@ -16,6 +16,7 @@ const ChatContext = createContext({
     userData:'',
     setMat:()=>{}, //fot material inventory
     setSup:()=>{}, // for suppliers
+    setBom:()=>{}, //for bom
     setStat:()=>{}, //for account settings
     setTask:()=>{}, //for value target 3 categories
     setVal:()=>{}, //for value targets
@@ -29,6 +30,7 @@ const ChatProvider = (props) => {
     const [task, setTask] = useState("");
     const [stat, setStat] = useState(null);
     const [sup, setSup] = useState(null)
+    const [bom, setBom] = useState(null)
     const [mat, setMat] = useState("")
     const [val, setVal] = useState(null)
     const [valType, setValType] = useState("")
@@ -54,6 +56,8 @@ const ChatProvider = (props) => {
                 setStat,
                 sup,
                 setSup,
+                bom,
+                setBom,
                 mat,
                 setMat,
                 val, 

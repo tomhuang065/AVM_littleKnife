@@ -26,7 +26,8 @@ function ProductTable({data }, {data2},) {
   const [showBomModal, setShowBomModal] = useState(false);
 
 
-  const {sup, setSup} = useChat();
+  //const {sup, setSup} = useChat();
+  const {bom , setBom} = useChat();
   const handleRowEditDelete = (states, supid, supName, updateUsr, updateTime, status) => {
     setStates(states)
     setRemoveModal(true);
@@ -35,10 +36,9 @@ function ProductTable({data }, {data2},) {
 }
 
 const handleEditproduct = async(sup)=>{
-  console.log("sup", sup)
   const jsonData = {
     orig: `${origs}`,
-    status:`${sup}`,
+    status:`1`,
     update_user: `${product.update_user}`,
     update_time: `${product.update_time}`,
     product_id: `${product.product_id}`,
@@ -56,31 +56,15 @@ const handleEditproduct = async(sup)=>{
 
 }
 
-const handleChangeState = (supid, supName, updateUsr, updateTime, status) =>{
-  setOrigs(supid)
-  setproduct({
-    product_id: supid,
-    product_name:supName,
-    update_time: updateTime,
-    update_user:updateUsr,
-  })
-  console.log(status)
-  if(status === 1){
-    setSup(false)
-  }
-  else{
-    setSup(true)
-  }
-}
 
   useEffect(()=>{
-    console.log(sup)
+    //console.log(sup)
     if(origs !== ''){
-      setproduct({status :sup})
-      handleEditproduct(sup)
+      setproduct({status :bom})
+      handleEditproduct(bom)
     }
     setOrigs("")    
-  },[sup])
+  },[bom])
 
   const handleRowClick = (rowKey) => {
     if (expandedRows.includes(rowKey)) {
@@ -101,6 +85,7 @@ const handleChangeState = (supid, supName, updateUsr, updateTime, status) =>{
   const handleSaveBom = async () => {
     // Handle the logic to save the Bom data
     setResult(await instance.get('/get_bom'))
+    setBom("1");
     console.log(result.data)
   };
 

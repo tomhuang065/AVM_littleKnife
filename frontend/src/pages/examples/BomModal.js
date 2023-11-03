@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Modal, Form, Card } from 'react-bootstrap';
 import axios from 'axios';
 import moment from 'moment';
@@ -8,6 +8,7 @@ import { BsPrefixComponent } from 'react-bootstrap/esm/helpers';
 function AddBOMModal({ show, onHide }) {
     const instance = axios.create({ baseURL: 'http://localhost:5000/api/avm' });
     const { userData , setSup} = useChat();
+    const { bom, setBom } = useChat();
     const [formData, setFormData] = useState({
         product_id: '',
         product_name: '',
