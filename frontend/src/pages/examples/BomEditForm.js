@@ -15,8 +15,7 @@ const RemoveModal = ({ onHide, show, states, product, origs }) =>{
     const [editing, setEditing] = useState(false)
     const [index, setIndex] = useState("選擇修改項目")
     const [forChange, setForChange] = useState("")
-    const {sup, setSup} = useChat();
-    
+    const {bom, setBom} = useChat();
     const [newproduct, setNewproduct] = useState({
         product_id: product.product_id,
         product_name: product.product_name,
@@ -71,7 +70,7 @@ const RemoveModal = ({ onHide, show, states, product, origs }) =>{
         const jsonData = {
           product_id: `${newproduct.product_id}`
         };
-        setSup(null)
+        setBom(null);
         console.log('JsonData: ', jsonData); //for debug
         const response = await instance.post('/del_bom_first', {
           ID:JSON.stringify(jsonData)
@@ -81,7 +80,8 @@ const RemoveModal = ({ onHide, show, states, product, origs }) =>{
         alert(response.data);
         onHide()
         setEditing(false); //not to show the input bar
-        setSup("del")
+        setBom("deleted");
+        
       }
     
       const handleEditproduct = async()=>{
@@ -92,7 +92,7 @@ const RemoveModal = ({ onHide, show, states, product, origs }) =>{
           product_name: `${newproduct.product_name}`,
           task :"modify"
         };
-        setSup(null)
+        setBom(null);
         const response = await instance.post('/update_bom_first', {
           ID:JSON.stringify(jsonData)
         })
@@ -102,7 +102,7 @@ const RemoveModal = ({ onHide, show, states, product, origs }) =>{
         setForChange("")
         setIndex("選擇修改項目") //the index button in the 
         alert("已成功修改產品資料");
-        setSup("edit")
+        setBom("edited");
         onHide()
       }
 

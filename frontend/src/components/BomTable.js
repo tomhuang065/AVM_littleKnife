@@ -256,7 +256,7 @@ const handleEditproduct = async(sup)=>{
               </td>
             </tr>
             )}
-            {expandedRows.includes(key) && (
+            {expandedRows.includes(key) &&  data.productCosts[key].status === 1 && (
               <tr>
                 {/* <Button variant="primary" onClick={handleRowClick(key)}>新增二階產品</Button>    
                          */}
